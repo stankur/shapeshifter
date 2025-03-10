@@ -2,9 +2,10 @@
 	import type { Refs } from '$lib/Document.svelte';
 	import type { Section } from '$lib/model/collection';
 	import type { ContentHeading } from '$lib/model/content';
-	import { registerRef } from '$lib/view/utils/registerRef.svelte';
+	import { float } from '$lib/view/utils/float.svelte';
 	import { registry } from '$lib/viewRegistry.svelte';
-	import { type Component } from 'svelte';
+	import { onMount, type Component } from 'svelte';
+	import DefaultControl from './control/DefaultControl.svelte';
 
 	let { node, refs, onUnmount }: { node: Section; refs: Refs; onUnmount: () => void } = $props();
 	let { heading, children, summary, activeView, view } = $derived(node);
@@ -36,32 +37,31 @@
 		}))
 	);
 
-	let state = $derived(
-		(view.find((v) => v.type === activeView) as { state: 'expanded' | 'summary' | 'collapsed' })
-			.state
+	let viewState = $derived(
+		view.find((v) => v.type === activeView) as { state: 'expanded' | 'summary' | 'collapsed' }
 	);
 
-	let getSectionId = (child: Section) => {
-		return `${child.id}-${node.activeView}-section`;
-	};
+	let headingElement: HTMLDivElement;
+	let controlElement: HTMLDivElement | null = $state(null);
+    let containerElement: HTMLDivElement;
 
-
+    onMount(() => {
+        containerElement.style.paddingLeft = `${controlElement?.clientWidth}px`
+        return float(headingElement, controlElement as HTMLElement, "left")();
+    })
 </script>
-<!-- data-flip-id={getSectionId(node)} use:registerRef={{
-		id: getSectionId(node),
-		refs,
-		animateOptions: {
-			animateAbsolute: false,
-			animateNested: true
-		}
-	}} -->
-<div class="flex flex-col" >
-	<HeadingRenderer node={heading} {refs} {onUnmount} />
-	{#if state === 'expanded'}
+
+<DefaultControl bind:controlElement={controlElement as HTMLDivElement} viewState={viewState}  />
+
+<div class="flex flex-col container" bind:this={containerElement}>
+	<div bind:this={headingElement}>
+		<HeadingRenderer node={heading} {refs} {onUnmount} />
+	</div>
+	{#if viewState.state === 'expanded'}
 		{#each ChildrenRenderers as { child, Renderer }}
 			<Renderer node={child} {refs} {onUnmount} />
 		{/each}
-	{:else if state === 'summary'}
+	{:else if viewState.state === 'summary'}
 		{#each SummaryRenderers as { child, Renderer }}
 			<Renderer node={child} {refs} {onUnmount} />
 		{/each}

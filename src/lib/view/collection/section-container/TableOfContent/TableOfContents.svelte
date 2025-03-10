@@ -1,14 +1,16 @@
 <script lang="ts">
 	import TableOfContentsChild from './TableOfContentsChild.svelte';
-	import { sectionContainer, type Section } from '$lib/model/collection';
+	import { sectionContainer } from '$lib/model/collection';
 	import type { ContentHeading } from '$lib/model/content';
 	import { registry } from '$lib/viewRegistry.svelte';
 	import { type Component } from 'svelte';
 	import { z } from 'zod';
 	import type { Refs } from '$lib/Document.svelte';
-	import { computePosition, shift, autoUpdate } from '@floating-ui/dom';
-	import { onMount } from 'svelte';
 	import Controls from './Controls.svelte';
+	import { getContext } from 'svelte';
+	import type { Document } from '$lib/model/document';
+
+	const document = getContext('document') as Document;
 
 	let {
 		node,
@@ -74,8 +76,9 @@
 
 </script>
 
-
-<Controls {directions} {node} {onUnmount} {isTableHovered}/>
+{#if document.state.mode === 'customize'}
+	<Controls {directions} {node} {onUnmount} {isTableHovered}/>
+{/if}
 <div
 	class="container flex flex-wrap"
 	style="flex-direction: {currentDirection.type}; {currentDirection.type === 'row'

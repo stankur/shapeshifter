@@ -12,7 +12,6 @@ export function registerRef(
 		};
 	}
 ) {
-
     
     params.refs[params.id] = {
 		element: node,

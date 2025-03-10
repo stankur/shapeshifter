@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { registry } from './viewRegistry.svelte';
 	import type { Document } from '$lib/model/document';
-	import { type Component } from 'svelte';
+	import { setContext, type Component } from 'svelte';
 
 	import { gsap } from 'gsap';
 	import Flip from 'gsap/dist/Flip';
+	import type { NoHeadingContentSingle } from './model/collection';
 	gsap.registerPlugin(Flip);
 
 	export type Refs = Record<
@@ -14,13 +15,15 @@
 
 	let { node }: { node: Document } = $props();
 	let Renderer = $derived(
-		registry[node.activeView as keyof typeof registry] as Component<{
-			node: Document;
+		registry[node.content.activeView as keyof typeof registry] as Component<{
+			node: NoHeadingContentSingle;
 			refs: Refs;
 			onUnmount: () => void;
 		}>
 	);
 	let refs = $state<Refs>({});
+
+    setContext('document', node);
 
 	let flipState: Flip.FlipState | null = $state(null);
 
@@ -98,8 +101,14 @@
 	});
 </script>
 
+<select bind:value={node.state.mode}>
+    <option value="write">Write</option>
+    <option value="customize">Customize</option>
+    <option value="read">Read</option>
+</select>
+
 <div class="flex justify-center">
 	<div class="w-3/4">
-		<Renderer {node} {refs} {onUnmount} />
+		<Renderer node={node.content} {refs} {onUnmount} />
 	</div>
 </div>

@@ -3,6 +3,7 @@
 	import { computePosition, shift, autoUpdate } from '@floating-ui/dom';
 	import type { z } from 'zod';
 	import type { sectionContainer } from '$lib/model/collection';
+	import { float } from '$lib/view/utils/float.svelte';
 
 	let {
 		node,
@@ -37,24 +38,7 @@
 	}
 
 	onMount(() => {
-		let cleanup: () => void;
-		if (referenceElement && floatingElement) {
-			cleanup = autoUpdate(referenceElement, floatingElement, () => {
-				computePosition(referenceElement, floatingElement, {
-					placement: 'left-start',
-					middleware: [shift({ crossAxis: true })]
-				}).then(({ x, y }) => {
-					Object.assign(floatingElement.style, {
-						left: `${x}px`,
-						top: `${y}px`
-					});
-				});
-			});
-		}
-
-		return () => {
-			cleanup?.();
-		};
+		return float(referenceElement, floatingElement)();
 	});
 </script>
 
@@ -63,7 +47,10 @@
 	bind:this={floatingElement}
 	onmouseenter={showControls}
 	onmouseleave={hideControls}
-	class={['floating-controls flex flex-col bg-white p-2', isHovered || isTableHovered ? 'visible' : 'invisible']}
+	class={[
+		'floating-controls flex flex-col bg-white p-2',
+		isHovered || isTableHovered ? 'visible' : 'invisible'
+	]}
 >
 	<button
 		class="rounded-md bg-blue-500 p-2 text-white"
@@ -73,7 +60,7 @@
 			node.activeView = 'collection/section-container/card';
 		}}
 	>
-		 card
+		card
 	</button>
 	<button
 		class="rounded-md bg-blue-500 p-2 text-white"
@@ -83,7 +70,7 @@
 			node.activeView = 'collection/section-container/sidebar';
 		}}
 	>
-		 sidebar
+		sidebar
 	</button>
 	{#each directions as _, index}
 		<select

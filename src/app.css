@@ -1,3 +1,7 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
+
+.ProseMirror {
+    outline: none;
+}
