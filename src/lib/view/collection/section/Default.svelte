@@ -51,7 +51,7 @@
     })
 </script>
 
-<DefaultControl bind:controlElement={controlElement as HTMLDivElement} viewState={viewState}  />
+<DefaultControl bind:controlElement={controlElement as HTMLDivElement} viewState={viewState} onUnmount={onUnmount} />
 
 <div class="flex flex-col container" bind:this={containerElement}>
 	<div bind:this={headingElement}>

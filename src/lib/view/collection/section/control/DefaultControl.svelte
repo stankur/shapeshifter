@@ -5,10 +5,12 @@
 
 	let {
 		controlElement = $bindable(),
-		viewState
+		viewState,
+		onUnmount
 	}: {
 		controlElement: HTMLDivElement;
 		viewState: { state: 'expanded' | 'summary' | 'collapsed' };
+		onUnmount: () => void;
 	} = $props();
 </script>
 
@@ -17,18 +19,21 @@
 		<SummaryIcon
 			onclick={() => {
 				viewState.state = 'summary';
+				onUnmount();
 			}}
 		/>
 	{:else if viewState.state === 'summary'}
 		<CollapseIcon
 			onclick={() => {
 				viewState.state = 'collapsed';
+				onUnmount();
 			}}
 		/>
 	{:else}
 		<AddIcon
 			onclick={() => {
 				viewState.state = 'expanded';
+				onUnmount();
 			}}
 		/>
 	{/if}

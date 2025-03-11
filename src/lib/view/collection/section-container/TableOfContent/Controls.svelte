@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { computePosition, shift, autoUpdate } from '@floating-ui/dom';
 	import type { z } from 'zod';
 	import type { sectionContainer } from '$lib/model/collection';
 	import { float } from '$lib/view/utils/float.svelte';

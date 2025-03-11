@@ -5,5 +5,4 @@
 
 	let node = $state(sectionContainerTOC as DocumentType);
 </script>
-
 <Document {node} />

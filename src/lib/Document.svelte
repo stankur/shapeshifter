@@ -64,7 +64,7 @@
 				const [animateAbsolute, animateNested] = key.split('-').map((v) => v === 'true');
 				Flip.from(flipState as Flip.FlipState, {
 					targets: elements,
-					duration: 0.5,
+					duration: 0.2,
 					delay: 0.2,
 					ease: 'power4.inOut',
 					absolute: animateAbsolute,
@@ -92,7 +92,7 @@
 						gsap.fromTo(
 							elements,
 							{ opacity: 0 },
-							{ opacity: 1, duration: 0.2, delay: 0.7, ease: 'power4.inOut' }
+							{ opacity: 1, duration: 0.2, delay: 0.4, ease: 'power4.inOut' }
 						)
 					}
 				})

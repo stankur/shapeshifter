@@ -62,6 +62,7 @@
 
 	// Function to change the active section
 	function setActiveSection(index: number) {
+		onUnmount();
 		// Update the activeIndex in the state
 		sidebarState.activeIndex = index;
 	}
