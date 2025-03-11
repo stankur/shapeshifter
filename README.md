@@ -6,4 +6,32 @@ In this iteration, the document is represented as a tree with nodes, similar to 
 
 There is also an animation engine that takes care of making switching between views intuitive.
 
+## Supabase Setup
 
+This project uses Supabase for document storage. To set up Supabase:
+
+1. Create a Supabase account at [https://supabase.com](https://supabase.com) if you don't have one already
+2. Create a new Supabase project
+3. In the SQL Editor, create a new table for documents (if not already created):
+
+```sql
+CREATE TABLE documents (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  document JSONB NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Optional: Create an index for faster queries
+CREATE INDEX documents_updated_at_idx ON documents (updated_at DESC);
+```
+
+4. Copy your Supabase URL and anon key from the project settings
+5. Create a `.env` file based on the `.env.example` template and add your Supabase credentials:
+
+```
+VITE_SUPABASE_URL=your_supabase_url_here
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+```
+
+After setting up Supabase, you can use the "Publish" button to save your documents to the database.
