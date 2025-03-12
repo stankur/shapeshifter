@@ -2,6 +2,7 @@
 	import { registry } from './viewRegistry.svelte';
 	import type { Document } from '$lib/model/document';
 	import { setContext, type Component } from 'svelte';
+	import { page } from '$app/state';
 
 	import { gsap } from 'gsap';
 	import Flip from 'gsap/dist/Flip';
@@ -23,9 +24,12 @@
 	);
 	let refs = $state<Refs>({});
 
-    setContext('document', node);
+	setContext('document', node);
 
 	let flipState: Flip.FlipState | null = $state(null);
+
+	// Check if we're on a document view page (URL with an ID parameter)
+	const isDocumentViewPage = $derived(!!page.params.id);
 
 	const onUnmount = () => {
 		const elements = Object.values(refs)
@@ -81,7 +85,7 @@
 					},
 
 					onLeave: (elements) => {
-                        gsap.fromTo(
+						gsap.fromTo(
 							elements,
 							{ opacity: 1 },
 							{ opacity: 0, duration: 0.2, ease: 'power4.inOut' }
@@ -93,19 +97,21 @@
 							elements,
 							{ opacity: 0 },
 							{ opacity: 1, duration: 0.2, delay: 0.4, ease: 'power4.inOut' }
-						)
+						);
 					}
-				})
+				});
 			});
 		}
 	});
 </script>
 
-<select bind:value={node.state.mode}>
-    <option value="write">Write</option>
-    <option value="customize">Customize</option>
-    <option value="read">Read</option>
-</select>
+{#if !isDocumentViewPage}
+	<select bind:value={node.state.mode}>
+		<option value="write">Write</option>
+		<option value="customize">Customize</option>
+		<option value="read">Read</option>
+	</select>
+{/if}
 
 <div class="flex justify-center">
 	<div class="w-3/4">

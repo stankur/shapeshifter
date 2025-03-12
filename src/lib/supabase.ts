@@ -16,13 +16,37 @@ export async function saveDocument(document: Document) {
 				document: document,
 				updated_at: new Date().toISOString()
 			})
-			.select();
+			.select('id')
+			.single();
 
 		if (error) throw error;
 
 		return { success: true, data };
 	} catch (error) {
 		console.error('Error saving document:', error);
+		return { success: false, error };
+	}
+}
+
+export async function getDocumentById(
+	id: string
+): Promise<{ success: boolean; document?: Document; error?: unknown }> {
+	try {
+		const { data, error } = await supabase
+			.from('documents')
+			.select('document')
+			.eq('id', id)
+			.single();
+
+		if (error) throw error;
+
+		if (!data) {
+			return { success: false, error: 'Document not found' };
+		}
+
+		return { success: true, document: data.document as Document };
+	} catch (error) {
+		console.error('Error fetching document:', error);
 		return { success: false, error };
 	}
 }

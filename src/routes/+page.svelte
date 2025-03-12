@@ -15,7 +15,9 @@
 
 	let node = $state(sectionContainerTOC as DocumentType);
 	let isPublishing = $state(false);
-	let publishStatus = $state<{ success: boolean; message: string } | null>(null);
+	let publishStatus = $state<{ success: boolean; message: string; documentId?: string } | null>(
+		null
+	);
 
 	async function handlePublish() {
 		isPublishing = true;
@@ -25,9 +27,11 @@
 			const result = await saveDocument(node);
 
 			if (result.success) {
+				const documentId = result.data?.id;
 				publishStatus = {
 					success: true,
-					message: 'Document published successfully!'
+					message: 'Document published successfully!',
+					documentId
 				};
 			} else {
 				publishStatus = {
@@ -88,7 +92,19 @@
 			? 'bg-green-100 text-green-800'
 			: 'bg-red-100 text-red-800'}"
 	>
-		{publishStatus.message}
+		<p>{publishStatus.message}</p>
+		{#if publishStatus.success && publishStatus.documentId}
+			<div class="mt-2">
+				<a
+					href="/{publishStatus.documentId}"
+					class="text-blue-600 hover:underline"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					View published document
+				</a>
+			</div>
+		{/if}
 	</div>
 {/if}
 
