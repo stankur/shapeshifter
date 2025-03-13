@@ -11,7 +11,8 @@
 	let {
 		node,
 		refs,
-        additionalFlipId
+        additionalFlipId,
+        onUnmount
 	}: {
 		node: ContentParagraph;
 		refs: Record<
@@ -19,6 +20,7 @@
 			{ element: HTMLElement; animateAbsolute: boolean; animateNested: boolean }
 		>;
 		additionalFlipId?: string;
+		onUnmount: () => void;
 	} = $props();
 	let { content } = $derived(node);
 	let doc: Node = $derived(defaultMarkdownParser.parse(content));
@@ -60,6 +62,7 @@
 			},
 			dispatchTransaction(transaction) {
 				const newState = view.state.apply(transaction);
+				onUnmount();
 
 				node.content = newState.doc.textContent;
 

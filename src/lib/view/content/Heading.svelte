@@ -23,6 +23,7 @@
 	let {
 		node,
 		refs,
+        onUnmount,
         additionalFlipId
 	}: {
 		node: ContentHeading;
@@ -30,6 +31,7 @@
 			string,
 			{ element: HTMLElement; animateAbsolute: boolean; animateNested: boolean }
 		>;
+		onUnmount: () => void;
 		additionalFlipId?: string;
 	} = $props();
 	let { content, level } = $derived(node);
@@ -56,6 +58,7 @@
 			state,
 			dispatchTransaction(transaction) {
 				const newState = view.state.apply(transaction);
+				onUnmount();
 
                 node.content = newState.doc.textContent;
 

@@ -261,6 +261,10 @@ export const card: Document = {
 			{
 				type: 'collection/section-container/sidebar',
 				state: { percentageWidth: 25, activeIndex: 0 }
+			},
+			{
+				type: 'collection/section-container/tabs',
+				state: { gap: 0, activeIndex: 0 }
 			}
 		],
 		activeView: 'collection/section-container/card',
@@ -528,7 +532,8 @@ const nestedSectionContainer: (num: number) => z.infer<typeof sectionContainer> 
 				]
 			}
 		},
-		{ type: 'collection/section-container/sidebar', state: { percentageWidth: 25, activeIndex: 0 } }
+		{ type: 'collection/section-container/sidebar', state: { percentageWidth: 25, activeIndex: 0 } },
+		{ type: 'collection/section-container/tabs', state: { gap: 16, activeIndex: 0 } }
 	],
 	activeView: 'collection/section-container/table-of-contents',
 	children: [
@@ -582,10 +587,10 @@ const topLevelSection = (num: number): Section => ({
 });
 
 // Define the section container with table-of-contents view
-export const sectionContainerTOC: Document = {  
-    state: {
-        mode: 'write'
-    },
+export const sectionContainerTOC: Document = {
+	state: {
+		mode: 'write'
+	},
 	type: 'document',
 	id: 'document-id',
 	created: '2025-02-23T01:04:00Z',
@@ -625,6 +630,10 @@ export const sectionContainerTOC: Document = {
 			{
 				type: 'collection/section-container/sidebar',
 				state: { percentageWidth: 25, activeIndex: 1 }
+			},
+			{
+				type: 'collection/section-container/tabs',
+				state: { gap: 16, activeIndex: 0 }
 			}
 		],
 		activeView: 'collection/section-container/table-of-contents',
@@ -634,9 +643,9 @@ export const sectionContainerTOC: Document = {
 
 // Define the section container with table-of-contents view
 export const sectionContainerTOCCard: Document = {
-    state: {
-        mode: 'write'
-    },
+	state: {
+		mode: 'write'
+	},
 	type: 'document',
 	id: 'document-id',
 	created: '2025-02-23T01:04:00Z',
@@ -676,6 +685,10 @@ export const sectionContainerTOCCard: Document = {
 			{
 				type: 'collection/section-container/sidebar',
 				state: { percentageWidth: 25, activeIndex: 0 }
+			},
+			{
+				type: 'collection/section-container/tabs',
+				state: { gap: 16, activeIndex: 0 }
 			}
 		],
 		activeView: 'collection/section-container/card',
@@ -694,7 +707,8 @@ export const sidebarExample: SectionContainer = {
 		{ type: 'collection/section-container/card', state: { perRow: 1, gap: 4 } },
 		{ type: 'collection/section-container/brick' },
 		{ type: 'collection/section-container/table-of-contents', state: { directions: [] } },
-		{ type: 'collection/section-container/sidebar', state: { percentageWidth: 25, activeIndex: 0 } }
+		{ type: 'collection/section-container/sidebar', state: { percentageWidth: 25, activeIndex: 0 } },
+		{ type: 'collection/section-container/tabs', state: { gap: 16, activeIndex: 0 } }
 	],
 	activeView: 'collection/section-container/sidebar',
 	children: [

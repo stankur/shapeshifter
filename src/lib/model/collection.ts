@@ -101,6 +101,11 @@ export const sectionContainerCardViewState = z.object({
 	gap: z.number().int().min(0).max(36)
 });
 
+export const sectionContainerTabsViewState = z.object({
+	gap: z.number().int().min(0).max(72),
+	activeIndex: z.number().int().min(0)
+});
+
 const dirctionStateBase = z.object({
 	interGenerationGap: z.number().int().min(0).max(36),
 	innerGap: z.number().int().min(0).max(36),
@@ -145,7 +150,14 @@ const sectionContainerView = z.tuple([
 	}),
 	z.object({
 		type: z.literal('collection/section-container/sidebar'),
-		state: z.object({ percentageWidth: z.number().int().min(0).max(100), activeIndex: z.number().int().min(0) })
+		state: z.object({
+			percentageWidth: z.number().int().min(0).max(100),
+			activeIndex: z.number().int().min(0)
+		})
+	}),
+	z.object({
+		type: z.literal('collection/section-container/tabs'),
+		state: sectionContainerTabsViewState
 	})
 ]);
 
