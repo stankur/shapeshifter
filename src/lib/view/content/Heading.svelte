@@ -20,20 +20,24 @@
 		}
 	};
 
+    type Props = {
+        node: ContentHeading;
+        refs: Record<
+            string,
+            { element: HTMLElement; animateAbsolute: boolean; animateNested: boolean }
+        >;
+        onUnmount: () => void;
+        updateParent: () => void;
+        additionalFlipId?: string;
+    }
+
 	let {
-		node,
+		node = $bindable<ContentHeading>(),
 		refs,
         onUnmount,
+        updateParent,
         additionalFlipId
-	}: {
-		node: ContentHeading;
-		refs: Record<
-			string,
-			{ element: HTMLElement; animateAbsolute: boolean; animateNested: boolean }
-		>;
-		onUnmount: () => void;
-		additionalFlipId?: string;
-	} = $props();
+	}: Props = $props();
 	let { content, level } = $derived(node);
 
 	let headingContent = $derived(`# ${content}`);
@@ -61,6 +65,8 @@
 				onUnmount();
 
                 node.content = newState.doc.textContent;
+                // node.last_modified = new Date().toISOString();
+                // updateParent();
 
 				view.updateState(newState);
 			},

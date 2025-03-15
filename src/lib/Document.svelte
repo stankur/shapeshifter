@@ -15,6 +15,7 @@
 	>;
 
 	let { node }: { node: Document } = $props();
+    setContext('document', node);
 	let Renderer = $derived(
 		registry[node.content.activeView as keyof typeof registry] as Component<{
 			node: NoHeadingContentSingle;
@@ -36,21 +37,10 @@
 			.filter((ref) => ref.element)
 			.map((ref) => ref.element);
 		flipState = Flip.getState(elements);
-		console.log('before flip ids');
-		console.log(elements.map((e) => e.getAttribute('data-flip-id')));
 	};
 
 	$effect(() => {
-		const currentTargets = Object.values(refs)
-			.filter((ref) => ref.element)
-			.map((ref) => ref.element);
-		console.log('after flip ids');
-		console.log(currentTargets.map((e) => e.getAttribute('data-flip-id')));
-
-		if (flipState !== null) {
-			// Group elements by animateAbsolute and animateNested properties
-			console.log('refs:');
-			console.log($state.snapshot(refs));
+		if (flipState !== null && node.state.animateNextChange) {
 			const groupedRefs = Object.values(refs).reduce(
 				(acc, ref) => {
 					const key = `${ref.animateAbsolute}-${ref.animateNested}`;
@@ -101,7 +91,10 @@
 					}
 				});
 			});
-		}
+		} else {
+            node.state.animateNextChange = true;
+            flipState = null;
+        }
 	});
 </script>
 

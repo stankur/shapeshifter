@@ -4,10 +4,14 @@ import type { ContentParagraph } from './content';
 import type { Document } from './document';
 import { type SectionContainer } from '$lib/model/collection';
 
-export const simpleParagraph: Document = {  
-    state: {
-        mode: 'write'
-    },
+/**
+ * a document with one paragraph
+ */
+export const simpleParagraph: Document = {
+	state: {
+		mode: 'write',
+		animateNextChange: true
+	},
 	type: 'document',
 	id: 'document-id',
 	created: '2025-02-23T01:04:00Z',
@@ -23,10 +27,14 @@ export const simpleParagraph: Document = {
 	}
 };
 
+/**
+ * a document with one section, no children, no summary
+ */
 export const simpleSection: Document = {
-    state: {
-        mode: 'write'
-    },
+	state: {
+		mode: 'write',
+		animateNextChange: true
+	},
 	type: 'document',
 	id: 'document-id',
 	created: '2025-02-23T01:04:00Z',
@@ -57,10 +65,14 @@ export const simpleSection: Document = {
 	}
 };
 
+/**
+ * a document with one section, one paragraph child, one paragraph summary
+ */
 export const nested: Document = {
 	state: {
-        mode: 'write'
-    },
+		mode: 'write',
+		animateNextChange: true
+	},
 	type: 'document',
 	id: 'document-id',
 	created: '2025-02-23T01:04:00Z',
@@ -111,10 +123,14 @@ export const nested: Document = {
 	}
 };
 
+/**
+ * a document with one section, one paragraph child, one paragraph summary
+ */
 export const nestedSummary: Document = {
 	state: {
-        mode: 'write'
-    },
+		mode: 'write',
+		animateNextChange: true
+	},
 	type: 'document',
 	id: 'document-id',
 	created: '2025-02-23T01:04:00Z',
@@ -165,10 +181,15 @@ export const nestedSummary: Document = {
 	}
 };
 
+
+/**
+ * a document with one untitled section, a paragraph child and section child, one untitled section child
+ */
 export const untitled: Document = {
 	state: {
-        mode: 'write'
-    },
+		mode: 'write',
+		animateNextChange: true
+	},
 	type: 'document',
 	id: 'document-id',
 	created: '2025-02-23T01:04:00Z',
@@ -220,8 +241,9 @@ export const untitled: Document = {
 
 export const card: Document = {
 	state: {
-        mode: 'write'
-    },
+		mode: 'write',
+		animateNextChange: true
+	},
 	type: 'document',
 	id: 'document-id',
 	created: '2025-02-23T01:04:00Z',
@@ -532,7 +554,10 @@ const nestedSectionContainer: (num: number) => z.infer<typeof sectionContainer> 
 				]
 			}
 		},
-		{ type: 'collection/section-container/sidebar', state: { percentageWidth: 25, activeIndex: 0 } },
+		{
+			type: 'collection/section-container/sidebar',
+			state: { percentageWidth: 25, activeIndex: 0 }
+		},
 		{ type: 'collection/section-container/tabs', state: { gap: 16, activeIndex: 0 } }
 	],
 	activeView: 'collection/section-container/table-of-contents',
@@ -589,7 +614,8 @@ const topLevelSection = (num: number): Section => ({
 // Define the section container with table-of-contents view
 export const sectionContainerTOC: Document = {
 	state: {
-		mode: 'write'
+		mode: 'write',
+		animateNextChange: true
 	},
 	type: 'document',
 	id: 'document-id',
@@ -644,7 +670,8 @@ export const sectionContainerTOC: Document = {
 // Define the section container with table-of-contents view
 export const sectionContainerTOCCard: Document = {
 	state: {
-		mode: 'write'
+		mode: 'write',
+		animateNextChange: true
 	},
 	type: 'document',
 	id: 'document-id',
@@ -707,7 +734,10 @@ export const sidebarExample: SectionContainer = {
 		{ type: 'collection/section-container/card', state: { perRow: 1, gap: 4 } },
 		{ type: 'collection/section-container/brick' },
 		{ type: 'collection/section-container/table-of-contents', state: { directions: [] } },
-		{ type: 'collection/section-container/sidebar', state: { percentageWidth: 25, activeIndex: 0 } },
+		{
+			type: 'collection/section-container/sidebar',
+			state: { percentageWidth: 25, activeIndex: 0 }
+		},
 		{ type: 'collection/section-container/tabs', state: { gap: 16, activeIndex: 0 } }
 	],
 	activeView: 'collection/section-container/sidebar',

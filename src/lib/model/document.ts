@@ -8,7 +8,8 @@ export const document = z.object({
 	last_modified: z.string().datetime(),
 	content: noHeadingContentSingle,
     state: z.object({
-        mode: z.enum(['write', 'customize', 'read'])
+        mode: z.enum(['write', 'customize', 'read']),
+        animateNextChange: z.boolean(),
     })
 });
 

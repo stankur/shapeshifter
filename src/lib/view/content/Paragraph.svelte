@@ -4,43 +4,55 @@
 	import { DOMParser, Node } from 'prosemirror-model';
 
 	import type { ContentParagraph } from '$lib/model/content';
-	import { EditorState } from 'prosemirror-state';
+	import { EditorState, Plugin } from 'prosemirror-state';
 	import { EditorView } from 'prosemirror-view';
 	import { onMount } from 'svelte';
-	import Flip from 'gsap/dist/Flip';
+	import { separate } from '$lib/services/prosemirror';
+
+
+
+    type Props = {
+        node: ContentParagraph;
+        refs: Record<
+            string,
+            { element: HTMLElement; animateAbsolute: boolean; animateNested: boolean }
+        >;
+        additionalFlipId?: string;
+        updateParent: () => void;
+        onUnmount: () => void;
+        onSplit: (blocks: string[]) => void;
+    }
 	let {
-		node,
+		node = $bindable<ContentParagraph>(),
 		refs,
         additionalFlipId,
-        onUnmount
-	}: {
-		node: ContentParagraph;
-		refs: Record<
-			string,
-			{ element: HTMLElement; animateAbsolute: boolean; animateNested: boolean }
-		>;
-		additionalFlipId?: string;
-		onUnmount: () => void;
-	} = $props();
+        updateParent,
+        onUnmount,
+        onSplit
+	}: Props= $props();
+    // let enterPressed = $state<boolean>(false);
 	let { content } = $derived(node);
 	let doc: Node = $derived(defaultMarkdownParser.parse(content));
-	let state = $derived(
+    let defaultPlugins = $state<Plugin[]>(exampleSetup({
+        schema,
+        menuBar: false
+    }));
+    
+	let editorState = $derived(
 		EditorState.create({
 			schema,
 			doc,
-			plugins: exampleSetup({
-				schema,
-				menuBar: false
-			})
+			plugins: defaultPlugins
 		})
 	);
 	let view: EditorView;
 	let ref: HTMLDivElement;
 
+
 	onMount(() => {
-		console.log('I just got mounted baybeh');
+		console.log('I just got mounted baybeh for ' + content);
 		view = new EditorView(ref, {
-			state,
+			state: editorState,
 			nodeViews: {
 				paragraph() {
 					const dom = document.createElement('p');
@@ -62,41 +74,58 @@
 			},
 			dispatchTransaction(transaction) {
 				const newState = view.state.apply(transaction);
+                console.log("transaction steps:");
+                console.log(transaction.steps);
 				onUnmount();
+
+                // console.log("enter pressed state:");
+                // console.log(enterPressed);
+                
+
+                const blocks = separate(newState.doc);
+                console.log("blocks: ");
+                console.log(blocks);
+// enterPressed && 
+				if (blocks.length > 1) {
+                    console.log("splitting");
+                    onSplit(blocks);
+					return;
+				}
 
 				node.content = newState.doc.textContent;
 
 				view.updateState(newState);
 			},
-			domParser: DOMParser.fromSchema(state.schema)
+			domParser: DOMParser.fromSchema(editorState.schema)
 		});
 
 		setTimeout(() => {
 			ref.onmouseenter = () => {
 				view.setProps({ editable: () => true });
 			};
-		}, 1000);
+		}, 800);
 
 		return () => {
 			if (view) {
-				console.log('View for ' + content + ' just got destroyed through unmount');
+				// console.log('View for ' + content + ' just got destroyed through unmount');
 				view.destroy();
 			}
 		};
 	});
 </script>
-	<!-- onmouseenter={() => {
-		if (refs[node.id] &&!Flip.isFlipping(refs[node.id].element)) {
-			console.log('yoohoo paragraph');
-			view.setProps({ editable: () => true });
-		}
-	}} -->
+	<!-- class="prose-p:inline-block" -->
+    <!-- onkeydown={(e) => {
+        if (e.key === 'Enter') {
+            console.log("enter pressed");
+            enterPressed = true;
+        }
+    }} -->
 
 <div
 	onclick={(e) => {
 		e.stopPropagation();
 	}}
-	class="prose-p:inline-block"
+
 	bind:this={ref}
 ></div>
 
