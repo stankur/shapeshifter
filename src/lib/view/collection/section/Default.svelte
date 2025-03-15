@@ -13,7 +13,7 @@
 	type ViewState = { state: 'expanded' | 'summary' | 'collapsed' };
 	let { node = $bindable<Section>(), refs, onUnmount }: Props = $props();
 
-    let document = getContext('document') as Document;
+	let document = getContext('document') as Document;
 
 	let { activeView, view } = $derived(node);
 	let HeadingRenderer = $derived(
@@ -29,7 +29,7 @@
 				node: typeof child;
 				refs: Refs;
 				onUnmount: () => void;
-				onSplit: (newBlocks: string[]) => void;
+				onSplit: (newBlocks: [string, string]) => void;
 			}>
 		}))
 	);
@@ -73,8 +73,20 @@
 		<HeadingRenderer bind:node={node.heading} {refs} {onUnmount} />
 	</div>
 	{#if (node.view[viewStateIndex] as ViewState).state === 'expanded'}
-		{#each ChildrenRenderers as { Renderer }, i}
-			<Renderer bind:node={node.children[i]} onSplit={() => {}} {refs} {onUnmount} />
+		<!-- should work without the key, but not working -->
+		{#each ChildrenRenderers as { Renderer }, i (node.children[i].last_modified + node.children[i].id)}
+			{console.log(i)}
+			{console.log(node.children[i])}
+			<Renderer
+				bind:node={node.children[i]}
+				onSplit={(newBlocks) => {
+					console.log('newBlocks');
+					console.log(newBlocks);
+					splitParagraph(node, 'children', newBlocks, document, i);
+				}}
+				{refs}
+				{onUnmount}
+			/>
 		{/each}
 	{:else if (node.view[viewStateIndex] as ViewState).state === 'summary'}
 		{#each SummaryRenderers as { Renderer }, i (node.summary[i].last_modified + node.summary[i].id)}
@@ -84,8 +96,8 @@
 				bind:node={node.summary[i]}
 				{refs}
 				onSplit={(newBlocks) => {
-                    splitParagraph(node, newBlocks, document, i);
-                }}
+					splitParagraph(node, 'summary', newBlocks, document, i);
+				}}
 				{onUnmount}
 			/>
 		{/each}
