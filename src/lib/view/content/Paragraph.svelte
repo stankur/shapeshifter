@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { defaultMarkdownParser, schema } from 'prosemirror-markdown';
+	import { defaultMarkdownParser, defaultMarkdownSerializer, schema } from 'prosemirror-markdown';
 	import { exampleSetup } from 'prosemirror-example-setup';
 	import { DOMParser, Node } from 'prosemirror-model';
 
@@ -20,7 +20,7 @@
         additionalFlipId?: string;
         updateParent: () => void;
         onUnmount: () => void;
-        onSplit: (blocks: string[]) => void;
+        onSplit: (blocks: [string, string]) => void;
     }
 	let {
 		node = $bindable<ContentParagraph>(),
@@ -88,11 +88,11 @@
 // enterPressed && 
 				if (blocks.length > 1) {
                     console.log("splitting");
-                    onSplit(blocks);
+                    onSplit([blocks[0], blocks[1]]);
 					return;
 				}
 
-				node.content = newState.doc.textContent;
+				node.content = defaultMarkdownSerializer.serialize(newState.doc);
 
 				view.updateState(newState);
 			},

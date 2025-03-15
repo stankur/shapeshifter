@@ -7,6 +7,7 @@
 	import { registry } from '$lib/viewRegistry.svelte';
 	import { getContext, onMount, type Component } from 'svelte';
 	import DefaultControl from './control/DefaultControl.svelte';
+	import { splitParagraph } from '$lib/actions/collection.svelte';
 
 	type Props = { node: Section; refs: Refs; onUnmount: () => void };
 	type ViewState = { state: 'expanded' | 'summary' | 'collapsed' };
@@ -38,7 +39,7 @@
 				node: typeof child;
 				refs: Refs;
 				onUnmount: () => void;
-				onSplit: (newBlocks: string[]) => void;
+				onSplit: (newBlocks: [string, string]) => void;
 			}>
 		}))
 	);
@@ -83,35 +84,8 @@
 				bind:node={node.summary[i]}
 				{refs}
 				onSplit={(newBlocks) => {
-                    document.state.animateNextChange = false;
-					if (node.summary[i].type === 'paragraph') {
-						for (let j = 0; j < newBlocks.length; j++) {
-							if (j === 0) {
-								node.summary[i].content = newBlocks[0];
-								node.summary[i].last_modified = new Date().toISOString();
-
-								console.log('changed start: ');
-								console.log($state.snapshot(node.summary[i]));
-							} else {
-								node.summary.push({
-									type: 'paragraph',
-									id: crypto.randomUUID(),
-									created: new Date().toISOString(),
-									last_modified: new Date().toISOString(),
-									view: node.summary[i].view,
-									activeView: node.summary[i].activeView,
-									content: newBlocks[1]
-								});
-
-								console.log('changed end: ');
-								console.log($state.snapshot(node.summary[i + 1]));
-							}
-						}
-
-
-						node.last_modified = new Date().toISOString();
-					}
-				}}
+                    splitParagraph(node, newBlocks, document, i);
+                }}
 				{onUnmount}
 			/>
 		{/each}

@@ -1,4 +1,6 @@
+import { defaultMarkdownSerializer } from 'prosemirror-markdown';
 import { Node } from 'prosemirror-model';
+
 
 export function separate(doc: Node): string[] {
 	const all: string[] = [];
@@ -6,7 +8,7 @@ export function separate(doc: Node): string[] {
     doc.forEach((node, _, index) => {
         console.log(`node ${index}: `);
         console.log(node);
-        all.push(node.textContent);
+        all.push(defaultMarkdownSerializer.serialize(node));
     });
 
 	return all;

@@ -62,6 +62,7 @@ export const section: z.ZodType<Section> = sectionBase.extend({
 	summary: noHeadingContent
 });
 
+
 // collection/untitled-section view
 const untitledSectionView = z.tuple([
 	z.object({
