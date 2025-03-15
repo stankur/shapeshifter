@@ -5,42 +5,27 @@
 	import type { Component } from 'svelte';
 	import type { z } from 'zod';
 	import type { Refs } from '$lib/Document.svelte';
-	import { getContext } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import type { Document } from '$lib/model/document';
 
 	const document = getContext('document') as Document;
 
 	type SectionContainer = z.infer<typeof sectionContainer>;
-	type TabsState = { gap: number; activeIndex: number };
+	type ViewState = { state: { gap: number; activeIndex: number } };
 
-	let {
-		node,
-		refs,
-		onUnmount
-	}: {
+	type Props = {
 		node: SectionContainer;
 		refs: Refs;
 		onUnmount: () => void;
-	} = $props();
-	let { children, view, activeView } = $derived(node);
+	};
 
-	// Find the tabs view state or create a default one
-	function getTabsState(): TabsState {
-		const activeViewObj = view.find((v) => v.type === activeView);
-		if (activeViewObj && 'state' in activeViewObj) {
-			const state = activeViewObj.state as any;
-			return {
-				gap: state.gap !== undefined ? state.gap : 0,
-				activeIndex: state.activeIndex !== undefined ? state.activeIndex : 0
-			};
-		}
-		return { gap: 0, activeIndex: 0 };
-	}
+	let { node = $bindable(), refs, onUnmount }: Props = $props();
+	let { view, activeView } = $derived(node);
 
-	let tabsState = $derived(getTabsState());
+	let viewStateIndex = $derived(view.findIndex((v) => v.type === activeView));
 
 	let ChildrenRenderers = $derived(
-		children.map((child, index) => ({
+		node.children.map((child, index) => ({
 			child,
 			index,
 			HeadingRenderer: registry[
@@ -55,9 +40,11 @@
 	);
 
 	// Prepare renderer for the active section
-	let activeIndex = $derived(tabsState.activeIndex || 0);
+	let activeIndex = $derived((node.view[viewStateIndex] as ViewState).state.activeIndex || 0);
+	let gap = $derived((node.view[viewStateIndex] as ViewState).state.gap || 0);
+
 	let ActiveSectionRenderer = $derived(
-		registry[children[activeIndex].activeView as keyof typeof registry] as Component<{
+		registry[node.children[activeIndex].activeView as keyof typeof registry] as Component<{
 			node: Section;
 			refs: Refs;
 			onUnmount: () => void;
@@ -68,67 +55,120 @@
 	function setActiveSection(index: number) {
 		onUnmount();
 		// Update the activeIndex in the state
-		const activeViewObj = view.find((v) => v.type === activeView);
-		if (activeViewObj && 'state' in activeViewObj) {
-			(activeViewObj.state as any).activeIndex = index;
-		}
+		(node.view[viewStateIndex] as ViewState).state.activeIndex = index;
 	}
 
 	function switchToTableOfContents() {
 		onUnmount();
 		node.activeView = 'collection/section-container/table-of-contents';
 	}
+
+	// Simple overflow detection
+	let tabsScroll: HTMLElement;
+	let hasLeftOverflow = $state(false);
+	let hasRightOverflow = $state(false);
+
+	function checkOverflow() {
+		if (!tabsScroll) return;
+
+		hasLeftOverflow = tabsScroll.scrollLeft > 0;
+		hasRightOverflow =
+			tabsScroll.scrollWidth > tabsScroll.clientWidth &&
+			tabsScroll.scrollLeft < tabsScroll.scrollWidth - tabsScroll.clientWidth;
+	}
+
+	function handleScroll() {
+		checkOverflow();
+	}
+
+	// Use Svelte's effect to ensure state changes are detected
+	$effect(() => {
+		if (tabsScroll) {
+			checkOverflow();
+		}
+	});
+
+	onMount(() => {
+		if (tabsScroll) {
+			tabsScroll.addEventListener('scroll', handleScroll);
+			window.addEventListener('resize', checkOverflow);
+		}
+
+		return () => {
+			if (tabsScroll) {
+				tabsScroll.removeEventListener('scroll', handleScroll);
+			}
+			window.removeEventListener('resize', checkOverflow);
+		};
+	});
 </script>
 
 <div class="container flex w-full flex-col">
 	{#if document.state.mode === 'customize'}
 		<div class="controls">
-			<button class="rounded-md bg-blue-500 p-2 text-white" on:click={switchToTableOfContents}>
+			<button class="rounded-md bg-blue-500 p-2 text-white" onclick={switchToTableOfContents}>
 				Switch to TOC
 			</button>
 		</div>
 	{/if}
 
 	<!-- Tabs navigation -->
-	<div class="tabs-nav flex overflow-x-auto" style:gap="{tabsState.gap}px">
-		{#each ChildrenRenderers as { child, index, HeadingRenderer }}
-			<div
-				class="tab-item cursor-pointer p-2 whitespace-nowrap {index === activeIndex
-					? 'border-b-2 border-blue-500'
-					: ''}"
-				on:click={() => setActiveSection(index)}
-			>
-				<HeadingRenderer
-					node={child.heading}
-					additionalFlipId={'tab-item-' + index}
-					{refs}
-					{onUnmount}
-				/>
-			</div>
-		{/each}
+	<div class="tabs-container">
+		<div class="tabs-scroll flex overflow-x-scroll" style:gap="{gap}px" bind:this={tabsScroll}>
+			{#each ChildrenRenderers as { child, index, HeadingRenderer }}
+				<div
+					class="cursor-pointer p-2 whitespace-nowrap {index === activeIndex
+						? 'border-b-2 border-blue-500'
+						: ''}"
+					onclick={() => setActiveSection(index)}
+				>
+					<HeadingRenderer
+						node={child.heading}
+						additionalFlipId={'tab-item-' + index}
+						{refs}
+						{onUnmount}
+					/>
+				</div>
+			{/each}
+		</div>
+		{#if hasLeftOverflow}
+			<div class="left-shadow overflow-shadow"></div>
+		{/if}
+		{#if hasRightOverflow}
+			<div class="right-shadow overflow-shadow"></div>
+		{/if}
 	</div>
 
 	<!-- Content -->
-	<div class="content mt-4">
-		<ActiveSectionRenderer node={children[activeIndex]} {refs} {onUnmount} />
+	<div>
+		<ActiveSectionRenderer node={node.children[activeIndex]} {refs} {onUnmount} />
 	</div>
 </div>
 
 <style>
-	.tabs-nav::-webkit-scrollbar {
-		height: 4px;
+	.tabs-scroll {
+		scrollbar-width: none;
 	}
-
-	.tabs-nav::-webkit-scrollbar-track {
-		background: #f1f1f1;
+	.tabs-scroll::-webkit-scrollbar {
+		display: none;
 	}
-
-	.tabs-nav::-webkit-scrollbar-thumb {
-		background: #888;
-		border-radius: 4px;
+	.tabs-container {
+		position: relative;
 	}
-
-	.tabs-nav::-webkit-scrollbar-thumb:hover {
-		background: #555;
+	.overflow-shadow {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		width: 80px;
+		pointer-events: none;
+		z-index: 1;
+	}
+	.left-shadow {
+		left: 0;
+		background: linear-gradient(to right, white, transparent);
+	}
+	.right-shadow {
+		right: 0;
+		background: linear-gradient(to left, white, transparent);
 	}
 </style>

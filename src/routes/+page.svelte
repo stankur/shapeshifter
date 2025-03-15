@@ -13,7 +13,7 @@
 	} from '$lib/model/examples';
 	import { saveDocument } from '$lib/supabase';
 
-	let node = $state(nested as DocumentType);
+	let node = $state(sectionContainerTOC as DocumentType);
 	let isPublishing = $state(false);
 	let publishStatus = $state<{ success: boolean; message: string; documentId?: string } | null>(
 		null
