@@ -113,13 +113,6 @@
 		};
 	});
 </script>
-	<!-- class="prose-p:inline-block" -->
-    <!-- onkeydown={(e) => {
-        if (e.key === 'Enter') {
-            console.log("enter pressed");
-            enterPressed = true;
-        }
-    }} -->
 
 <div
 	onclick={(e) => {

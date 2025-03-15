@@ -48,6 +48,7 @@
 			node: Section;
 			refs: Refs;
 			onUnmount: () => void;
+			overRides?: { heading: boolean };
 		}>
 	);
 
@@ -140,9 +141,11 @@
 	</div>
 
 	<!-- Content -->
-	<div>
-		<ActiveSectionRenderer node={node.children[activeIndex]} {refs} {onUnmount} />
-	</div>
+	{#key activeIndex}
+		<div>
+			<ActiveSectionRenderer node={node.children[activeIndex]} overRides={{ heading: false }} {refs} {onUnmount} />
+		</div>
+	{/key}
 </div>
 
 <style>
