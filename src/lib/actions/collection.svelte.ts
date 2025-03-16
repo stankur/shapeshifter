@@ -2,14 +2,14 @@ import type { Document } from '$lib/model/document';
 import type { Section } from '$lib/model/collection';
 export function splitParagraph(
 	node: Section,
-	arr: "summary" | "children",
+	arr: 'summary' | 'children',
 	newBlocks: [string, string],
 	document: Document,
 	i: number
 ) {
 	document.state.animateNextChange = false;
 	if (node[arr][i].type === 'paragraph') {
-        console.log("new blocs length: ", newBlocks.length);
+		console.log('new blocs length: ', newBlocks.length);
 		for (let j = 0; j < newBlocks.length; j++) {
 			if (j === 0) {
 				node[arr][i].content = newBlocks[0];
@@ -36,3 +36,4 @@ export function splitParagraph(
 		node.last_modified = new Date().toISOString();
 	}
 }
+

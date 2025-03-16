@@ -9,7 +9,11 @@
 	import type { Component } from 'svelte';
 	import type { z } from 'zod';
 	import type { Refs } from '$lib/Document.svelte';
-	import { registerRef } from '$lib/view/utils/registerRef.svelte';
+	import { getContext } from 'svelte';
+	import type { Document } from '$lib/model/document';
+	import Controls from './Controls.svelte';
+
+	const document = getContext('document') as Document;
 
 	type SectionContainer = z.infer<typeof sectionContainer>;
 	type SectionContainerViewState = z.infer<typeof sectionContainerCardViewState>;
@@ -55,52 +59,38 @@
 		(view.find((v) => v.type === activeView) as { state: SectionContainerViewState }).state.gap
 	);
 
-	let getCardCollectionButtonId = (node: SectionContainer) => {
-		return `${node.id}-${node.activeView}-card-collection-button`;
-	};
+	let isCardHovered = $state(false);
+
+	function showCardControls() {
+		isCardHovered = true;
+	}
+
+	function hideCardControls() {
+		isCardHovered = false;
+	}
 </script>
 
-<button
-	class="rounded-md bg-blue-500 p-2 text-white"
-	onclick={() => {
-		console.log('clicked');
-		onUnmount();
-		node.activeView = 'collection/section-container/default';
-	}}
-	use:registerRef={{
-		id: getCardCollectionButtonId(node),
-		refs,
-		animateOptions: {
-			animateAbsolute: false,
-			animateNested: false
-		}
-	}}
->
-	switch to default
-</button>
+<div class="card-container" onmouseenter={showCardControls} onmouseleave={hideCardControls}>
+	{#if document.state.mode === 'customize'}
+		<Controls {node} {onUnmount} {isCardHovered} />
+	{/if}
 
-<!-- data-flip-id={getCardContainerId(child)}
-			use:registerRef={{
-				id: getCardContainerId(child),
-				refs,
-				animateOptions: {
-					animateAbsolute: false,
-					animateNested: false
-				}
-			}} -->
-
-<div class="container flex flex-wrap" style:--perRow={perRow} style:--gap={`${gap}px`}>
-	{#each ChildrenRenderers as { child, HeadingRenderer, SummaryRenderers }}
-		<div class="card border-1 border-black p-5">
-			<HeadingRenderer node={child.heading} {refs} />
-			{#each SummaryRenderers as { summaryChild, Renderer }}
-				<Renderer node={summaryChild} {refs} {onUnmount} />
-			{/each}
-		</div>
-	{/each}
+	<div class="container flex flex-wrap" style:--perRow={perRow} style:--gap={`${gap}px`}>
+		{#each ChildrenRenderers as { child, HeadingRenderer, SummaryRenderers }}
+			<div class="card border-1 border-black p-5">
+				<HeadingRenderer node={child.heading} {refs} />
+				{#each SummaryRenderers as { summaryChild, Renderer }}
+					<Renderer node={summaryChild} {refs} {onUnmount} />
+				{/each}
+			</div>
+		{/each}
+	</div>
 </div>
 
 <style lang="postcss">
+	.card-container {
+		position: relative;
+	}
 	.card {
 		flex: 0 0 calc((99.9% - (var(--perRow) - 1) * var(--gap)) / var(--perRow));
 	}
@@ -108,4 +98,3 @@
 		gap: var(--gap);
 	}
 </style>
-

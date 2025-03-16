@@ -7,6 +7,7 @@
 	import type { Refs } from '$lib/Document.svelte';
 	import { getContext, onMount } from 'svelte';
 	import type { Document } from '$lib/model/document';
+	import Controls from './Controls.svelte';
 
 	const document = getContext('document') as Document;
 
@@ -59,15 +60,11 @@
 		(node.view[viewStateIndex] as ViewState).state.activeIndex = index;
 	}
 
-	function switchToTableOfContents() {
-		onUnmount();
-		node.activeView = 'collection/section-container/table-of-contents';
-	}
-
 	// Simple overflow detection
 	let tabsScroll: HTMLElement;
 	let hasLeftOverflow = $state(false);
 	let hasRightOverflow = $state(false);
+	let isTabsHovered = $state(false);
 
 	function checkOverflow() {
 		if (!tabsScroll) return;
@@ -80,6 +77,14 @@
 
 	function handleScroll() {
 		checkOverflow();
+	}
+
+	function showTabsControls() {
+		isTabsHovered = true;
+	}
+
+	function hideTabsControls() {
+		isTabsHovered = false;
 	}
 
 	// Use Svelte's effect to ensure state changes are detected
@@ -104,13 +109,13 @@
 	});
 </script>
 
-<div class="container flex w-full flex-col">
+<div
+	class="container flex w-full flex-col"
+	onmouseenter={showTabsControls}
+	onmouseleave={hideTabsControls}
+>
 	{#if document.state.mode === 'customize'}
-		<div class="controls">
-			<button class="rounded-md bg-blue-500 p-2 text-white" onclick={switchToTableOfContents}>
-				Switch to TOC
-			</button>
-		</div>
+		<Controls {node} {onUnmount} {isTabsHovered} />
 	{/if}
 
 	<!-- Tabs navigation -->
@@ -118,7 +123,7 @@
 		<div class="tabs-scroll flex overflow-x-scroll" style:gap="{gap}px" bind:this={tabsScroll}>
 			{#each ChildrenRenderers as { child, index, HeadingRenderer }}
 				<div
-					class="cursor-pointer p-2 whitespace-nowrap {index === activeIndex
+					class="cursor-pointer p-5 whitespace-nowrap {index === activeIndex
 						? 'border-b-2 border-blue-500'
 						: ''}"
 					onclick={() => setActiveSection(index)}
@@ -142,8 +147,13 @@
 
 	<!-- Content -->
 	{#key activeIndex}
-		<div>
-			<ActiveSectionRenderer node={node.children[activeIndex]} overRides={{ heading: false }} {refs} {onUnmount} />
+		<div class="pt-5">
+			<ActiveSectionRenderer
+				node={node.children[activeIndex]}
+				overRides={{ heading: false }}
+				{refs}
+				{onUnmount}
+			/>
 		</div>
 	{/key}
 </div>
