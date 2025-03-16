@@ -118,6 +118,7 @@
 	onclick={(e) => {
 		e.stopPropagation();
 	}}
+    class="leading-7"
 
 	bind:this={ref}
 ></div>

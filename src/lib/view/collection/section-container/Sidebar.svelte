@@ -69,7 +69,7 @@
 </script>
 
 {#key children[sidebarState.activeIndex].id}
-	<div class="container">
+	<div class="flex">
 		<!-- Sidebar -->
 		<div class="sidebar" style:width="{sidebarState.percentageWidth}%">
 			{#each ChildrenRenderers as { child, index, HeadingRenderer, SummaryRenderers }}
@@ -110,11 +110,6 @@
 {/key}
 
 <style>
-	.container {
-		display: flex;
-		width: 100%;
-	}
-
 	.sidebar {
 		border-right: 1px solid black;
 	}

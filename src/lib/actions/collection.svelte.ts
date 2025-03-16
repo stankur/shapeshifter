@@ -1,5 +1,5 @@
 import type { Document } from '$lib/model/document';
-import type { Section } from '$lib/model/collection';
+import type { Section, SectionContainer } from '$lib/model/collection';
 export function splitParagraph(
 	node: Section,
 	arr: 'summary' | 'children',
@@ -37,3 +37,49 @@ export function splitParagraph(
 	}
 }
 
+export function addSection(node: SectionContainer, headingLevel: number = 1) {
+	node.children.push({
+		type: 'section',
+		id: crypto.randomUUID(),
+		created: new Date().toISOString(),
+		last_modified: new Date().toISOString(),
+		view: [
+			{ type: 'collection/section/default', state: 'expanded' },
+			{ type: 'collection/section/static' },
+			{ type: 'collection/section/page' }
+		],
+		heading: {
+			type: 'heading',
+			id: crypto.randomUUID(),
+			created: new Date().toISOString(),
+			last_modified: new Date().toISOString(),
+			view: [{ type: 'content/heading/default' }],
+			content: 'New Section',
+			level: headingLevel,
+			activeView: 'content/heading/default'
+		},
+		summary: [
+			{
+				type: 'paragraph',
+				id: crypto.randomUUID(),
+				created: new Date().toISOString(),
+				last_modified: new Date().toISOString(),
+				view: [{ type: 'content/paragraph/default' }],
+				content: "New Section's summary",
+				activeView: 'content/paragraph/default'
+			}
+		],
+		activeView: 'collection/section/default',
+		children: [
+			{
+				type: 'paragraph',
+				id: crypto.randomUUID(),
+				created: new Date().toISOString(),
+				last_modified: new Date().toISOString(),
+				view: [{ type: 'content/paragraph/default' }],
+				content: "New Section's first paragraph",
+				activeView: 'content/paragraph/default'
+			}
+		]
+	});
+}

@@ -26,8 +26,9 @@
 		}))
 	);
 </script>
+<div class="flex flex-col gap-6">
+	{#each ChildrenRenderers as { child, Renderer }}
+		<Renderer node={child} {refs} {onUnmount} />
+	{/each}
+</div>
 
-
-{#each ChildrenRenderers as { child, Renderer }}
-	<Renderer node={child} {refs} {onUnmount} />
-{/each}

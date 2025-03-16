@@ -70,7 +70,7 @@
 			const placement = overRides?.heading ? 'left' : 'left-start';
 
 			if (referenceElement) {
-				return float(referenceElement as HTMLElement, controlElement as HTMLElement, placement)();
+				return float(referenceElement as HTMLElement, controlElement as HTMLElement, placement, false)();
 			}
 		}
 	});
@@ -83,7 +83,7 @@
 	{onUnmount}
 />
 
-<div class="container flex flex-col" bind:this={containerElement}>
+<div class="container flex flex-col gap-6" bind:this={containerElement}>
 	{#if overRides && overRides.heading}
 		{#key node.heading.id}
 			<div bind:this={headingElement}>

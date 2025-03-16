@@ -12,6 +12,7 @@
 	import { getContext } from 'svelte';
 	import type { Document } from '$lib/model/document';
 	import Controls from './Controls.svelte';
+	import { addSection } from '$lib/actions/collection.svelte';
 
 	const document = getContext('document') as Document;
 
@@ -84,6 +85,11 @@
 				{/each}
 			</div>
 		{/each}
+
+		<button onclick={() => {
+            onUnmount()
+
+            addSection(node, node.children[0].heading.level)}}>Add Section</button>
 	</div>
 </div>
 
