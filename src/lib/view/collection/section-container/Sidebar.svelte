@@ -71,12 +71,9 @@
 {#key children[sidebarState.activeIndex].id}
 	<div class="flex">
 		<!-- Sidebar -->
-		<div class="sidebar" style:width="{sidebarState.percentageWidth}%">
+		<div class="sidebar shrink-0" style:width="{sidebarState.percentageWidth}%">
 			{#each ChildrenRenderers as { child, index, HeadingRenderer, SummaryRenderers }}
-				<div
-					class="sidebar-item"
-					on:click={() => setActiveSection(index)}
-				>
+				<div class="sidebar-item p-5" on:click={() => setActiveSection(index)}>
 					<div class="heading">
 						<HeadingRenderer
 							node={child.heading}
@@ -103,7 +100,7 @@
 		</div>
 
 		<!-- Content -->
-		<div class="content grow basis-0 p-2">
+		<div class="content grow basis-0 p-2" style:width="{100 -sidebarState.percentageWidth}%">
 			<ActiveSectionRenderer node={children[sidebarState.activeIndex]} {refs} {onUnmount} />
 		</div>
 	</div>
@@ -116,7 +113,6 @@
 
 	.sidebar-item {
 		border-bottom: 1px solid black;
-		padding: 8px;
 		cursor: pointer;
 	}
 
