@@ -124,7 +124,7 @@
 			{#each ChildrenRenderers as { child, index, HeadingRenderer }}
 				<div
 					class="cursor-pointer p-5 whitespace-nowrap {index === activeIndex
-						? 'border-b-2 border-blue-500'
+						? 'border-b-2 border-black'
 						: ''}"
 					onclick={() => setActiveSection(index)}
 				>

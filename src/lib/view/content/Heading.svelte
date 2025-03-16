@@ -116,7 +116,7 @@
 	onclick={(e) => {
 		e.stopPropagation();
 	}}
-	class={[headingSize, 'prose-h1:inline-block', 'prose-h1:font-bold']}
+	class={[headingSize, 'prose-h1:inline-block', 'prose-h1:font-semibold']}
 ></div>
 
 <svelte:document
