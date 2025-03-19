@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import Document from '$lib/Document.svelte';
 	import type { Document as DocumentType } from '$lib/model/document';
 	import {
@@ -65,7 +66,9 @@
 	async function handleSignIn() {
 		isSigningIn = true;
 		try {
-			await signInWithGoogle();
+			const { data, error } = await signInWithGoogle();
+			console.log('data in handleSignIn: ', data);
+			console.log('error in handleSignIn: ', error);
 		} catch (error) {
 			console.error('Error signing in:', error);
 		} finally {

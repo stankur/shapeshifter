@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types/supabase';
 import type { Document } from './model/document';
-
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
 // These will be replaced with actual environment variables
-const supabaseUrl: string = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey: string = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseUrl: string = PUBLIC_SUPABASE_URL;
+const supabaseAnonKey: string = PUBLIC_SUPABASE_ANON_KEY;
 
 // Browser client (for client-side operations)
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
@@ -13,9 +13,9 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 export async function signInWithGoogle() {
 	const { data, error } = await supabase.auth.signInWithOAuth({
 		provider: 'google',
-		options: {
-			redirectTo: `${window.location.origin}/auth/callback`
-		}
+		// options: {
+		// 	redirectTo: `${window.location.origin}/auth/callback`
+		// }
 	});
 
 	return { data, error };

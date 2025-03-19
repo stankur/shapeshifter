@@ -1,24 +1,19 @@
-<script lang="ts">
-	import '../app.css';
-	import { invalidate } from '$app/navigation';
-	import { onMount } from 'svelte';
-	import { supabase } from '$lib/supabase';
+<script>
+  import { invalidate } from '$app/navigation'
+  import { onMount } from 'svelte'
 
-	let { children, data } = $props();
+  let { data, children } = $props()
+  let { session, supabase } = $derived(data)
 
-	onMount(() => {
-		// Set up auth state change listener to invalidate data when auth state changes
-		const {
-			data: { subscription }
-		} = supabase.auth.onAuthStateChange(() => {
-			invalidate('supabase:auth');
-		});
+  onMount(() => {
+    const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
+      if (newSession?.expires_at !== session?.expires_at) {
+        invalidate('supabase:auth')
+      }
+    })
 
-		// Clean up subscription on unmount
-		return () => {
-			subscription.unsubscribe();
-		};
-	});
+    return () => data.subscription.unsubscribe()
+  })
 </script>
 
 {@render children()}
