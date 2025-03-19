@@ -20,11 +20,6 @@
 	let session = $state(data.session);
 	let isAuthenticated = $derived(!!session);
 
-	// Debug log for session data
-	$effect(() => {
-		console.log('Current session status:', { session, isAuthenticated });
-	});
-
 	// Manually check for session on mount
 	onMount(async () => {
 		try {
@@ -87,16 +82,7 @@
 	async function handleSignIn() {
 		isSigningIn = true;
 		try {
-			const { data, error } = await signInWithGoogle();
-			console.log('data in handleSignIn: ', data);
-			console.log('error in handleSignIn: ', error);
-
-			// After redirect, check for session
-			const currentSession = await getSession();
-			if (currentSession) {
-				console.log('Session found after sign-in:', currentSession);
-				session = currentSession; // Directly update the local session
-			}
+			 await signInWithGoogle();
 		} catch (error) {
 			console.error('Error signing in:', error);
 		} finally {
