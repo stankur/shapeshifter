@@ -5,7 +5,10 @@
 	import { DOMParser, type Node } from 'prosemirror-model';
 	import { EditorState } from 'prosemirror-state';
 	import { EditorView } from 'prosemirror-view';
-	import { onMount } from 'svelte';
+	import { getContext, onMount } from 'svelte';
+	import type { Document } from '$lib/model/document';
+
+	let documentNode: Document = getContext('document');
 
 	const getHeadingSize = (level: number) => {
 		switch (level) {
@@ -20,23 +23,23 @@
 		}
 	};
 
-    type Props = {
-        node: ContentHeading;
-        refs: Record<
-            string,
-            { element: HTMLElement; animateAbsolute: boolean; animateNested: boolean }
-        >;
-        onUnmount: () => void;
-        updateParent: () => void;
-        additionalFlipId?: string;
-    }
+	type Props = {
+		node: ContentHeading;
+		refs: Record<
+			string,
+			{ element: HTMLElement; animateAbsolute: boolean; animateNested: boolean }
+		>;
+		onUnmount: () => void;
+		updateParent: () => void;
+		additionalFlipId?: string;
+	};
 
 	let {
 		node = $bindable<ContentHeading>(),
 		refs,
-        onUnmount,
-        updateParent,
-        additionalFlipId
+		onUnmount,
+		updateParent,
+		additionalFlipId
 	}: Props = $props();
 	let { content, level } = $derived(node);
 
@@ -64,19 +67,20 @@
 				const newState = view.state.apply(transaction);
 				onUnmount();
 
-                node.content = newState.doc.textContent;
-                // node.last_modified = new Date().toISOString();
-                // updateParent();
+				documentNode.state.animateNextChange = false;
+				node.content = newState.doc.textContent;
+				// node.last_modified = new Date().toISOString();
+				// updateParent();
 
 				view.updateState(newState);
 			},
 			nodeViews: {
 				heading() {
-                    const id = node.id + (additionalFlipId ? `-${additionalFlipId}` : '');
+					const id = node.id + (additionalFlipId ? `-${additionalFlipId}` : '');
 					const dom = document.createElement('h1');
 					dom.setAttribute('data-flip-id', id);
 
-					console.log("yo I'm in the heading node view for: " + content + " with id: " + id);
+					console.log("yo I'm in the heading node view for: " + content + ' with id: ' + id);
 
 					refs[id] = { element: dom, animateAbsolute: false, animateNested: false };
 
@@ -107,8 +111,6 @@
 			}
 		};
 	});
-
-
 </script>
 
 <div

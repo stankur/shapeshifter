@@ -3,10 +3,42 @@ import type { Database } from './types/supabase';
 import type { Document } from './model/document';
 
 // These will be replaced with actual environment variables
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseUrl: string = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey: string = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
+// Browser client (for client-side operations)
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+
+// Authentication methods
+export async function signInWithGoogle() {
+	const { data, error } = await supabase.auth.signInWithOAuth({
+		provider: 'google',
+		options: {
+			redirectTo: `${window.location.origin}/auth/callback`
+		}
+	});
+
+	return { data, error };
+}
+
+export async function signOut() {
+	const { error } = await supabase.auth.signOut();
+	return { error };
+}
+
+export async function getCurrentUser() {
+	const {
+		data: { user }
+	} = await supabase.auth.getUser();
+	return user;
+}
+
+export async function getSession() {
+	const {
+		data: { session }
+	} = await supabase.auth.getSession();
+	return session;
+}
 
 export async function saveDocument(document: Document) {
 	try {

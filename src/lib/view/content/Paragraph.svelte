@@ -6,9 +6,9 @@
 	import type { ContentParagraph } from '$lib/model/content';
 	import { EditorState, Plugin } from 'prosemirror-state';
 	import { EditorView } from 'prosemirror-view';
-	import { onMount } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import { separate } from '$lib/services/prosemirror';
-
+    import type {Document} from '$lib/model/document'
 
 
     type Props = {
@@ -32,6 +32,7 @@
 	}: Props= $props();
     // let enterPressed = $state<boolean>(false);
 	let { content } = $derived(node);
+    let documentNode:Document = getContext('document');
 	let doc: Node = $derived(defaultMarkdownParser.parse(content));
     let defaultPlugins = $state<Plugin[]>(exampleSetup({
         schema,
@@ -92,6 +93,7 @@
 					return;
 				}
 
+                documentNode.state.animateNextChange = false;
 				node.content = defaultMarkdownSerializer.serialize(newState.doc);
 
 				view.updateState(newState);

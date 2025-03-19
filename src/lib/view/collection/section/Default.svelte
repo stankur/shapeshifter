@@ -83,7 +83,7 @@
 	{onUnmount}
 />
 
-<div class="container flex flex-col gap-6" bind:this={containerElement}>
+<div class="container flex flex-col gap-7" bind:this={containerElement}>
 	{#if overRides && overRides.heading}
 		{#key node.heading.id}
 			<div bind:this={headingElement}>

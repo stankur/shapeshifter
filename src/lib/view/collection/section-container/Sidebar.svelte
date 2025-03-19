@@ -112,7 +112,6 @@
 	}
 
 	.sidebar-item {
-		border-bottom: 1px solid black;
 		cursor: pointer;
 	}
 
