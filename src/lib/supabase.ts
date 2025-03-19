@@ -12,10 +12,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 // Authentication methods
 export async function signInWithGoogle() {
 	const { data, error } = await supabase.auth.signInWithOAuth({
-		provider: 'google',
-		// options: {
-		// 	redirectTo: `${window.location.origin}/auth/callback`
-		// }
+		provider: 'google'
 	});
 
 	return { data, error };

@@ -12,11 +12,32 @@
 		sectionContainerTOCCard,
 		sidebarExample
 	} from '$lib/model/examples';
-	import { saveDocument, signInWithGoogle, signOut } from '$lib/supabase';
+	import { saveDocument, signInWithGoogle, signOut, getSession, supabase } from '$lib/supabase';
+	import { onMount } from 'svelte';
+	import { invalidate } from '$app/navigation';
 
 	let { data } = $props();
-	let session = $derived(data.session);
+	let session = $state(data.session);
 	let isAuthenticated = $derived(!!session);
+
+	// Debug log for session data
+	$effect(() => {
+		console.log('Current session status:', { session, isAuthenticated });
+	});
+
+	// Manually check for session on mount
+	onMount(async () => {
+		try {
+			const currentSession = await getSession();
+			if (currentSession) {
+				console.log('Found session on mount:', currentSession);
+				session = currentSession;
+				invalidate('supabase:auth');
+			}
+		} catch (error) {
+			console.error('Error checking session on mount:', error);
+		}
+	});
 
 	let node = $state(sectionContainerTOC as DocumentType);
 	let isPublishing = $state(false);
@@ -69,6 +90,13 @@
 			const { data, error } = await signInWithGoogle();
 			console.log('data in handleSignIn: ', data);
 			console.log('error in handleSignIn: ', error);
+
+			// After redirect, check for session
+			const currentSession = await getSession();
+			if (currentSession) {
+				console.log('Session found after sign-in:', currentSession);
+				session = currentSession; // Directly update the local session
+			}
 		} catch (error) {
 			console.error('Error signing in:', error);
 		} finally {
@@ -79,6 +107,7 @@
 	async function handleSignOut() {
 		try {
 			await signOut();
+			session = null; // Directly clear the session state
 		} catch (error) {
 			console.error('Error signing out:', error);
 		}
