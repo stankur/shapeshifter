@@ -1,0 +1,95 @@
+# Project Intelligence
+
+## File Organization
+- SvelteKit routes in `src/routes`
+- Components in `src/lib/view`
+- Models in `src/lib/model`
+- Actions in `src/lib/actions`
+- Services in `src/lib/services`
+- Types in `src/lib/types`
+
+## Component Patterns
+1. Section Containers
+   - Located in `src/lib/view/collection/section-container`
+   - Each container type has its own directory
+   - Includes main component and Controls component
+
+2. Content Components
+   - Located in `src/lib/view/content`
+   - Basic building blocks like Heading and Paragraph
+
+3. Section Controls
+   - Located in `src/lib/view/collection/section/control`
+   - Reusable control components like Collapse/Expand
+
+## Naming Conventions
+- `.svelte` for Svelte components
+- `.svelte.ts` for Svelte-specific TypeScript files
+- `.ts` for regular TypeScript files
+- Component directories contain main component file and related files
+
+## Implementation Paths
+1. Document Structure
+   - Document model defines structure
+   - View registry maps content to components
+   - Actions handle document interactions
+
+2. Content Editing
+   - ProseMirror handles core editing
+   - Custom extensions for transformations
+   - Component-based UI for different views
+
+3. Data Flow
+   - Document model manages state
+   - Direct model-view updates
+   - Supabase for persistence
+
+## Project Preferences
+- TypeScript for type safety
+- Component-based architecture
+- Modular design patterns
+- Clear separation of concerns
+
+## Known Patterns
+1. View Registry
+   - Central component mapping
+   - Extensible for new content types
+   - Dynamic component loading
+
+2. Section Container Pattern
+   - Container components for different views
+   - Separate controls for each container
+   - Consistent interface across types
+
+3. Document Actions
+   - Handles document interactions
+   - Manages state changes
+   - Coordinates updates
+
+## Critical Paths
+1. Document Updates
+   ```
+   User Input -> ProseMirror -> Document Model -> View Update -> Supabase
+   ```
+
+2. View Rendering
+   ```
+   Document Model -> View Registry -> Component Selection -> Render
+   ```
+
+3. Content Transformation
+   ```
+   Selection -> Transform -> Model Update -> View Refresh
+   ```
+
+## Tool Usage
+- ProseMirror for rich text editing
+- Supabase for data persistence
+- TypeScript for type definitions
+- Tailwind for styling
+
+## Evolution Notes
+- Started with basic document model
+- Added view registry for flexibility
+- Implemented container pattern for different views
+- Building transformation capabilities
