@@ -14,15 +14,19 @@ Initial project setup and documentation of core concepts for an idea transformat
 3. Improved document structure
    - Added collection model and actions
    - Implemented document utilities
+   - Added document titles and slugs
+   - Created TitleInput component
 4. Set up route handling
    - Added dynamic document routes
    - Configured layout components
+   - Prepared for username/slug-based URLs
 
 ## Active Decisions
 1. **Authentication & Security**
    - Using Supabase auth with custom profiles
    - Implementing row-level security policies
    - Managing user-specific content access
+   - Enforcing unique document titles per user
 
 2. **Document Organization**
    - Hierarchical section containers
@@ -39,6 +43,7 @@ Initial project setup and documentation of core concepts for an idea transformat
    - Optimizing user onboarding
    - Managing auth state across routes
    - Handling auth-specific UI states
+   - Ensuring unique document identifiers
 
 2. **Document Organization**
    - Complex nested section relationships

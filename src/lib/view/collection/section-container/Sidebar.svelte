@@ -4,7 +4,7 @@
 	import { registry } from '$lib/viewRegistry.svelte';
 	import type { Component } from 'svelte';
 	import type { z } from 'zod';
-	import type { Refs } from '$lib/Document.svelte';
+	import type { Refs } from '$lib/components/Document.svelte';
 
 	type SectionContainer = z.infer<typeof sectionContainer>;
 

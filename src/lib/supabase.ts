@@ -74,11 +74,22 @@ export async function getSession() {
 
 export async function saveDocument(document: Document) {
 	try {
+		const {
+			data: { user }
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			return { success: false, error: 'User not authenticated' };
+		}
+
 		const { data, error } = await supabase
 			.from('documents')
 			.upsert({
+                id: document.id,
 				document: document,
-				updated_at: new Date().toISOString()
+				updated_at: new Date().toISOString(),
+				user_id: user.id,
+				slug: document.slug // Save slug in the table for easier querying
 			})
 			.select('id')
 			.single();

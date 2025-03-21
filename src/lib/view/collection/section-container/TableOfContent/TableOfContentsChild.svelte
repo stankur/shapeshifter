@@ -5,7 +5,7 @@
 	import { onDestroy, type Component } from 'svelte';
 	import { z } from 'zod';
 	import TableOfContentsChild from './TableOfContentsChild.svelte';
-	import type { Refs } from '$lib/Document.svelte';
+	import type { Refs } from '$lib/components/Document.svelte';
 	import { registerRef } from '$lib/view/utils/registerRef.svelte';
 	let {
 		node,

@@ -19,8 +19,17 @@
 - [x] Document actions
 - [x] Collection model
 - [x] Route handling
+- [x] Document identification
+  - [x] Title and slug fields
+  - [x] User-specific unique slugs
+  - [x] Title input component
+  - [x] Automatic slug generation
 
 ### UI Components
+- [x] Document controls
+  - [x] Title input in top bar
+  - [x] Username display
+  - [x] Publish controls
 - [x] Section containers
   - [x] Card view with controls
   - [x] Table of Contents with child components

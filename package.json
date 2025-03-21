@@ -53,6 +53,7 @@
 		"prosemirror-model": "^1.24.1",
 		"prosemirror-state": "^1.4.3",
 		"prosemirror-view": "^1.38.0",
+		"slugify": "^1.6.6",
 		"zod": "^3.24.2"
 	}
 }

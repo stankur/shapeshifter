@@ -1,4 +1,4 @@
-import type { Refs } from '$lib/Document.svelte';
+import type { Refs } from '$lib/components/Document.svelte';
 import { onDestroy } from 'svelte';
 
 export function registerRef(

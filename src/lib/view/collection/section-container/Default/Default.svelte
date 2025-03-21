@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Refs } from '$lib/Document.svelte';
+	import type { Refs } from '$lib/components/Document.svelte';
 	import { type Section, type SectionContainer } from '$lib/model/collection';
 	import { registry } from '$lib/viewRegistry.svelte';
 	import type { Component } from 'svelte';

@@ -14,19 +14,25 @@ export type Database = {
           created_at: string
           document: Json | null
           id: string
+          slug: string | null
           updated_at: string | null
+          user_id: string | null
         }
         Insert: {
           created_at?: string
           document?: Json | null
           id?: string
+          slug?: string | null
           updated_at?: string | null
+          user_id?: string | null
         }
         Update: {
           created_at?: string
           document?: Json | null
           id?: string
+          slug?: string | null
           updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }

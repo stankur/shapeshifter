@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import Document from '$lib/Document.svelte';
+	import Document from '$lib/components/Document.svelte';
 	import type { Document as DocumentType } from '$lib/model/document';
 	import {
 		simpleSection,
@@ -12,10 +12,11 @@
 		sectionContainerTOCCard,
 		sidebarExample
 	} from '$lib/model/examples';
-	import { saveDocument, signInWithGoogle, signOut, getSession, supabase } from '$lib/supabase';
+	import { saveDocument, signInWithGoogle, signOut, getSession, supabase, getUserProfile } from '$lib/supabase';
 	import { onMount } from 'svelte';
 	import { invalidate } from '$app/navigation';
-	import UsernameInput from '$lib/view/auth/UsernameInput.svelte';
+	import UsernameInput from '$lib/components/UsernameInput.svelte';
+	import TitleInput from '$lib/components/TitleInput.svelte';
 
 	let { data } = $props();
 	let session = $state(data.session);
@@ -46,6 +47,16 @@
 		isPublishing = true;
 		publishStatus = null;
 
+		// Validate title
+		if (!node.title?.trim()) {
+			publishStatus = {
+				success: false,
+				message: 'Please enter a document title'
+			};
+			isPublishing = false;
+			return;
+		}
+
 		try {
 			const result = await saveDocument(node);
 
@@ -59,7 +70,7 @@
 			} else {
 				publishStatus = {
 					success: false,
-					message: 'Failed to publish document. Please try again.'
+					message: typeof result.error === 'string' ? result.error : 'Failed to publish document. Please try again.'
 				};
 			}
 		} catch (error) {
@@ -105,6 +116,7 @@
 	{#if isAuthenticated && session}
 		<div class="mr-2 flex items-center gap-4">
 			<UsernameInput {session} />
+			<TitleInput document={node} />
 			<button class="text-sm text-gray-600 underline hover:text-gray-800" on:click={handleSignOut}>
 				Sign out
 			</button>
@@ -188,17 +200,21 @@
 			: 'bg-red-100 text-red-800'}"
 	>
 		<p>{publishStatus.message}</p>
-		{#if publishStatus.success && publishStatus.documentId}
-			<div class="mt-2">
-				<a
-					href="/{publishStatus.documentId}"
-					class="text-blue-600 hover:underline"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					View published document
-				</a>
-			</div>
+		{#if publishStatus.success && session?.user}
+			{#await getUserProfile(session.user.id) then profile}
+				{#if profile?.username}
+					<div class="mt-2">
+						<a
+							href="/{profile.username}/{node.slug}"
+							class="text-blue-600 hover:underline"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							View published document
+						</a>
+					</div>
+				{/if}
+			{/await}
 		{/if}
 	</div>
 {/if}

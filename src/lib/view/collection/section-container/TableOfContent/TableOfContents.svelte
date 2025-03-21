@@ -5,7 +5,7 @@
 	import { registry } from '$lib/viewRegistry.svelte';
 	import { type Component } from 'svelte';
 	import { z } from 'zod';
-	import type { Refs } from '$lib/Document.svelte';
+	import type { Refs } from '$lib/components/Document.svelte';
 	import Controls from './Controls.svelte';
 	import { getContext } from 'svelte';
 	import type { Document } from '$lib/model/document';

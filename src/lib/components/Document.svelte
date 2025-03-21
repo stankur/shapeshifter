@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { registry } from './viewRegistry.svelte';
+	import { registry } from '../viewRegistry.svelte';
 	import type { Document } from '$lib/model/document';
 	import { setContext, type Component } from 'svelte';
 	import { page } from '$app/state';
-
 	import { gsap } from 'gsap';
 	import Flip from 'gsap/dist/Flip';
-	import type { NoHeadingContentSingle } from './model/collection';
+	import type { NoHeadingContentSingle } from '../model/collection';
 	gsap.registerPlugin(Flip);
 
 	export type Refs = Record<
@@ -106,7 +105,7 @@
 	</select>
 {/if}
 
-<div class="flex justify-center">
+<div class="flex flex-col items-center gap-4">
 	<div class=" w-2/3">
 		<Renderer node={node.content} {refs} {onUnmount} />
 	</div>

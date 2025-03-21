@@ -13,12 +13,14 @@ export const simpleParagraph: Document = {
 		animateNextChange: true
 	},
 	type: 'document',
-	id: 'document-id',
+	id: '550e8400-e29b-41d4-a716-446655440000',
+	title: 'Simple Paragraph Example',
+	slug: 'simple-paragraph-example',
 	created: '2025-02-23T01:04:00Z',
 	last_modified: '2025-02-23T01:04:00Z',
 	content: {
 		type: 'paragraph',
-		id: 'a1b2c3d4-e5f6-7890-1234-56789abcdef0',
+		id: '67e55044-10b1-426f-9247-bb680e5fe0c8',
 		created: '2025-02-23T01:04:00Z',
 		last_modified: '2025-02-23T01:04:00Z',
 		content: 'This is a simple paragraph with **basic** formatting.',
@@ -36,16 +38,18 @@ export const simpleSection: Document = {
 		animateNextChange: true
 	},
 	type: 'document',
-	id: 'document-id',
+	id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
+	title: 'Simple Section Example',
+	slug: 'simple-section-example',
 	created: '2025-02-23T01:04:00Z',
 	last_modified: '2025-02-23T01:04:00Z',
 	content: {
 		type: 'section',
-		id: '01234567-89ab-cdef-0123-456789abcdef',
+		id: 'c2d10889-457c-4553-9477-a5c3bcdac83c',
 		heading: {
 			type: 'heading',
 			level: 2,
-			id: '12345678-9abc-def0-1234-56789abcdef0',
+			id: '123e4567-e89b-12d3-a456-426614174000',
 			created: '2025-02-23T01:04:00Z',
 			last_modified: '2025-02-23T01:04:00Z',
 			content: 'Card 1',
@@ -74,12 +78,14 @@ export const nested: Document = {
 		animateNextChange: true
 	},
 	type: 'document',
-	id: 'document-id',
+	id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+	title: 'Nested Example',
+	slug: 'nested-example',
 	created: '2025-02-23T01:04:00Z',
 	last_modified: '2025-02-23T01:04:00Z',
 	content: {
 		type: 'section',
-		id: 'b2c3d4e5-f6a7-8901-2345-6789abcdef01',
+		id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
 		created: '2025-02-23T01:04:00Z',
 		last_modified: '2025-02-23T01:04:00Z',
 		view: [
@@ -91,7 +97,7 @@ export const nested: Document = {
 		heading: {
 			type: 'heading',
 			level: 1,
-			id: 'c3d4e5f6-a7b8-9012-3456-789abcdef012',
+			id: '6ec0bd7f-11c0-43da-975e-2a8ad9ebae0b',
 			created: '2025-02-23T01:04:00Z',
 			last_modified: '2025-02-23T01:04:00Z',
 			content: 'Main Section',
@@ -101,7 +107,7 @@ export const nested: Document = {
 		children: [
 			{
 				type: 'paragraph',
-				id: 'd4e5f6a7-b890-1234-5678-9abcdef01234',
+				id: '936da01f-9abd-4d9d-80c7-02af85c822a8',
 				created: '2025-02-23T01:04:00Z',
 				last_modified: '2025-02-23T01:04:00Z',
 				content: 'First child paragraph',
@@ -112,7 +118,7 @@ export const nested: Document = {
 		summary: [
 			{
 				type: 'paragraph',
-				id: 'e5f6a7b8-9012-3456-789a-bcdef0123456',
+				id: 'b7d0d2f8-6584-4af6-a28f-0aec59c6f442',
 				created: '2025-02-23T01:04:00Z',
 				last_modified: '2025-02-23T01:04:00Z',
 				content: 'Summary content',
@@ -132,12 +138,14 @@ export const nestedSummary: Document = {
 		animateNextChange: true
 	},
 	type: 'document',
-	id: 'document-id',
+	id: '4f7eb358-c3c1-4c98-9f9c-12d5e5f19c1a',
+	title: 'Nested Summary Example',
+	slug: 'nested-summary-example',
 	created: '2025-02-23T01:04:00Z',
 	last_modified: '2025-02-23T01:04:00Z',
 	content: {
 		type: 'section',
-		id: 'b2c3d4e5-f6a7-8901-2345-6789abcdef01',
+		id: '8f9aa33a-8d7c-4cb3-9b3a-c6f8f8f8f8f8',
 		created: '2025-02-23T01:04:00Z',
 		last_modified: '2025-02-23T01:04:00Z',
 		view: [
@@ -150,7 +158,7 @@ export const nestedSummary: Document = {
 			type: 'heading',
 			level: 1,
 			content: 'Main Section',
-			id: 'c3d4e5f6-a7b8-9012-3456-789abcdef012',
+			id: 'a1b2c3d4-e5f6-7890-1234-56789abcdef0',
 			created: '2025-02-23T01:04:00Z',
 			last_modified: '2025-02-23T01:04:00Z',
 			view: [{ type: 'content/heading/default' }],
@@ -159,7 +167,7 @@ export const nestedSummary: Document = {
 		children: [
 			{
 				type: 'paragraph',
-				id: 'd4e5f6a7-b890-1234-5678-9abcdef01234',
+				id: 'b2c3d4e5-f6a7-8901-2345-6789abcdef01',
 				created: '2025-02-23T01:04:00Z',
 				last_modified: '2025-02-23T01:04:00Z',
 				content: 'First child paragraph',
@@ -170,7 +178,7 @@ export const nestedSummary: Document = {
 		summary: [
 			{
 				type: 'paragraph',
-				id: 'e5f6a7b8-9012-3456-789a-bcdef0123456',
+				id: 'c3d4e5f6-a7b8-9012-3456-789abcdef012',
 				content: 'Summary content',
 				created: '2025-02-23T01:04:00Z',
 				last_modified: '2025-02-23T01:04:00Z',
@@ -191,12 +199,14 @@ export const untitled: Document = {
 		animateNextChange: true
 	},
 	type: 'document',
-	id: 'document-id',
+	id: 'd4e5f6a7-b890-1234-5678-9abcdef01234',
+	title: 'Untitled Example',
+	slug: 'untitled-example',
 	created: '2025-02-23T01:04:00Z',
 	last_modified: '2025-02-23T01:04:00Z',
 	content: {
 		type: 'untitled-section',
-		id: 'f6a7b890-1234-5678-9abc-def012345678',
+		id: 'e5f6a7b8-9012-3456-789a-bcdef0123456',
 		created: '2025-02-23T01:04:00Z',
 		last_modified: '2025-02-23T01:04:00Z',
 		view: [{ type: 'collection/untitled-section/default', state: 'expanded' }, { type: 'static' }],
@@ -204,7 +214,7 @@ export const untitled: Document = {
 		children: [
 			{
 				type: 'paragraph',
-				id: 'a7b89012-3456-789a-bcde-f0123456789a',
+				id: 'f6a7b890-1234-5678-9abc-def012345678',
 				created: '2025-02-23T01:04:00Z',
 				last_modified: '2025-02-23T01:04:00Z',
 				content: 'Content in untitled section',
@@ -213,11 +223,11 @@ export const untitled: Document = {
 			},
 			{
 				type: 'section',
-				id: 'b8901234-5678-9abc-def0-123456789abc',
+				id: 'a7b89012-3456-789a-bcde-f0123456789a',
 				heading: {
 					type: 'heading',
 					level: 3,
-					id: 'cdef0123-4567-89ab-cdef-0123456789ab',
+					id: 'b8901234-5678-9abc-def0-123456789abc',
 					created: '2025-02-23T01:04:00Z',
 					last_modified: '2025-02-23T01:04:00Z',
 					content: 'Nested Section',
@@ -245,12 +255,14 @@ export const card: Document = {
 		animateNextChange: true
 	},
 	type: 'document',
-	id: 'document-id',
+	id: 'cdef0123-4567-89ab-cdef-0123456789ab',
+	title: 'Card Example',
+	slug: 'card-example',
 	created: '2025-02-23T01:04:00Z',
 	last_modified: '2025-02-23T01:04:00Z',
 	content: {
 		type: 'section-container',
-		id: 'def01234-5678-9abc-def0-123456789abc',
+		id: 'd4e5f6a7-b890-1234-5678-9abcdef01234',
 		created: '2025-02-23T01:04:00Z',
 		last_modified: '2025-02-23T01:04:00Z',
 		view: [
@@ -293,11 +305,11 @@ export const card: Document = {
 		children: [
 			{
 				type: 'section',
-				id: '01234567-89ab-cdef-0123-456789abcdef',
+				id: 'e5f6a7b8-9012-3456-789a-bcdef0123456',
 				heading: {
 					type: 'heading',
 					level: 2,
-					id: '12345678-9abc-def0-1234-56789abcdef0',
+					id: 'f6a7b890-1234-5678-9abc-def012345678',
 					created: '2025-02-23T01:04:00Z',
 					last_modified: '2025-02-23T01:04:00Z',
 					content: 'Card 1',
@@ -313,7 +325,7 @@ export const card: Document = {
 				children: [
 					{
 						type: 'paragraph',
-						id: 'e5f6a7b8-9012-3456-789a-bcdef0123456',
+						id: 'a7b89012-3456-789a-bcde-f0123456789a',
 						content: 'Actual content',
 						created: '2025-02-23T01:04:00Z',
 						last_modified: '2025-02-23T01:04:00Z',
@@ -324,7 +336,7 @@ export const card: Document = {
 				summary: [
 					{
 						type: 'paragraph',
-						id: 'e5f6a7b8-9012-3456-789a-bcdef0123456-1',
+						id: 'b8901234-5678-9abc-def0-123456789abc',
 						content: 'Summary content 1',
 						created: '2025-02-23T01:04:00Z',
 						last_modified: '2025-02-23T01:04:00Z',
@@ -337,11 +349,11 @@ export const card: Document = {
 			},
 			{
 				type: 'section',
-				id: '23456789-abcd-ef01-2345-6789abcdef01',
+				id: 'cdef0123-4567-89ab-cdef-0123456789ab',
 				heading: {
 					type: 'heading',
 					level: 2,
-					id: '3456789a-bcde-f012-3456-789abcdef012',
+					id: 'd4e5f6a7-b890-1234-5678-9abcdef01234',
 					created: '2025-02-23T01:04:00Z',
 					last_modified: '2025-02-23T01:04:00Z',
 					content: 'Card 2',
@@ -368,7 +380,7 @@ export const card: Document = {
 				summary: [
 					{
 						type: 'paragraph',
-						id: 'e5f6a7b8-9012-3456-789a-bcdef0123456-2',
+						id: 'f6a7b890-1234-5678-9abc-def012345678',
 						content: 'Summary content 2',
 						created: '2025-02-23T01:04:00Z',
 						last_modified: '2025-02-23T01:04:00Z',
@@ -381,11 +393,11 @@ export const card: Document = {
 			},
 			{
 				type: 'section',
-				id: '3456789a-bcde-f012-3456-789abcdef012',
+				id: 'a7b89012-3456-789a-bcde-f0123456789a',
 				heading: {
 					type: 'heading',
 					level: 2,
-					id: '456789ab-cdef-0123-4567-89abcdef0123',
+					id: 'b8901234-5678-9abc-def0-123456789abc',
 					created: '2025-02-23T01:04:00Z',
 					last_modified: '2025-02-23T01:04:00Z',
 					content: 'Card 3',
@@ -401,7 +413,7 @@ export const card: Document = {
 				children: [
 					{
 						type: 'paragraph',
-						id: 'f6a7b890-1234-5678-9abc-def012345678',
+						id: 'cdef0123-4567-89ab-cdef-0123456789ab',
 						content: 'Content for Card 3',
 						created: '2025-02-23T01:04:00Z',
 						last_modified: '2025-02-23T01:04:00Z',
@@ -412,7 +424,7 @@ export const card: Document = {
 				summary: [
 					{
 						type: 'paragraph',
-						id: 'f6a7b890-1234-5678-9abc-def012345678',
+						id: 'd4e5f6a7-b890-1234-5678-9abcdef01234',
 						content: 'Summary for Card 3',
 						created: '2025-02-23T01:04:00Z',
 						last_modified: '2025-02-23T01:04:00Z',
@@ -425,11 +437,11 @@ export const card: Document = {
 			},
 			{
 				type: 'section',
-				id: '456789ab-cdef-0123-4567-89abcdef0123',
+				id: 'e5f6a7b8-9012-3456-789a-bcdef0123456',
 				heading: {
 					type: 'heading',
 					level: 2,
-					id: '56789abc-def0-1234-5678-9abcdef01234',
+					id: 'f6a7b890-1234-5678-9abc-def012345678',
 					created: '2025-02-23T01:04:00Z',
 					last_modified: '2025-02-23T01:04:00Z',
 					content: 'Card 4',
@@ -445,7 +457,7 @@ export const card: Document = {
 				children: [
 					{
 						type: 'paragraph',
-						id: '6789abcd-ef01-2345-6789-abcdef012345',
+						id: 'a7b89012-3456-789a-bcde-f0123456789a',
 						content: 'Content for Card 4',
 						created: '2025-02-23T01:04:00Z',
 						last_modified: '2025-02-23T01:04:00Z',
@@ -456,7 +468,7 @@ export const card: Document = {
 				summary: [
 					{
 						type: 'paragraph',
-						id: '6789abcd-ef01-2345-6789-abcdef012345',
+						id: 'b8901234-5678-9abc-def0-123456789abc',
 						content: 'Summary for Card 4',
 						created: '2025-02-23T01:04:00Z',
 						last_modified: '2025-02-23T01:04:00Z',
@@ -474,10 +486,10 @@ export const card: Document = {
 // Define a paragraph as a child content
 const paragraphChild = (num: number, childNum: number, parentNum: number): ContentParagraph => ({
 	type: 'paragraph',
-	id: `child-paragraph-id-${num}-${childNum}-${parentNum}`,
+	id: `${crypto.randomUUID()}`,
 	created: '2025-02-23T01:04:00Z',
 	last_modified: '2025-02-23T01:04:00Z',
-	content: `This is a child paragraph ${num}.`,
+	content: `This is child paragraph ${num}-${childNum} (parent: ${parentNum})`,
 	view: [{ type: 'content/paragraph/default' }],
 	activeView: 'content/paragraph/default'
 });
@@ -485,13 +497,13 @@ const paragraphChild = (num: number, childNum: number, parentNum: number): Conte
 // Define a nested section
 const nestedSection = (num: number, childNum: number): Section => ({
 	type: 'section',
-	id: `nested-section-id-${num}-${childNum}`,
+	id: `${crypto.randomUUID()}`,
 	created: '2025-02-23T01:04:00Z',
 	last_modified: '2025-02-23T01:04:00Z',
 	heading: {
 		type: 'heading',
 		level: 3,
-		id: `nested-heading-id-${num}-${childNum}`,
+		id: `${crypto.randomUUID()}`,
 		created: '2025-02-23T01:04:00Z',
 		last_modified: '2025-02-23T01:04:00Z',
 		content: `Nested Section ${num} ${childNum}`,
@@ -512,7 +524,7 @@ const nestedSection = (num: number, childNum: number): Section => ({
 	summary: [
 		{
 			type: 'paragraph',
-			id: `nested-section-summary-${num}-${childNum}`,
+			id: `${crypto.randomUUID()}`,
 			content: `Summary content ${num}-${childNum}`,
 			created: '2025-02-23T01:04:00Z',
 			last_modified: '2025-02-23T01:04:00Z',
@@ -524,7 +536,7 @@ const nestedSection = (num: number, childNum: number): Section => ({
 
 const nestedSectionContainer: (num: number) => z.infer<typeof sectionContainer> = (num) => ({
 	type: 'section-container',
-	id: `nested-section-container-id-${num}`,
+	id: `${crypto.randomUUID()}`,
 	created: '2025-02-23T01:04:00Z',
 	last_modified: '2025-02-23T01:04:00Z',
 	view: [
@@ -578,13 +590,13 @@ const nestedSectionContainer: (num: number) => z.infer<typeof sectionContainer> 
 // Define a top-level section
 const topLevelSection = (num: number): Section => ({
 	type: 'section',
-	id: `top-level-section-id-${num}`,
+	id: `${crypto.randomUUID()}`,
 	created: '2025-02-23T01:04:00Z',
 	last_modified: '2025-02-23T01:04:00Z',
 	heading: {
 		type: 'heading',
 		level: 2,
-		id: `top-level-heading-id-${num}`,
+		id: `${crypto.randomUUID()}`,
 		created: '2025-02-23T01:04:00Z',
 		last_modified: '2025-02-23T01:04:00Z',
 		content: `Top Section ${num}`,
@@ -601,7 +613,7 @@ const topLevelSection = (num: number): Section => ({
 	summary: [
 		{
 			type: 'paragraph',
-			id: `top-level-section-summary-${num}`,
+			id: `${crypto.randomUUID()}`,
 			content: `Summary content ${num}`,
 			created: '2025-02-23T01:04:00Z',
 			last_modified: '2025-02-23T01:04:00Z',
@@ -618,12 +630,14 @@ export const sectionContainerTOC: Document = {
 		animateNextChange: true
 	},
 	type: 'document',
-	id: 'document-id',
+	id: 'cdef0123-4567-89ab-cdef-0123456789ab',
+	title: 'Section Container TOC Example',
+	slug: 'section-container-toc-example',
 	created: '2025-02-23T01:04:00Z',
 	last_modified: '2025-02-23T01:04:00Z',
 	content: {
 		type: 'section-container',
-		id: 'section-container-id',
+		id: 'd4e5f6a7-b890-1234-5678-9abcdef01234',
 		created: '2025-02-23T01:04:00Z',
 		last_modified: '2025-02-23T01:04:00Z',
 		view: [
@@ -674,12 +688,14 @@ export const sectionContainerTOCCard: Document = {
 		animateNextChange: true
 	},
 	type: 'document',
-	id: 'document-id',
+	id: 'e5f6a7b8-9012-3456-789a-bcdef0123456',
+	title: 'Section Container TOC Card Example',
+	slug: 'section-container-toc-card-example',
 	created: '2025-02-23T01:04:00Z',
 	last_modified: '2025-02-23T01:04:00Z',
 	content: {
 		type: 'section-container',
-		id: 'section-container-id',
+		id: 'f6a7b890-1234-5678-9abc-def012345678',
 		created: '2025-02-23T01:04:00Z',
 		last_modified: '2025-02-23T01:04:00Z',
 		view: [
@@ -724,7 +740,7 @@ export const sectionContainerTOCCard: Document = {
 };
 
 export const sidebarExample: SectionContainer = {
-	id: 'sidebar-example',
+	id: 'a7b89012-3456-789a-bcde-f0123456789a',
 	type: 'section-container',
 	created: '2025-02-23T01:04:00Z',
 	last_modified: '2025-02-23T01:04:00Z',
@@ -743,12 +759,12 @@ export const sidebarExample: SectionContainer = {
 	activeView: 'collection/section-container/sidebar',
 	children: [
 		{
-			id: 'section-1',
+			id: 'b8901234-5678-9abc-def0-123456789abc',
 			type: 'section',
 			created: '2025-02-23T01:04:00Z',
 			last_modified: '2025-02-23T01:04:00Z',
 			heading: {
-				id: 'heading-1',
+				id: 'cdef0123-4567-89ab-cdef-0123456789ab',
 				type: 'heading',
 				level: 2,
 				created: '2025-02-23T01:04:00Z',
@@ -759,7 +775,7 @@ export const sidebarExample: SectionContainer = {
 			},
 			summary: [
 				{
-					id: 'summary-1',
+					id: 'd4e5f6a7-b890-1234-5678-9abcdef01234',
 					type: 'paragraph',
 					created: '2025-02-23T01:04:00Z',
 					last_modified: '2025-02-23T01:04:00Z',
@@ -770,7 +786,7 @@ export const sidebarExample: SectionContainer = {
 			],
 			children: [
 				{
-					id: 'content-1',
+					id: 'e5f6a7b8-9012-3456-789a-bcdef0123456',
 					type: 'paragraph',
 					created: '2025-02-23T01:04:00Z',
 					last_modified: '2025-02-23T01:04:00Z',
@@ -788,12 +804,12 @@ export const sidebarExample: SectionContainer = {
 			activeView: 'collection/section/default'
 		},
 		{
-			id: 'section-2',
+			id: 'f6a7b890-1234-5678-9abc-def012345678',
 			type: 'section',
 			created: '2025-02-23T01:04:00Z',
 			last_modified: '2025-02-23T01:04:00Z',
 			heading: {
-				id: 'heading-2',
+				id: 'a7b89012-3456-789a-bcde-f0123456789a',
 				type: 'heading',
 				level: 2,
 				created: '2025-02-23T01:04:00Z',
@@ -804,7 +820,7 @@ export const sidebarExample: SectionContainer = {
 			},
 			summary: [
 				{
-					id: 'summary-2',
+					id: 'b8901234-5678-9abc-def0-123456789abc',
 					type: 'paragraph',
 					created: '2025-02-23T01:04:00Z',
 					last_modified: '2025-02-23T01:04:00Z',
@@ -815,7 +831,7 @@ export const sidebarExample: SectionContainer = {
 			],
 			children: [
 				{
-					id: 'content-2-1',
+					id: 'cdef0123-4567-89ab-cdef-0123456789ab',
 					type: 'paragraph',
 					created: '2025-02-23T01:04:00Z',
 					last_modified: '2025-02-23T01:04:00Z',
@@ -824,7 +840,7 @@ export const sidebarExample: SectionContainer = {
 					activeView: 'content/paragraph/default'
 				},
 				{
-					id: 'content-2-2',
+					id: 'd4e5f6a7-b890-1234-5678-9abcdef01234',
 					type: 'paragraph',
 					created: '2025-02-23T01:04:00Z',
 					last_modified: '2025-02-23T01:04:00Z',
@@ -833,7 +849,7 @@ export const sidebarExample: SectionContainer = {
 					activeView: 'content/paragraph/default'
 				},
 				{
-					id: 'content-2-3',
+					id: 'e5f6a7b8-9012-3456-789a-bcdef0123456',
 					type: 'paragraph',
 					created: '2025-02-23T01:04:00Z',
 					last_modified: '2025-02-23T01:04:00Z',
@@ -842,7 +858,7 @@ export const sidebarExample: SectionContainer = {
 					activeView: 'content/paragraph/default'
 				},
 				{
-					id: 'content-2-4',
+					id: 'f6a7b890-1234-5678-9abc-def012345678',
 					type: 'paragraph',
 					created: '2025-02-23T01:04:00Z',
 					last_modified: '2025-02-23T01:04:00Z',
@@ -859,12 +875,12 @@ export const sidebarExample: SectionContainer = {
 			activeView: 'collection/section/default'
 		},
 		{
-			id: 'section-3',
+			id: 'a7b89012-3456-789a-bcde-f0123456789a',
 			type: 'section',
 			created: '2025-02-23T01:04:00Z',
 			last_modified: '2025-02-23T01:04:00Z',
 			heading: {
-				id: 'heading-3',
+				id: 'b8901234-5678-9abc-def0-123456789abc',
 				type: 'heading',
 				level: 2,
 				created: '2025-02-23T01:04:00Z',
@@ -875,7 +891,7 @@ export const sidebarExample: SectionContainer = {
 			},
 			summary: [
 				{
-					id: 'summary-3',
+					id: 'cdef0123-4567-89ab-cdef-0123456789ab',
 					type: 'paragraph',
 					created: '2025-02-23T01:04:00Z',
 					last_modified: '2025-02-23T01:04:00Z',
@@ -886,7 +902,7 @@ export const sidebarExample: SectionContainer = {
 			],
 			children: [
 				{
-					id: 'content-3',
+					id: 'd4e5f6a7-b890-1234-5678-9abcdef01234',
 					type: 'paragraph',
 					created: '2025-02-23T01:04:00Z',
 					last_modified: '2025-02-23T01:04:00Z',

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Refs } from '$lib/Document.svelte';
+	import type { Refs } from '$lib/components/Document.svelte';
 	import type { Section } from '$lib/model/collection';
 	import type { ContentHeading, ContentParagraph } from '$lib/model/content';
 	import type { Document } from '$lib/model/document';

@@ -4,6 +4,8 @@ import { noHeadingContentSingle } from './collection';
 export const document = z.object({
 	type: z.literal('document'),
 	id: z.string(),
+    title: z.string(),
+    slug: z.string(),
 	created: z.string().datetime(),
 	last_modified: z.string().datetime(),
 	content: noHeadingContentSingle,

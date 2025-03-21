@@ -31,6 +31,15 @@ src/
    - ProseMirror-based editor core
    - Custom content types (Heading, Paragraph)
    - Extensible view registry
+   - Title and slug management
+   ```mermaid
+   flowchart TD
+       Title[Document Title] --> Slug[URL Slug]
+       Slug --> Unique[Unique per User]
+       Title --> UI[TitleInput Component]
+       UI --> Save[Save Document]
+       Save --> DB[Database]
+   ```
 
 ### Data Flow
 ```mermaid
@@ -86,3 +95,16 @@ flowchart TD
 - Supabase authentication
 - Row-level security
 - Content permissions
+- Unique document constraints per user
+
+## Document Identification
+1. **Title System**
+   - User-friendly document titles
+   - Automatic slug generation
+   - Unique per user constraint
+   - Real-time title updates
+
+2. **URL Structure**
+   - Username-based paths
+   - Slug-based document identification
+   - Human-readable URLs
