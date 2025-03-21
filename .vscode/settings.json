@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.sql": "postgres"
+    },
+    "sql.linter.config": {
+        "dialect": "postgres"
+    }
+}

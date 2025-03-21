@@ -15,6 +15,7 @@
 	import { saveDocument, signInWithGoogle, signOut, getSession, supabase } from '$lib/supabase';
 	import { onMount } from 'svelte';
 	import { invalidate } from '$app/navigation';
+	import UsernameInput from '$lib/view/auth/UsernameInput.svelte';
 
 	let { data } = $props();
 	let session = $state(data.session);
@@ -82,7 +83,7 @@
 	async function handleSignIn() {
 		isSigningIn = true;
 		try {
-			 await signInWithGoogle();
+			await signInWithGoogle();
 		} catch (error) {
 			console.error('Error signing in:', error);
 		} finally {
@@ -102,8 +103,8 @@
 
 <div class="mb-4 flex justify-end gap-2">
 	{#if isAuthenticated && session}
-		<div class="mr-2 flex items-center">
-			<span class="mr-2 text-sm text-gray-600">Signed in as {session.user.email}</span>
+		<div class="mr-2 flex items-center gap-4">
+			<UsernameInput {session} />
 			<button class="text-sm text-gray-600 underline hover:text-gray-800" on:click={handleSignOut}>
 				Sign out
 			</button>

@@ -30,6 +30,41 @@ export async function getCurrentUser() {
 	return user;
 }
 
+export async function getUserProfile(userId: string) {
+	const { data, error } = await supabase
+		.from('profiles')
+		.select('username')
+		.eq('id', userId)
+		.single();
+	
+	if (error) throw error;
+	return data;
+}
+
+export async function updateUsername(userId: string, username: string) {
+	// First check if username is taken
+	const { data: existing } = await supabase
+		.from('profiles')
+		.select('id')
+		.eq('username', username)
+		.not('id', 'eq', userId)
+		.single();
+
+	if (existing) {
+		return { success: false, error: 'Username already taken' };
+	}
+
+	const { error } = await supabase
+		.from('profiles')
+		.upsert({ username, id: userId, updated_at: new Date().toISOString() })
+
+	if (error) {
+		return { success: false, error: error.message };
+	}
+
+	return { success: true };
+}
+
 export async function getSession() {
 	const {
 		data: { session }

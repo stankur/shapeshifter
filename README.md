@@ -35,3 +35,21 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
 ```
 
 After setting up Supabase, you can use the "Publish" button to save your documents to the database.
+
+## Getting the database ts definition
+
+```
+npx supabase gen types typescript --project-id "<PROJECT ID>" --schema public > src/lib/types/supabase.ts
+```
+
+## Running migration if database schema is changed
+
+most updated version should be able to be found here: 
+- https://supabase.com/docs/guides/local-development/overview#link-your-project
+
+
+
+```
+supabase db push
+```
+
