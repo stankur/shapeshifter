@@ -6,6 +6,7 @@ import TableOfContents from './view/collection/section-container/TableOfContent/
 import Default from './view/collection/section-container/Default/Default.svelte';
 import Sidebar from './view/collection/section-container/Sidebar.svelte';
 import Tabs from './view/collection/section-container/Tabs/Tabs.svelte';
+import TabShadcn from './view/collection/section-container/TabShadcn/TabShadcn.svelte';
 
 export const registry = {
 	'content/paragraph/default': Paragraph,
@@ -15,5 +16,6 @@ export const registry = {
 	'collection/section-container/table-of-contents': TableOfContents,
 	'collection/section-container/default': Default,
 	'collection/section-container/sidebar': Sidebar,
-	'collection/section-container/tabs': Tabs
+	'collection/section-container/tabs': Tabs,
+	'collection/section-container/tab-shadcn': TabShadcn
 };

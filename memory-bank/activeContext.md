@@ -11,6 +11,7 @@ Initial project setup and documentation of core concepts for an idea transformat
    - Implemented Table of Contents component
    - Added Tabs interface
    - Created Card view
+   - Added TabShadcn view using ShadCN UI components
 3. Improved document structure
    - Added collection model and actions
    - Implemented document utilities
@@ -20,6 +21,10 @@ Initial project setup and documentation of core concepts for an idea transformat
    - Added dynamic document routes
    - Configured layout components
    - Prepared for username/slug-based URLs
+5. Integrated ShadCN UI components
+   - Added ShadCN Tabs component
+   - Updated model schema to support TabShadcn view
+   - Added navigation between views
 
 ## Active Decisions
 1. **Authentication & Security**

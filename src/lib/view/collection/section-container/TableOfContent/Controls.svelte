@@ -81,6 +81,16 @@
 	>
 		tabs
 	</button>
+	<button
+		class="rounded-md bg-blue-500 p-2 text-white"
+		onclick={() => {
+			console.log('clicked');
+			onUnmount();
+			node.activeView = 'collection/section-container/tab-shadcn';
+		}}
+	>
+		shadcn tabs
+	</button>
 	{#each directions as _, index}
 		<select
 			bind:value={directions[index].type}

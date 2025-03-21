@@ -159,6 +159,10 @@ const sectionContainerView = z.tuple([
 	z.object({
 		type: z.literal('collection/section-container/tabs'),
 		state: sectionContainerTabsViewState
+	}),
+	z.object({
+		type: z.literal('collection/section-container/tab-shadcn'),
+		state: sectionContainerTabsViewState
 	})
 ]);
 

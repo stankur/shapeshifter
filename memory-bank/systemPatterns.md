@@ -68,6 +68,7 @@ flowchart TD
    - Card view
    - Table of Contents
    - Tabs interface
+   - TabShadcn interface (using ShadCN UI components)
    - Default layout
 
 2. **Controls**

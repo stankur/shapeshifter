@@ -299,6 +299,10 @@ export const card: Document = {
 			{
 				type: 'collection/section-container/tabs',
 				state: { gap: 0, activeIndex: 0 }
+			},
+			{
+				type: 'collection/section-container/tab-shadcn',
+				state: { gap: 0, activeIndex: 0 }
 			}
 		],
 		activeView: 'collection/section-container/card',
@@ -570,7 +574,8 @@ const nestedSectionContainer: (num: number) => z.infer<typeof sectionContainer> 
 			type: 'collection/section-container/sidebar',
 			state: { percentageWidth: 30, activeIndex: 0 }
 		},
-		{ type: 'collection/section-container/tabs', state: { gap: 16, activeIndex: 0 } }
+		{ type: 'collection/section-container/tabs', state: { gap: 16, activeIndex: 0 } },
+		{ type: 'collection/section-container/tab-shadcn', state: { gap: 16, activeIndex: 0 } }
 	],
 	activeView: 'collection/section-container/table-of-contents',
 	children: [
@@ -674,6 +679,10 @@ export const sectionContainerTOC: Document = {
 			{
 				type: 'collection/section-container/tabs',
 				state: { gap: 16, activeIndex: 0 }
+			},
+			{
+				type: 'collection/section-container/tab-shadcn',
+				state: { gap: 16, activeIndex: 0 }
 			}
 		],
 		activeView: 'collection/section-container/table-of-contents',
@@ -732,6 +741,10 @@ export const sectionContainerTOCCard: Document = {
 			{
 				type: 'collection/section-container/tabs',
 				state: { gap: 16, activeIndex: 0 }
+			},
+			{
+				type: 'collection/section-container/tab-shadcn',
+				state: { gap: 16, activeIndex: 0 }
 			}
 		],
 		activeView: 'collection/section-container/card',
@@ -754,7 +767,8 @@ export const sidebarExample: SectionContainer = {
 			type: 'collection/section-container/sidebar',
 			state: { percentageWidth: 30, activeIndex: 0 }
 		},
-		{ type: 'collection/section-container/tabs', state: { gap: 16, activeIndex: 0 } }
+		{ type: 'collection/section-container/tabs', state: { gap: 16, activeIndex: 0 } },
+		{ type: 'collection/section-container/tab-shadcn', state: { gap: 16, activeIndex: 0 } }
 	],
 	activeView: 'collection/section-container/sidebar',
 	children: [

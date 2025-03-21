@@ -34,6 +34,7 @@
   - [x] Card view with controls
   - [x] Table of Contents with child components
   - [x] Tabs interface with controls
+  - [x] TabShadcn interface using ShadCN UI components
   - [x] Default layout
   - [x] Sidebar implementation
 - [x] Section controls

@@ -53,3 +53,26 @@ most updated version should be able to be found here:
 supabase db push
 ```
 
+## UI Components
+
+### ShadCN Integration
+
+This project uses ShadCN for some UI components. To use ShadCN components:
+
+1. Install ShadCN for Svelte:
+```bash
+pnpm add -D shadcn-svelte
+```
+
+2. Initialize ShadCN in the project:
+```bash
+pnpm shadcn-svelte init
+```
+
+3. Add specific components as needed:
+```bash
+pnpm shadcn-svelte add tabs
+```
+
+ShadCN components will be added to `src/lib/components/ui/` by default.
+
