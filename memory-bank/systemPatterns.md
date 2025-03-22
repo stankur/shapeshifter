@@ -105,6 +105,7 @@ flowchart TD
    - Real-time title updates
 
 2. **URL Structure**
-   - Username-based paths
+   - Username-based paths (e.g., /username/document-slug)
    - Slug-based document identification
    - Human-readable URLs
+   - Unique document URLs per user

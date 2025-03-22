@@ -28,8 +28,8 @@
 
 	let flipState: Flip.FlipState | null = $state(null);
 
-	// Check if we're on a document view page (URL with an ID parameter)
-	const isDocumentViewPage = $derived(!!page.params.id);
+	// Check if we're on a document view page (URL with username and slug parameters)
+	const isDocumentViewPage = $derived(!!page.params.username && !!page.params.slug);
 
 	const onUnmount = () => {
 		const elements = Object.values(refs)

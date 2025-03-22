@@ -19,7 +19,8 @@ Initial project setup and documentation of core concepts for an idea transformat
 4. Set up route handling
    - Added dynamic document routes
    - Configured layout components
-   - Prepared for username/slug-based URLs
+   - Implemented username/slug-based URLs
+   - Replaced ID-based routing with username/slug routing
 
 ## Active Decisions
 1. **Authentication & Security**
@@ -62,6 +63,7 @@ Initial project setup and documentation of core concepts for an idea transformat
    - [ ] Add social auth providers
 
 2. **Document System**
+   - [x] Implement username/slug-based routing
    - [ ] Enhance section container interactions
    - [ ] Implement advanced view transitions
    - [ ] Add drag-and-drop organization

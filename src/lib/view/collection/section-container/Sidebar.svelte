@@ -73,7 +73,7 @@
 		<!-- Sidebar -->
 		<div class="sidebar shrink-0" style:width="{sidebarState.percentageWidth}%">
 			{#each ChildrenRenderers as { child, index, HeadingRenderer, SummaryRenderers }}
-				<div class="sidebar-item p-5" on:click={() => setActiveSection(index)}>
+				<div class="sidebar-item first:pt-0 p-5" on:click={() => setActiveSection(index)}>
 					<div class="heading">
 						<HeadingRenderer
 							node={child.heading}
@@ -100,7 +100,7 @@
 		</div>
 
 		<!-- Content -->
-		<div class="content grow basis-0 p-2" style:width="{100 -sidebarState.percentageWidth}%">
+		<div class="content grow basis-0 pt-0 p-2" style:width="{100 -sidebarState.percentageWidth}%">
 			<ActiveSectionRenderer node={children[sidebarState.activeIndex]} {refs} {onUnmount} />
 		</div>
 	</div>

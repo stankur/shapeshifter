@@ -19,6 +19,8 @@
 - [x] Document actions
 - [x] Collection model
 - [x] Route handling
+  - [x] Username/slug-based routing
+  - [x] Document read mode
 - [x] Document identification
   - [x] Title and slug fields
   - [x] User-specific unique slugs

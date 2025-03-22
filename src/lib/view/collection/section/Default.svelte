@@ -57,8 +57,8 @@
 	let containerElement: HTMLDivElement | null = $state(null);
 
 	$inspect(node);
-	$inspect(node.summary);
-	$inspect(node.heading);
+	$inspect(node?.summary);
+	$inspect(node?.heading);
 
 	onMount(() => {
 		if (containerElement && controlElement) {

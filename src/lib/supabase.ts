@@ -103,14 +103,30 @@ export async function saveDocument(document: Document) {
 	}
 }
 
-export async function getDocumentById(
-	id: string
+export async function getDocumentByUsernameAndSlug(
+	username: string,
+	slug: string
 ): Promise<{ success: boolean; document?: Document; error?: unknown }> {
 	try {
+		// First get the user_id from the username
+		const { data: profileData, error: profileError } = await supabase
+			.from('profiles')
+			.select('id')
+			.eq('username', username)
+			.single();
+
+		if (profileError) throw profileError;
+
+		if (!profileData) {
+			return { success: false, error: 'User not found' };
+		}
+
+		// Then get the document with the matching user_id and slug
 		const { data, error } = await supabase
 			.from('documents')
 			.select('document')
-			.eq('id', id)
+			.eq('user_id', profileData.id)
+			.eq('slug', slug)
 			.single();
 
 		if (error) throw error;
