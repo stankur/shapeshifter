@@ -132,7 +132,9 @@
 
 <div
 	onclick={(e) => {
-		e.stopPropagation();
+		if (documentNode.state.mode !== 'read') {
+			e.stopPropagation();
+		}
 	}}
 	class="mt-6 leading-7 first:mt-0"
 	bind:this={ref}

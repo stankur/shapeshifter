@@ -128,7 +128,9 @@
 <div
 	bind:this={ref}
 	onclick={(e) => {
-		e.stopPropagation();
+        if (documentNode.state.mode !== 'read') {
+            e.stopPropagation();
+        }
 	}}
 	class={[headingSize, 'prose-h1:inline-block', 'prose-h1:font-semibold']}
 ></div>
