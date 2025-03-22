@@ -99,11 +99,23 @@
 			domParser: DOMParser.fromSchema(state.schema)
 		});
 
-		setTimeout(() => {
-			ref.onmouseenter = () => {
-				view.setProps({ editable: () => true });
-			};
-		}, 1000);
+		$effect(() => {
+			if (documentNode.state.mode !== 'read') {
+				// When not in read mode, set up the mouseenter handler after a delay
+				const timeoutId = setTimeout(() => {
+					ref.onmouseenter = () => {
+						view.setProps({ editable: () => true });
+					};
+				}, 800);
+
+				// Return cleanup function to clear timeout if effect reruns
+				return () => clearTimeout(timeoutId);
+			} else {
+				// When in read mode, remove the mouseenter handler
+				ref.onmouseenter = null;
+				view.setProps({ editable: () => false });
+			}
+		});
 
 		return () => {
 			if (view) {
