@@ -1,6 +1,9 @@
 import type { Document } from '$lib/model/document';
 import type { Section, SectionContainer } from '$lib/model/collection';
-export function splitParagraph(
+// import { tick } from 'svelte';
+import { EditorFocusService } from '$lib/services/editorFocus';
+import { tick } from 'svelte';
+export async function splitParagraph(
 	node: Section,
 	arr: 'summary' | 'children',
 	newBlocks: [string, string],
@@ -8,32 +11,36 @@ export function splitParagraph(
 	i: number
 ) {
 	document.state.animateNextChange = false;
+	let newId: string | null = null;
+    
 	if (node[arr][i].type === 'paragraph') {
 		console.log('new blocs length: ', newBlocks.length);
 		for (let j = 0; j < newBlocks.length; j++) {
 			if (j === 0) {
 				node[arr][i].content = newBlocks[0];
 				node[arr][i].last_modified = new Date().toISOString();
-
-				console.log('changed start: ');
-				console.log($state.snapshot(node[arr][i]));
 			} else {
+				newId = crypto.randomUUID();
+
 				node[arr].splice(i + 1, 0, {
 					type: 'paragraph',
-					id: crypto.randomUUID(),
+					id: newId,
 					created: new Date().toISOString(),
 					last_modified: new Date().toISOString(),
 					view: node[arr][i].view,
 					activeView: node[arr][i].activeView,
 					content: newBlocks[1]
 				});
-
-				console.log('changed end: ');
-				console.log($state.snapshot(node[arr][i + 1]));
 			}
 		}
 
 		node.last_modified = new Date().toISOString();
+
+		await tick();
+
+		if (newId) {
+			EditorFocusService.focus(newId, document);
+		}
 	}
 }
 

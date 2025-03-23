@@ -97,9 +97,7 @@
 				}
 			},
 			editable() {
-				return (
-					false
-				);
+				return !documentNode.state.animateNextChange;
 			},
 			dispatchTransaction(transaction) {
 				const newState = view.state.apply(transaction);

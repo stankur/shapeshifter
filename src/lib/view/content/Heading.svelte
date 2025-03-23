@@ -118,7 +118,7 @@
 				}
 			},
 			editable() {
-				return false
+				return !documentNode.state.animateNextChange;
 			},
 			domParser: DOMParser.fromSchema(schema)
 		});
