@@ -1,5 +1,5 @@
 import Card from './view/collection/section-container/Card/Card.svelte';
-import Section from './view/collection/section/Default.svelte';
+import Section from './view/collection/section/default/Default.svelte';
 import Heading from './view/content/Heading.svelte';
 import Paragraph from './view/content/Paragraph.svelte';
 import TableOfContents from './view/collection/section-container/TableOfContent/TableOfContents.svelte';

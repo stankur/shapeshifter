@@ -1,86 +1,41 @@
 # Active Context
 
 ## Current Focus
-Initial project setup and documentation of core concepts for an idea transformation and publishing platform.
+We're implementing a cursor navigation system for the editor to improve the user experience when moving between content blocks. The current issue is that when typing in one block and pressing Enter, the cursor disappears and doesn't transfer to the next block, requiring manual clicking.
+
+## Implementation Approach
+1. Created an EditorFocusService to manage focus between editor instances
+   - Uses a closure pattern for encapsulation
+   - Maintains a map of content IDs to editor views
+   - Provides register/unregister/focus methods
+
+2. Created a navigation system for content blocks
+   - Implemented in src/lib/view/content/navigation.ts
+   - Provides arrow key navigation between blocks
+   - Uses ProseMirror keymap plugin
+
+3. Updated content components to register with EditorFocusService
+   - Both Paragraph and Heading components register their editors
+   - Components unregister when destroyed
+
+4. Implemented view-specific navigation logic
+   - Card view navigation in src/lib/view/collection/section-container/Card/navigation.ts
+   - Card view only shows heading and summary (no children)
+   - Navigation functions handle moving between sections
 
 ## Recent Changes
-1. Implemented user authentication system
-   - Added profile tables and security policies in Supabase
-   - Created UsernameInput component for auth UI
-2. Enhanced section containers
-   - Implemented Table of Contents component
-   - Added Tabs interface
-   - Created Card view
-3. Improved document structure
-   - Added collection model and actions
-   - Implemented document utilities
-   - Added document titles and slugs
-   - Created TitleInput component
-4. Set up route handling
-   - Added dynamic document routes
-   - Configured layout components
-   - Implemented username/slug-based URLs
-   - Replaced ID-based routing with username/slug routing
-
-## Active Decisions
-1. **Authentication & Security**
-   - Using Supabase auth with custom profiles
-   - Implementing row-level security policies
-   - Managing user-specific content access
-   - Enforcing unique document titles per user
-
-2. **Document Organization**
-   - Hierarchical section containers
-   - Flexible view types (Cards, Tabs, TOC)
-   - Collection-based document structure
-
-3. **Component Architecture**
-   - Modular section containers
-   - Reusable control components
-   - Utility-first styling with Tailwind
-
-## Current Challenges
-1. **Authentication Flow**
-   - Optimizing user onboarding
-   - Managing auth state across routes
-   - Handling auth-specific UI states
-   - Ensuring unique document identifiers
-
-2. **Document Organization**
-   - Complex nested section relationships
-   - State management across components
-   - Real-time content synchronization
-
-3. **Component Integration**
-   - Coordinating section containers
-   - Managing component lifecycles
-   - Optimizing performance
+- Created EditorFocusService to manage focus between editor instances
+- Implemented navigation system for content blocks
+- Updated Paragraph and Heading components to register with EditorFocusService
+- Created Card view navigation logic
+- Fixed Card view to only show heading and summary
 
 ## Next Steps
-1. **Authentication**
-   - [ ] Complete user profile management
-   - [ ] Implement role-based access
-   - [ ] Add social auth providers
+- Test the navigation system
+- Implement navigation for other view types (Default, TableOfContents, etc.)
+- Add keyboard shortcuts for common operations
 
-2. **Document System**
-   - [x] Implement username/slug-based routing
-   - [ ] Enhance section container interactions
-   - [ ] Implement advanced view transitions
-   - [ ] Add drag-and-drop organization
-
-3. **Component Features**
-   - [ ] Add more section container types
-   - [ ] Implement advanced controls
-   - [ ] Optimize component performance
-
-## Open Questions
-1. How to optimize the auth flow for different user types?
-2. What additional section container types would be most useful?
-3. How to handle complex nested section relationships?
-4. What performance optimizations are needed for large documents?
-
-## Current Sprint
-- Completing authentication system
-- Enhancing section containers
-- Optimizing document organization
-- Implementing advanced controls
+## Active Decisions
+- Using a view-specific approach for navigation logic rather than a centralized service
+- Registering editors with EditorFocusService on mount and unregistering on destroy
+- Using ProseMirror keymap plugin for handling arrow key navigation
