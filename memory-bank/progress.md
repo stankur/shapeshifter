@@ -1,111 +1,36 @@
-# Progress Tracking
+# Progress
 
-## What's Built
+## What Works
+- Document model and structure
+- Basic editing functionality
+- View registry for component mapping
+- Section containers (Card, TableOfContents, Tabs)
+- Content components (Heading, Paragraph)
+- ProseMirror integration for rich text editing
+- Document actions for state management
+- Supabase integration for data persistence
+- Editor focus management system
+- Navigation between content blocks using arrow keys
 
-### Core Infrastructure
-- [x] SvelteKit project setup
-- [x] TypeScript configuration
-- [x] Supabase integration
-  - [x] Authentication setup
-  - [x] Profile tables and policies
-  - [x] Real-time sync configuration
-- [x] ProseMirror editor integration
-- [x] Tailwind CSS styling
+## What's Left to Build
+- Complete navigation system for all view types
+- Keyboard shortcuts for common operations
+- Improved content transformation capabilities
+- Enhanced collaboration features
+- Mobile-friendly UI adaptations
+- Advanced formatting options
+- Image and media support
+- Export functionality
+- Version history and change tracking
+- User permissions and access control
 
-### Document System
-- [x] Basic document model
-- [x] Content type definitions
-- [x] View registry system
-- [x] Document actions
-- [x] Collection model
-- [x] Route handling
-  - [x] Username/slug-based routing
-  - [x] Document read mode
-- [x] Document identification
-  - [x] Title and slug fields
-  - [x] User-specific unique slugs
-  - [x] Title input component
-  - [x] Automatic slug generation
+## Current Status
+We've implemented a cursor navigation system that allows users to move between content blocks using arrow keys. This improves the editing experience by eliminating the need to manually click on the next block after pressing Enter. The system uses an EditorFocusService to manage focus between editor instances and view-specific navigation logic to handle different container types.
 
-### UI Components
-- [x] Document controls
-  - [x] Title input in top bar
-  - [x] Username display
-  - [x] Publish controls
-- [x] Section containers
-  - [x] Card view with controls
-  - [x] Table of Contents with child components
-  - [x] Tabs interface with controls
-  - [x] Default layout
-  - [x] Sidebar implementation
-- [x] Section controls
-  - [x] Collapse/Expand icons
-  - [x] Summary controls
-  - [x] Default controls
-- [x] Authentication
-  - [x] Username input component
-  - [x] Auth state management
-
-### Content Types
-- [x] Heading component
-- [x] Paragraph component
-- [x] Basic text editing
-
-## In Progress
-
-### Authentication System
-- [ ] Profile management UI
-- [ ] Role-based access control
-- [ ] Social auth integration
-- [ ] Auth flow optimization
-
-### Document Enhancements
-- [ ] Advanced section interactions
-- [ ] Drag-and-drop organization
-- [ ] View transitions
-- [ ] Performance optimization
-
-### Component Development
-- [ ] Additional section container types
-- [ ] Advanced control features
-- [ ] Component lifecycle optimization
-- [ ] State management improvements
+The Card view has been updated to properly handle navigation between headings and summary content, reflecting its design which only shows these elements (not children). Both Paragraph and Heading components now register with the EditorFocusService when mounted and unregister when destroyed.
 
 ## Known Issues
-
-### Authentication
-1. Profile management needs completion
-2. Role-based access control pending
-3. Social auth providers to be added
-
-### Document System
-1. Complex section relationships need refinement
-2. Performance optimization for large documents
-3. Real-time sync improvements needed
-
-### Components
-1. Additional container types needed
-2. Advanced controls pending implementation
-3. Component lifecycle optimization required
-
-## Next Milestones
-
-### Short Term
-1. Complete auth system implementation
-2. Enhance section container interactions
-3. Optimize component performance
-
-### Medium Term
-1. Implement advanced control features
-2. Add more container types
-3. Improve state management
-
-### Long Term
-1. AI-assisted document organization
-2. Real-time collaboration features
-3. Advanced content transformation tools
-
-## Project Health
-- **Status**: Active Development
-- **Progress**: Core infrastructure and components implemented
-- **Focus**: Authentication system and component enhancements
+- Navigation between different view types needs refinement
+- Some edge cases in cursor positioning when navigating between blocks
+- Need to implement navigation for all container types
+- Performance optimization for large documents with many editors

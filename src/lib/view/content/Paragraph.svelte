@@ -9,6 +9,9 @@
 	import { getContext, onMount } from 'svelte';
 	import { separate } from '$lib/services/prosemirror';
 	import type { Document } from '$lib/model/document';
+	import { EditorFocusService } from '$lib/services/editorFocus';
+	import type { NavigationHandler } from '$lib/services/navigation/types';
+	import { createNavigationPlugin } from './navigation';
 
 	type Props = {
 		node: ContentParagraph;
@@ -20,6 +23,8 @@
 		updateParent: () => void;
 		onUnmount: () => void;
 		onSplit: (blocks: [string, string]) => void;
+		getNextEditable?: NavigationHandler;
+		getPrevEditable?: NavigationHandler;
 	};
 	let {
 		node = $bindable<ContentParagraph>(),
@@ -27,26 +32,44 @@
 		additionalFlipId,
 		updateParent,
 		onUnmount,
-		onSplit
+		onSplit,
+		getNextEditable,
+		getPrevEditable
 	}: Props = $props();
 	// let enterPressed = $state<boolean>(false);
 	let { content } = $derived(node);
 	let documentNode: Document = getContext('document');
 	let doc: Node = $derived(defaultMarkdownParser.parse(content));
-	let defaultPlugins = $state<Plugin[]>(
-		exampleSetup({
+	
+	// Create the plugins array
+	const plugins = [
+		...exampleSetup({
 			schema,
 			menuBar: false
 		})
-	);
-
-	let editorState = $derived(
-		EditorState.create({
+	];
+	
+	// Add navigation plugin if handlers are provided
+	if (getNextEditable || getPrevEditable) {
+		plugins.push(createNavigationPlugin(getNextEditable, getPrevEditable, documentNode));
+	}
+	
+	// Create the editor state
+	let editorState = EditorState.create({
+		schema,
+		doc: defaultMarkdownParser.parse(content),
+		plugins
+	});
+	
+	// Update editor state when content changes
+	$effect(() => {
+		const newDoc = defaultMarkdownParser.parse(content);
+		editorState = EditorState.create({
 			schema,
-			doc,
-			plugins: defaultPlugins
-		})
-	);
+			doc: newDoc,
+			plugins
+		});
+	});
 	let view: EditorView;
 	let ref: HTMLDivElement;
 
@@ -74,7 +97,7 @@
 				}
 			},
 			editable() {
-				return false;
+				return documentNode.state.focusedContentId === node.id && documentNode.state.mode !== 'read';
 			},
 			dispatchTransaction(transaction) {
 				const newState = view.state.apply(transaction);
@@ -103,11 +126,16 @@
 			domParser: DOMParser.fromSchema(editorState.schema)
 		});
 
+		// Register this editor with the EditorFocusService
+		EditorFocusService.register(node.id, view);
+		
 		$effect(() => {
 			if (documentNode.state.mode !== 'read') {
 				// When not in read mode, set up the mouseenter handler after a delay
 				const timeoutId = setTimeout(() => {
 					ref.onmouseenter = () => {
+						// Set this editor as focused in the document state
+						documentNode.state.focusedContentId = node.id;
 						view.setProps({ editable: () => true });
 					};
 				}, 800);
@@ -123,6 +151,8 @@
 
 		return () => {
 			if (view) {
+				// Unregister this editor when it's destroyed
+				EditorFocusService.unregister(node.id);
 				// console.log('View for ' + content + ' just got destroyed through unmount');
 				view.destroy();
 			}
@@ -134,6 +164,8 @@
 	onclick={(e) => {
 		if (documentNode.state.mode !== 'read') {
 			e.stopPropagation();
+			// Focus this editor when clicked
+			EditorFocusService.focus(node.id, documentNode);
 		}
 	}}
 	class="mt-6 leading-7 first:mt-0"
@@ -142,6 +174,10 @@
 
 <svelte:document
 	onclick={() => {
-		view.setProps({ editable: () => false });
+		// Only clear focus if this editor is focused
+		if (documentNode.state.focusedContentId === node.id) {
+			documentNode.state.focusedContentId = null;
+			view.setProps({ editable: () => false });
+		}
 	}}
 />

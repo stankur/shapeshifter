@@ -4,7 +4,7 @@
 		sectionContainerCardViewState,
 		type Section
 	} from '$lib/model/collection';
-	import type { ContentHeading } from '$lib/model/content';
+	import type { ContentHeading, ContentParagraph } from '$lib/model/content';
 	import { registry } from '$lib/viewRegistry.svelte';
 	import type { Component } from 'svelte';
 	import type { z } from 'zod';
@@ -13,11 +13,38 @@
 	import type { Document } from '$lib/model/document';
 	import Controls from './Controls.svelte';
 	import { addSection } from '$lib/actions/collection.svelte';
+	import {
+		createHeadingNavProps,
+		createSummaryNavProps
+	} from './navigation';
+	import type { NavigationHandler } from '$lib/services/navigation/types';
 
 	const document = getContext('document') as Document;
 
 	type SectionContainer = z.infer<typeof sectionContainer>;
 	type SectionContainerViewState = z.infer<typeof sectionContainerCardViewState>;
+
+	// Define component types with navigation props
+	type HeadingComponentProps = {
+		node: ContentHeading;
+		refs: Refs;
+		onUnmount: () => void;
+		updateParent?: () => void;
+		getNextEditable?: NavigationHandler;
+		getPrevEditable?: NavigationHandler;
+		documentNode?: Document;
+	};
+	
+	type ContentComponentProps<T> = {
+		node: T; 
+		refs: Refs;
+		onUnmount: () => void;
+		updateParent?: () => void;
+		onSplit?: (blocks: [string, string]) => void;
+		getNextEditable?: NavigationHandler;
+		getPrevEditable?: NavigationHandler;
+		documentNode?: Document;
+	};
 
 	let {
 		node,
@@ -30,25 +57,18 @@
 	} = $props();
 	let { children, view, activeView } = $derived(node);
 
-	let ChildrenRenderers = $derived(
-		children.map((child) => ({
+	let SectionRenderers = $derived(
+		children.map((child, sectionIndex) => ({
 			child,
+			sectionIndex,
 			HeadingRenderer: registry[
 				child.heading.activeView as keyof typeof registry
-			] as unknown as Component<{
-				node: ContentHeading;
-				refs: Refs;
-			}>,
+			] as unknown as Component<HeadingComponentProps>,
 			SummaryRenderers: child.summary.map((summaryChild) => ({
 				summaryChild,
-				Renderer: registry[summaryChild.activeView as keyof typeof registry] as Component<{
-					node: typeof summaryChild;
-					refs: Record<
-						string,
-						{ element: HTMLElement; animateAbsolute: boolean; animateNested: boolean }
-					>;
-					onUnmount: () => void;
-				}>
+				Renderer: registry[
+					summaryChild.activeView as keyof typeof registry
+                ] as unknown as Component<ContentComponentProps<typeof summaryChild>>
 			}))
 		}))
 	);
@@ -77,11 +97,21 @@
 	{/if}
 
 	<div class="container flex flex-wrap" style:--perRow={perRow} style:--gap={`${gap}px`}>
-		{#each ChildrenRenderers as { child, HeadingRenderer, SummaryRenderers }}
+		{#each SectionRenderers as { child, sectionIndex, HeadingRenderer, SummaryRenderers }}
 			<div class="card border-1 border-black p-5">
-				<HeadingRenderer node={child.heading} {refs} />
+				<HeadingRenderer
+					node={child.heading}
+					{refs}
+					{onUnmount}
+					{...createHeadingNavProps(child, node, sectionIndex, document)}
+				/>
 				{#each SummaryRenderers as { summaryChild, Renderer }}
-					<Renderer node={summaryChild} {refs} {onUnmount} />
+					<Renderer
+						node={summaryChild}
+						{refs}
+						{onUnmount}
+						{...createSummaryNavProps(child, node, summaryChild.id, sectionIndex, document)}
+					/>
 				{/each}
 			</div>
 		{/each}
