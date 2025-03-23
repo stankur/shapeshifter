@@ -40,7 +40,7 @@
 	let { content } = $derived(node);
 	let documentNode: Document = getContext('document');
 	let doc: Node = $derived(defaultMarkdownParser.parse(content));
-	
+
 	// Create the plugins array
 	const plugins = [
 		...exampleSetup({
@@ -48,19 +48,19 @@
 			menuBar: false
 		})
 	];
-	
+
 	// Add navigation plugin if handlers are provided
 	if (getNextEditable || getPrevEditable) {
 		plugins.push(createNavigationPlugin(getNextEditable, getPrevEditable, documentNode));
 	}
-	
+
 	// Create the editor state
 	let editorState = EditorState.create({
 		schema,
 		doc: defaultMarkdownParser.parse(content),
 		plugins
 	});
-	
+
 	// Update editor state when content changes
 	$effect(() => {
 		const newDoc = defaultMarkdownParser.parse(content);
@@ -97,7 +97,9 @@
 				}
 			},
 			editable() {
-				return documentNode.state.focusedContentId === node.id && documentNode.state.mode !== 'read';
+				return (
+					false
+				);
 			},
 			dispatchTransaction(transaction) {
 				const newState = view.state.apply(transaction);
@@ -111,8 +113,8 @@
 				const blocks = separate(newState.doc);
 				console.log('blocks: ');
 				console.log(blocks);
-				// enterPressed &&
-				if (blocks.length > 1) {
+
+                if (blocks.length > 1) {
 					console.log('splitting');
 					onSplit([blocks[0], blocks[1]]);
 					return;
@@ -128,7 +130,7 @@
 
 		// Register this editor with the EditorFocusService
 		EditorFocusService.register(node.id, view);
-		
+
 		$effect(() => {
 			if (documentNode.state.mode !== 'read') {
 				// When not in read mode, set up the mouseenter handler after a delay
@@ -140,8 +142,21 @@
 					};
 				}, 800);
 
-				// Return cleanup function to clear timeout if effect reruns
-				return () => clearTimeout(timeoutId);
+				const timeoutId2 = setTimeout(() => {
+					view.setProps({
+						editable: () => {
+							return (
+								documentNode.state.focusedContentId === node.id &&
+								documentNode.state.mode !== 'read'
+							);
+						}
+					});
+				}, 800);
+
+				return () => {
+					clearTimeout(timeoutId);
+					clearTimeout(timeoutId2);
+				};
 			} else {
 				// When in read mode, remove the mouseenter handler
 				ref.onmouseenter = null;
@@ -164,8 +179,6 @@
 	onclick={(e) => {
 		if (documentNode.state.mode !== 'read') {
 			e.stopPropagation();
-			// Focus this editor when clicked
-			EditorFocusService.focus(node.id, documentNode);
 		}
 	}}
 	class="mt-6 leading-7 first:mt-0"

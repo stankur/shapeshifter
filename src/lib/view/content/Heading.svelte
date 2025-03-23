@@ -118,7 +118,7 @@
 				}
 			},
 			editable() {
-				return documentNode.state.focusedContentId === node.id && documentNode.state.mode !== 'read';
+				return false
 			},
 			domParser: DOMParser.fromSchema(schema)
 		});
@@ -137,8 +137,17 @@
 					};
 				}, 800);
 
+				const timeoutId2 = setTimeout(() => {
+					view.setProps({ editable: () => {
+						return documentNode.state.focusedContentId === node.id && documentNode.state.mode !== 'read';
+					} });
+				}, 800);
+
 				// Return cleanup function to clear timeout if effect reruns
-				return () => clearTimeout(timeoutId);
+				return () => {
+					clearTimeout(timeoutId);
+					clearTimeout(timeoutId2);
+				};
 			} else {
 				// When in read mode, remove the mouseenter handler
 				ref.onmouseenter = null;
@@ -161,8 +170,6 @@
 	onclick={(e) => {
         if (documentNode.state.mode !== 'read') {
             e.stopPropagation();
-            // Focus this editor when clicked
-            EditorFocusService.focus(node.id, documentNode);
         }
 	}}
 	class={[headingSize, 'prose-h1:inline-block', 'prose-h1:font-semibold']}
