@@ -62,6 +62,7 @@ flowchart TD
 - Section-based content structure
 - Multiple view types (Card, Table of Contents, Tabs)
 - Hierarchical document model
+- Section splitting for content reorganization
 
 ### UI Components
 1. **Section Containers**
@@ -74,6 +75,16 @@ flowchart TD
    - Section-specific controls
    - Collapse/Expand functionality
    - Content transformation tools
+   - Paragraph-to-heading conversion
+   ```mermaid
+   flowchart TD
+       Hover[User Hovers Over Paragraph] --> Controls[Controls Appear]
+       Controls --> Click[User Clicks 'H' Button]
+       Click --> Convert[Convert Paragraph to Heading]
+       Convert --> Split[Split Section]
+       Split --> NewSection[Create New Section]
+       NewSection --> Insert[Insert After Current Section]
+   ```
 
 ## State Management
 - Document model for state representation
@@ -90,6 +101,7 @@ flowchart TD
    - Custom content blocks
    - Specialized formatters
    - Transform plugins
+   - Content conversion operations
 
 ## Security Patterns
 - Supabase authentication
@@ -109,3 +121,35 @@ flowchart TD
    - Slug-based document identification
    - Human-readable URLs
    - Unique document URLs per user
+
+## Action Patterns
+
+### Component Hierarchy Pattern
+```mermaid
+flowchart TD
+    Action[Action Definition] --> Container[Container Component]
+    Container --> Specialized[Specialized Callbacks]
+    Specialized --> Child[Child Component]
+    Child --> UI[UI Controls]
+    UI --> Trigger[Action Trigger]
+```
+
+1. **Action Definition**
+   - Core logic defined in actions file
+   - Direct mutations leveraging Svelte 5 reactivity
+   - Clear parameter typing
+
+2. **Callback Propagation**
+   - Top-level containers define base implementations
+   - Specialized callbacks created for each child
+   - Context-aware functions passed down the hierarchy
+
+3. **UI Controls**
+   - Floating controls for user interaction
+   - Visibility based on hover state
+   - Consistent positioning and styling
+
+4. **Content Transformation**
+   - Paragraph to heading conversion
+   - Section splitting and reorganization
+   - Content structure manipulation

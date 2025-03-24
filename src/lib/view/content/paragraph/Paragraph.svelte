@@ -4,7 +4,7 @@
 	import { DOMParser, Node } from 'prosemirror-model';
 
 	import type { ContentParagraph } from '$lib/model/content';
-	import { EditorState, Plugin } from 'prosemirror-state';
+	import { EditorState } from 'prosemirror-state';
 	import { EditorView } from 'prosemirror-view';
 	import { getContext, onMount } from 'svelte';
 	import { separate } from '$lib/services/prosemirror';
@@ -12,6 +12,7 @@
 	import { EditorFocusService } from '$lib/services/editorFocus';
 	import type { NavigationHandler } from '$lib/services/navigation/types';
 	import { createNavigationPlugin } from '../navigation';
+	import ParagraphControls from './ParagraphControls.svelte';
 
 	type Props = {
 		node: ContentParagraph;
@@ -23,6 +24,7 @@
 		updateParent: () => void;
 		onUnmount: () => void;
 		onSplit: (blocks: [string, string]) => void;
+		onConvertToHeading?: (paragraphId: string) => void;
 		getNextEditable?: NavigationHandler;
 		getPrevEditable?: NavigationHandler;
 	};
@@ -33,13 +35,14 @@
 		updateParent,
 		onUnmount,
 		onSplit,
+		onConvertToHeading,
 		getNextEditable,
 		getPrevEditable
 	}: Props = $props();
 	// let enterPressed = $state<boolean>(false);
 	let { content } = $derived(node);
 	let documentNode: Document = getContext('document');
-	let doc: Node = $derived(defaultMarkdownParser.parse(content));
+	let isParagraphHovered = $state(false);
 
 	// Create the plugins array
 	const plugins = [
@@ -70,6 +73,12 @@
 			plugins
 		});
 	});
+
+    $effect(() => {
+        if (!node) {
+            console.log("node is undefined")
+        }
+    })
 	let view: EditorView;
 	let ref: HTMLDivElement;
 
@@ -112,7 +121,7 @@
 				console.log('blocks: ');
 				console.log(blocks);
 
-                if (blocks.length > 1) {
+				if (blocks.length > 1) {
 					console.log('splitting');
 					onSplit([blocks[0], blocks[1]]);
 					return;
@@ -163,10 +172,9 @@
 		});
 
 		return () => {
-			if (view) {
+			if (view && node) {
 				// Unregister this editor when it's destroyed
 				EditorFocusService.unregister(node.id);
-				// console.log('View for ' + content + ' just got destroyed through unmount');
 				view.destroy();
 			}
 		};
@@ -179,9 +187,18 @@
 			e.stopPropagation();
 		}
 	}}
-	class="mt-6 leading-7 first:mt-0"
+	class="mt-6 leading-7 first:mt-0 relative"
 	bind:this={ref}
-></div>
+	onmouseenter={() => isParagraphHovered = true}
+	onmouseleave={() => isParagraphHovered = false}
+>
+	{#if onConvertToHeading && documentNode.state.mode !== 'read'}
+		<ParagraphControls 
+			{isParagraphHovered} 
+			onConvertToHeading={() => onConvertToHeading(node.id)} 
+		/>
+	{/if}
+</div>
 
 <svelte:document
 	onclick={() => {

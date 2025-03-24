@@ -27,7 +27,6 @@
 
 	let ChildrenRenderers = $derived(
 		node.children.map((child, index) => ({
-			child,
 			index,
 			HeadingRenderer: registry[
 				child.heading.activeView as keyof typeof registry
@@ -121,7 +120,7 @@
 	<!-- Tabs navigation -->
 	<div class="tabs-container">
 		<div class="tabs-scroll flex overflow-x-scroll" style:gap="{gap}px" bind:this={tabsScroll}>
-			{#each ChildrenRenderers as { child, index, HeadingRenderer }}
+			{#each ChildrenRenderers as {  index, HeadingRenderer }}
 				<div
 					class="cursor-pointer p-5 whitespace-nowrap {index === activeIndex
 						? 'border-b-2 border-black'
@@ -129,7 +128,7 @@
 					onclick={() => setActiveSection(index)}
 				>
 					<HeadingRenderer
-						node={child.heading}
+						node={node.children[index].heading}
 						additionalFlipId={'tab-item-' + index}
 						{refs}
 						{onUnmount}

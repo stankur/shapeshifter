@@ -97,10 +97,32 @@ export function addSection(node: SectionContainer, headingLevel: number = 1) {
 	});
 }
 
-export function splitSection(
+/**
+ * Adds an existing section to a container at the specified index
+ *
+ * @param container The SectionContainer to add the section to
+ * @param section The section to add
+ * @param index Optional index to insert the section at
+ */
+export function addSectionToContainer(
+	container: SectionContainer,
+	section: Section,
+	index?: number
+) {
+	if (index !== undefined && index >= 0 && index <= container.children.length) {
+		// Insert at the specified index
+		container.children.splice(index, 0, section);
+	} else {
+		// Add to the end
+		container.children.push(section);
+	}
+	container.last_modified = new Date().toISOString();
+}
+
+export async function splitSection(
 	node: Section,
 	paragraphId: string,
-	addSection: (node: Section) => void
+	addSection: (section: Section) => void
 ) {
 	const newId = crypto.randomUUID();
 
@@ -140,8 +162,11 @@ export function splitSection(
 		activeView: 'collection/section/default'
 	};
 
-    // remove the paragraph from the original section
-    node.children = node.children.slice(0, paragraphIndex);
+	node.children = node.children.slice(0, paragraphIndex);
+	console.log('removed some from children');
+
+	await tick();
 
 	addSection(newSection);
+	console.log('added new section');
 }

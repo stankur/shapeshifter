@@ -11,11 +11,15 @@
 - Supabase integration for data persistence
 - Editor focus management system
 - Navigation between content blocks using arrow keys
+- Section splitting functionality
+- Paragraph-to-heading conversion
+- UI controls for content transformation
 
 ## What's Left to Build
+- Customizable heading levels for section splitting
 - Complete navigation system for all view types
 - Keyboard shortcuts for common operations
-- Improved content transformation capabilities
+- Additional content transformation capabilities
 - Enhanced collaboration features
 - Mobile-friendly UI adaptations
 - Advanced formatting options
@@ -25,12 +29,19 @@
 - User permissions and access control
 
 ## Current Status
-We've implemented a cursor navigation system that allows users to move between content blocks using arrow keys. This improves the editing experience by eliminating the need to manually click on the next block after pressing Enter. The system uses an EditorFocusService to manage focus between editor instances and view-specific navigation logic to handle different container types.
+We've implemented a section split feature that allows users to convert a paragraph into a heading and create a new section from it. This enhances the document editing experience by providing a way to better organize content and create new sections as needed.
 
-The Card view has been updated to properly handle navigation between headings and summary content, reflecting its design which only shows these elements (not children). Both Paragraph and Heading components now register with the EditorFocusService when mounted and unregister when destroyed.
+The implementation follows a consistent pattern:
+1. Actions are defined in the actions file (collection.svelte.ts)
+2. Callbacks are passed down through the component hierarchy
+3. UI controls trigger the actions
+4. Everything is connected through the component hierarchy
+
+We've also created comprehensive documentation in the guides folder to document the patterns used in the application, which will make it easier to add new functionality in the future.
 
 ## Known Issues
 - Navigation between different view types needs refinement
 - Some edge cases in cursor positioning when navigating between blocks
 - Need to implement navigation for all container types
 - Performance optimization for large documents with many editors
+- Section splitting currently uses the same heading level as the parent section

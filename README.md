@@ -53,3 +53,8 @@ most updated version should be able to be found here:
 supabase db push
 ```
 
+
+## known bugs
+
+When the paragraph editor is about to get destroyed, somehow the node is undefined, and this causes the app to crash. A temporary fix is to check whether the node is defined, and only do the destroy if it is, but this is of course hacky. A proper way would be to understand why the node is undefined at the time of destroy.
+

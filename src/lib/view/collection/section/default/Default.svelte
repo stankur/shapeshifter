@@ -7,16 +7,23 @@
 	import { registry } from '$lib/viewRegistry.svelte';
 	import { getContext, onMount, type Component } from 'svelte';
 	import DefaultControl from './control/DefaultControl.svelte';
-	import { splitParagraph } from '$lib/actions/collection.svelte';
+	import { splitParagraph, splitSection } from '$lib/actions/collection.svelte';
 
 	type Props = {
 		node: Section;
 		refs: Refs;
 		onUnmount: () => void;
 		overRides: { heading: boolean };
+		addSection: (newSection: Section) => void;
 	};
 	type ViewState = { state: 'expanded' | 'summary' | 'collapsed' };
-	let { node = $bindable<Section>(), refs, onUnmount, overRides = { heading: true } }: Props = $props();
+	let {
+		node = $bindable<Section>(),
+		refs,
+		onUnmount,
+		overRides = { heading: true },
+		addSection
+	}: Props = $props();
 
 	let document = getContext('document') as Document;
 
@@ -35,6 +42,7 @@
 				refs: Refs;
 				onUnmount: () => void;
 				onSplit: (newBlocks: [string, string]) => void;
+				onConvertToHeading: (paragraphId: string) => void;
 			}>
 		}))
 	);
@@ -70,7 +78,12 @@
 			const placement = overRides?.heading ? 'left' : 'left-start';
 
 			if (referenceElement) {
-				return float(referenceElement as HTMLElement, controlElement as HTMLElement, placement, false)();
+				return float(
+					referenceElement as HTMLElement,
+					controlElement as HTMLElement,
+					placement,
+					false
+				)();
 			}
 		}
 	});
@@ -94,16 +107,19 @@
 
 	<div bind:this={contentElement}>
 		{#if (node.view[viewStateIndex] as ViewState).state === 'expanded'}
+            {console.log("children renderers length in section: ", ChildrenRenderers.length)}
 			<!-- should work without the key, but not working -->
 			{#each ChildrenRenderers as { Renderer }, i (node.children[i].last_modified + node.children[i].id)}
-				{console.log(i)}
-				{console.log(node.children[i])}
+				{console.log("node.children[i].id: ", node.children[i].id)}
 				<Renderer
 					bind:node={node.children[i]}
 					onSplit={(newBlocks) => {
 						console.log('newBlocks');
 						console.log(newBlocks);
 						splitParagraph(node, 'children', newBlocks, document, i);
+					}}
+					onConvertToHeading={(paragraphId) => {
+						splitSection(node, paragraphId, addSection);
 					}}
 					{refs}
 					{onUnmount}
