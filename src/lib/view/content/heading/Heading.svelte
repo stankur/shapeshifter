@@ -9,8 +9,8 @@
 	import type { Document } from '$lib/model/document';
 	import { EditorFocusService } from '$lib/services/editorFocus';
 	import type { NavigationHandler } from '$lib/services/navigation/types';
-	import { createNavigationPlugin } from './navigation';
-import { createLevelPlugin } from './heading/levelPlugin';
+	import { createNavigationPlugin } from '../navigation';
+import { createLevelPlugin } from './levelPlugin';
 
 	let documentNode: Document = getContext('document');
 

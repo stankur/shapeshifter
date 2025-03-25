@@ -1,6 +1,6 @@
 import Card from './view/collection/section-container/Card/Card.svelte';
 import Section from './view/collection/section/default/Default.svelte';
-import Heading from './view/content/Heading.svelte';
+import Heading from './view/content/heading/Heading.svelte';
 import Paragraph from './view/content/paragraph/Paragraph.svelte';
 import TableOfContents from './view/collection/section-container/TableOfContent/TableOfContents.svelte';
 import Default from './view/collection/section-container/Default/Default.svelte';
