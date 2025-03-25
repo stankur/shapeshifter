@@ -7,7 +7,7 @@
 	import { registry } from '$lib/viewRegistry.svelte';
 	import { getContext, onMount, type Component } from 'svelte';
 	import DefaultControl from './control/DefaultControl.svelte';
-	import { splitParagraph, splitSection } from '$lib/actions/collection.svelte';
+	import { splitParagraph, splitSection, handleHeadingLevelIncrease } from '$lib/actions/collection.svelte';
 
 	type Props = {
 		node: Section;
@@ -15,6 +15,8 @@
 		onUnmount: () => void;
 		overRides: { heading: boolean };
 		addSection: (newSection: Section) => void;
+		findParentSection: (level: number) => Section | null;
+		onSectionMoved: () => void;
 	};
 	type ViewState = { state: 'expanded' | 'summary' | 'collapsed' };
 	let {
@@ -22,7 +24,9 @@
 		refs,
 		onUnmount,
 		overRides = { heading: true },
-		addSection
+		addSection,
+		findParentSection,
+		onSectionMoved
 	}: Props = $props();
 
 	let document = getContext('document') as Document;
@@ -33,6 +37,7 @@
 			node: ContentHeading;
 			refs: Refs;
 			onUnmount: () => void;
+			onLevelIncrease: () => boolean;
 		}>
 	);
 	let ChildrenRenderers = $derived(
@@ -100,7 +105,12 @@
 	{#if overRides && overRides.heading}
 		{#key node.heading.id}
 			<div bind:this={headingElement}>
-				<HeadingRenderer bind:node={node.heading} {refs} {onUnmount} />
+				<HeadingRenderer 
+					bind:node={node.heading} 
+					{refs} 
+					{onUnmount}
+					onLevelIncrease={() => handleHeadingLevelIncrease(node, findParentSection, onSectionMoved)} 
+				/>
 			</div>
 		{/key}
 	{/if}

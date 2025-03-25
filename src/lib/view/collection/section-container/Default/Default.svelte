@@ -23,6 +23,8 @@
 				refs: Refs;
 				onUnmount: () => void;
 				addSection: (section: Section) => void;
+				findParentSection: (level: number) => Section | null;
+				onSectionMoved: () => void;
 			}>
 		}))
 	);
@@ -31,14 +33,30 @@
 <div class="flex flex-col gap-12">
 	{console.log('children renderers length in section container: ', ChildrenRenderers.length)}
 	{#each ChildrenRenderers as { Renderer }, index}
-		<Renderer
-			node={node.children[index]}
-			{refs}
-			{onUnmount}
-			addSection={(section) => {
-				onUnmount();
-				addSectionToContainer(node, section, index + 1);
-			}}
-		/>
+			<Renderer
+				node={node.children[index]}
+				{refs}
+				{onUnmount}
+				addSection={(section) => {
+					onUnmount();
+					addSectionToContainer(node, section, index + 1);
+				}}
+				findParentSection={(level) => {
+					// Look for a section before the current one with the specified level
+					for (let i = index - 1; i >= 0; i--) {
+						if (node.children[i].heading.level === level) {
+							return node.children[i];
+						}
+					}
+
+					console.log('no parent section found for level: ', level);
+					return null;
+				}}
+				onSectionMoved={() => {
+					// Remove the section from the container
+					node.children.splice(index, 1);
+					node.last_modified = new Date().toISOString();
+				}}
+			/>
 	{/each}
 </div>

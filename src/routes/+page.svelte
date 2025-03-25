@@ -9,6 +9,7 @@
 		card,
 		nestedSummary,
 		sectionContainerTOC,
+        sectionContainerDefault,
 		sectionContainerTOCCard,
 		sidebarExample
 	} from '$lib/model/examples';
@@ -36,7 +37,7 @@
 		}
 	});
 
-	let node = $state(sectionContainerTOC as DocumentType);
+	let node = $state(sectionContainerDefault as DocumentType);
 	let isPublishing = $state(false);
 	let publishStatus = $state<{ success: boolean; message: string; documentId?: string } | null>(
 		null

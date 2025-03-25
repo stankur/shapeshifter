@@ -11,11 +11,13 @@ import type { Document } from '$lib/model/document';
  * 
  * @param headingNode The heading node to modify
  * @param documentNode The document node to update
+ * @param onLevelIncrease Optional callback when level increases, returns whether change is allowed
  * @returns A ProseMirror plugin for handling heading level changes
  */
 export function createLevelPlugin(
   headingNode: ContentHeading,
-  documentNode: Document
+  documentNode: Document,
+  onLevelIncrease?: () => boolean
 ): Plugin {
   return keymap({
     Tab: (state) => {
@@ -24,9 +26,18 @@ export function createLevelPlugin(
       const atStart = selection.$head.pos === 1;
       
       if (atStart) {
-        // Increase heading level (no maximum)
-        const newLevel = headingNode.level + 1;
-        headingNode.level = newLevel;
+        // If callback provided, let it determine if change is allowed
+        if (onLevelIncrease) {
+          const allowed = onLevelIncrease();
+          if (!allowed) {
+            // If not allowed, revert the level change
+            return true; // Consume event but don't change level
+          }
+        } else {
+          // If no callback, just increase the level
+          headingNode.level += 1;
+        }
+        
         // Trigger UI update
         documentNode.state.animateNextChange = false;
         return true;
@@ -40,9 +51,19 @@ export function createLevelPlugin(
       const atStart = selection.$head.pos === 1;
       
       if (atStart) {
-        // Prevent default space insertion at beginning
-        const newLevel = headingNode.level + 1;
-        headingNode.level = newLevel;
+        // If callback provided, let it determine if change is allowed
+        if (onLevelIncrease) {
+          const allowed = onLevelIncrease();
+          if (!allowed) {
+            // If not allowed, revert the level change
+            return true; // Consume event but don't change level
+          }
+        } else {
+          // If no callback, just increase the level
+          headingNode.level += 1;
+        }
+        
+        // Trigger UI update
         documentNode.state.animateNextChange = false;
         return true;
       }
