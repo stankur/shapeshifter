@@ -10,6 +10,7 @@
 	import { EditorFocusService } from '$lib/services/editorFocus';
 	import type { NavigationHandler } from '$lib/services/navigation/types';
 	import { createNavigationPlugin } from './navigation';
+import { createLevelPlugin } from './heading/levelPlugin';
 
 	let documentNode: Document = getContext('document');
 
@@ -55,14 +56,15 @@
 
 	let doc: Node = $derived(defaultMarkdownParser.parse(headingContent));
 	
-	// Create the plugins array
-	const plugins = [
-		...exampleSetup({
-			schema,
-			menuBar: false
-		}),
-        createNavigationPlugin(getNextEditable, getPrevEditable, documentNode)
-	];
+// Create the plugins array
+const plugins = [
+	...exampleSetup({
+		schema,
+		menuBar: false
+	}),
+    createNavigationPlugin(getNextEditable, getPrevEditable, documentNode),
+    createLevelPlugin(node, documentNode)
+];
 	
 	
 	// Create the editor state
