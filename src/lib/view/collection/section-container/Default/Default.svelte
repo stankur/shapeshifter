@@ -2,7 +2,7 @@
 	import type { Refs } from '$lib/components/Document.svelte';
 	import { type Section, type SectionContainer } from '$lib/model/collection';
 	import { registry } from '$lib/viewRegistry.svelte';
-	import type { Component } from 'svelte';
+	import { tick, type Component } from 'svelte';
 	import { addSectionToContainer } from '$lib/actions/collection.svelte';
 
 	let {
@@ -15,6 +15,7 @@
 		onUnmount: () => void;
 	} = $props();
 	let { children } = $derived(node);
+    let sectionsToRemove = $state<string[]>([]);
 
 	let ChildrenRenderers = $derived(
 		children.map((child) => ({
@@ -28,11 +29,18 @@
 			}>
 		}))
 	);
+
+    $effect(() => {
+        if (sectionsToRemove.length > 0) {
+            console.log("sections to remove: ", sectionsToRemove);
+            node.children = node.children.filter(child => !sectionsToRemove.includes(child.id));
+            sectionsToRemove = [];
+        }
+    });
 </script>
 
 <div class="flex flex-col gap-12">
-	{console.log('children renderers length in section container: ', ChildrenRenderers.length)}
-	{#each ChildrenRenderers as { Renderer }, index}
+	{#each ChildrenRenderers as { Renderer }, index (node.children[index].id + node.children[index].last_modified)}
 			<Renderer
 				node={node.children[index]}
 				{refs}
@@ -52,10 +60,10 @@
 					console.log('no parent section found for level: ', level);
 					return null;
 				}}
-				onSectionMoved={() => {
-					// Remove the section from the container
-					node.children.splice(index, 1);
+				onSectionMoved={async () => {
+					sectionsToRemove.push(node.children[index].id);
 					node.last_modified = new Date().toISOString();
+					console.log("sucked section removed from container");
 				}}
 			/>
 	{/each}

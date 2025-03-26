@@ -107,8 +107,6 @@ const plugins = [
 					const dom = document.createElement('h1');
 					dom.setAttribute('data-flip-id', id);
 
-					console.log("yo I'm in the heading node view for: " + content + ' with id: ' + id);
-
 					refs[id] = { element: dom, animateAbsolute: false, animateNested: false };
 
 					return {

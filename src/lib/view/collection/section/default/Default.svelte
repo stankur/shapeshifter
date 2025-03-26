@@ -69,9 +69,10 @@
 	let controlElement: HTMLDivElement | null = $state(null);
 	let containerElement: HTMLDivElement | null = $state(null);
 
-	$inspect(node);
-	$inspect(node?.summary);
-	$inspect(node?.heading);
+    $effect(() => {
+        console.log("detected change in children of section: ", node.children);
+    });
+
 
 	onMount(() => {
 		if (containerElement && controlElement) {
@@ -109,18 +110,18 @@
 					bind:node={node.heading} 
 					{refs} 
 					{onUnmount}
-					onLevelIncrease={() => handleHeadingLevelIncrease(node, findParentSection, onSectionMoved)} 
+					onLevelIncrease={() => {
+                        console.log("onLevelIncrease in section");
+                        return handleHeadingLevelIncrease(node, findParentSection, onSectionMoved)}} 
 				/>
 			</div>
 		{/key}
 	{/if}
 
-	<div bind:this={contentElement}>
+	<div bind:this={contentElement} class="flex flex-col gap-7">
 		{#if (node.view[viewStateIndex] as ViewState).state === 'expanded'}
-            {console.log("children renderers length in section: ", ChildrenRenderers.length)}
 			<!-- should work without the key, but not working -->
 			{#each ChildrenRenderers as { Renderer }, i (node.children[i].last_modified + node.children[i].id)}
-				{console.log("node.children[i].id: ", node.children[i].id)}
 				<Renderer
 					bind:node={node.children[i]}
 					onSplit={(newBlocks) => {

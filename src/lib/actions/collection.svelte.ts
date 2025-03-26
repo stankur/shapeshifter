@@ -121,7 +121,7 @@ export function addSectionToContainer(
 
 /**
  * Handles the restructuring when a heading level increases by 1
- * 
+ *
  * @param section The section whose heading level would increase
  * @param findParentSection A callback to find a parent section with the appropriate level
  * @param onSectionMoved A callback to notify when the section has been moved
@@ -130,30 +130,33 @@ export function addSectionToContainer(
 export function handleHeadingLevelIncrease(
 	section: Section,
 	findParentSection: (level: number) => Section | null,
-	onSectionMoved: () => void
+	onSectionMoved: (sectionId: string) => void
 ): boolean {
 	const currentLevel = section.heading.level;
 	const newLevel = currentLevel + 1;
-	
+
 	// Find a section with level one less than the new level
 	const parentSection = findParentSection(currentLevel);
-	
+
 	// If no parent found, prevent the change
 	if (!parentSection) return false;
-	
+
 	// Increase the heading level
+	console.log('increasing level of section');
 	section.heading.level = newLevel;
-	
+
 	// Add the section as a child of the parent section
+	console.log('adding section to parent section');
 	parentSection.children.push(section);
-	
+
 	// Update timestamps
 	section.heading.last_modified = new Date().toISOString();
 	parentSection.last_modified = new Date().toISOString();
-	
+
 	// Notify the container that this section has been moved
-	onSectionMoved();
-	
+	console.log('notifying container that section has been moved');
+	onSectionMoved(section.id);
+
 	return true;
 }
 
