@@ -572,7 +572,7 @@ const nestedSectionContainer: (num: number) => z.infer<typeof sectionContainer> 
 		},
 		{ type: 'collection/section-container/tabs', state: { gap: 16, activeIndex: 0 } }
 	],
-	activeView: 'collection/section-container/table-of-contents',
+	activeView: 'collection/section-container/default',
 	children: [
 		nestedSection(num, 1),
 		nestedSection(num, 2),
@@ -677,6 +677,63 @@ export const sectionContainerTOC: Document = {
 			}
 		],
 		activeView: 'collection/section-container/table-of-contents',
+		children: [topLevelSection(1), topLevelSection(2), topLevelSection(3), topLevelSection(4)]
+	}
+};
+
+export const sectionContainerDefault: Document = {
+	state: {
+		mode: 'write',
+		animateNextChange: true
+	},
+	type: 'document',
+	id: 'cdef0123-4567-89ab-cdef-0123456789ab',
+	title: 'Section Container TOC Example',
+	slug: 'section-container-toc-example',
+	created: '2025-02-23T01:04:00Z',
+	last_modified: '2025-02-23T01:04:00Z',
+	content: {
+		type: 'section-container',
+		id: 'd4e5f6a7-b890-1234-5678-9abcdef01234',
+		created: '2025-02-23T01:04:00Z',
+		last_modified: '2025-02-23T01:04:00Z',
+		view: [
+			{ type: 'collection/section-container/default' },
+			{ type: 'collection/section-container/static' },
+			{ type: 'collection/section-container/card', state: { perRow: 3, gap: 4 } },
+			{ type: 'collection/section-container/brick' },
+			{
+				type: 'collection/section-container/table-of-contents',
+				state: {
+					directions: [
+						{
+							type: 'column',
+							gap: 72,
+							interGenerationGap: 32,
+							innerGap: 4,
+							innerDirection: 'column'
+						},
+						{
+							type: 'row',
+							perRow: 3,
+							gap: 16,
+							interGenerationGap: 16,
+							innerGap: 16,
+							innerDirection: 'column'
+						}
+					]
+				}
+			},
+			{
+				type: 'collection/section-container/sidebar',
+				state: { percentageWidth: 30, activeIndex: 1 }
+			},
+			{
+				type: 'collection/section-container/tabs',
+				state: { gap: 16, activeIndex: 0 }
+			}
+		],
+		activeView: 'collection/section-container/default',
 		children: [topLevelSection(1), topLevelSection(2), topLevelSection(3), topLevelSection(4)]
 	}
 };

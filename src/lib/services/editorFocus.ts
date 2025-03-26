@@ -17,26 +17,20 @@ export const EditorFocusService = (() => {
 
 	// Return the public API
 	return {
-		// Register an editor
 		register(id: string, view: EditorView) {
-			console.log(`Registering editor for ${id}`);
 			editors.set(id, view);
 		},
 
-		// Unregister an editor
 		unregister(id: string) {
-			console.log(`Unregistering editor for ${id}`);
 			editors.delete(id);
 		},
 
 		// Update an existing editor view
 		updateView(id: string, view: EditorView) {
 			if (editors.has(id)) {
-				console.log(`Updating view for ${id}`);
 				editors.set(id, view);
 				return true;
 			}
-			console.log(`Cannot update view for ${id} - not found`);
 			return false;
 		},
 
@@ -44,26 +38,21 @@ export const EditorFocusService = (() => {
 		focus(id: string, documentNode: Document, cursorPosition: CursorPosition = 'start') {
 			const view = editors.get(id);
 			if (!view) {
-				console.log(`View not found for ${id}`);
 				return false;
 			}
 
-			console.log(`View found for ${id}`);
 
 			try {
 				// Check if the DOM element is still in the document
 				if (!isElementInDocument(view.dom as HTMLElement)) {
-					console.error(`Editor DOM for ${id} is not in the document`);
 					return false;
 				}
 
 				// Update the document's focusedContentId
 				documentNode.state.focusedContentId = id;
-				console.log(`Set focusedContentId to ${id}`);
 
 				// Focus the editor
 				view.focus();
-				console.log(`Focused ${id}`);
 
 				// Set cursor position
 				const { state } = view;

@@ -83,7 +83,6 @@
 	let ref: HTMLDivElement;
 
 	onMount(() => {
-		console.log('I just got mounted baybeh for ' + content);
 		view = new EditorView(ref, {
 			state: editorState,
 			nodeViews: {
@@ -187,7 +186,7 @@
 			e.stopPropagation();
 		}
 	}}
-	class="mt-6 leading-7 first:mt-0 relative"
+	class="leading-7 relative"
 	bind:this={ref}
 	onmouseenter={() => isParagraphHovered = true}
 	onmouseleave={() => isParagraphHovered = false}

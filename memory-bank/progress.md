@@ -14,9 +14,10 @@
 - Section splitting functionality
 - Paragraph-to-heading conversion
 - UI controls for content transformation
+- Heading level increase with document restructuring
 
 ## What's Left to Build
-- Customizable heading levels for section splitting
+- Heading level decrease with document restructuring
 - Complete navigation system for all view types
 - Keyboard shortcuts for common operations
 - Additional content transformation capabilities
@@ -29,19 +30,24 @@
 - User permissions and access control
 
 ## Current Status
-We've implemented a section split feature that allows users to convert a paragraph into a heading and create a new section from it. This enhances the document editing experience by providing a way to better organize content and create new sections as needed.
+We've implemented document structure updates when heading levels increase. Now when a user presses Tab or Space at the beginning of a heading, the system will:
 
-The implementation follows a consistent pattern:
+1. Check if there's a parent section with the appropriate level (one level lower than the new heading level)
+2. If found, increase the heading level and move the section to become a child of that parent section
+3. Update the document structure accordingly
+
+The implementation follows the established callback propagation pattern:
 1. Actions are defined in the actions file (collection.svelte.ts)
 2. Callbacks are passed down through the component hierarchy
-3. UI controls trigger the actions
+3. UI events trigger the actions
 4. Everything is connected through the component hierarchy
 
-We've also created comprehensive documentation in the guides folder to document the patterns used in the application, which will make it easier to add new functionality in the future.
+We still need to implement the heading level decrease functionality, which will handle the case when a heading level goes down and needs to break out of its current container, taking any subsections with higher heading levels with it.
 
 ## Known Issues
+- Heading level decrease functionality not yet implemented
+- Edge cases in heading level increase (e.g., first section in a document)
 - Navigation between different view types needs refinement
 - Some edge cases in cursor positioning when navigating between blocks
 - Need to implement navigation for all container types
 - Performance optimization for large documents with many editors
-- Section splitting currently uses the same heading level as the parent section

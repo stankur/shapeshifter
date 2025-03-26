@@ -10,7 +10,7 @@
 	import { EditorFocusService } from '$lib/services/editorFocus';
 	import type { NavigationHandler } from '$lib/services/navigation/types';
 	import { createNavigationPlugin } from './navigationPlugin';
-import { createLevelPlugin } from './levelPlugin';
+	import { createLevelPlugin } from './levelPlugin';
 
 	let documentNode: Document = getContext('document');
 
@@ -38,6 +38,7 @@ import { createLevelPlugin } from './levelPlugin';
 		additionalFlipId?: string;
 		getNextEditable: NavigationHandler;
 		getPrevEditable: NavigationHandler;
+		onLevelIncrease: () => boolean;
 	};
 
 	let {
@@ -47,7 +48,8 @@ import { createLevelPlugin } from './levelPlugin';
 		updateParent,
 		additionalFlipId,
 		getNextEditable,
-		getPrevEditable
+		getPrevEditable,
+		onLevelIncrease
 	}: Props = $props();
 	let { content, level } = $derived(node);
 
@@ -55,7 +57,7 @@ import { createLevelPlugin } from './levelPlugin';
 	let headingSize = $derived(getHeadingSize(level));
 
 	let doc: Node = $derived(defaultMarkdownParser.parse(headingContent));
-	
+
 // Create the plugins array
 const plugins = [
 	...exampleSetup({
@@ -63,17 +65,16 @@ const plugins = [
 		menuBar: false
 	}),
     createNavigationPlugin(getNextEditable, getPrevEditable, documentNode),
-    createLevelPlugin(node, documentNode)
+    createLevelPlugin(node, documentNode, onLevelIncrease)
 ];
-	
-	
+
 	// Create the editor state
 	let editorState = EditorState.create({
 		schema,
 		doc: defaultMarkdownParser.parse(headingContent),
 		plugins
 	});
-	
+
 	// Update editor state when content changes
 	$effect(() => {
 		const newDoc = defaultMarkdownParser.parse(`# ${content}`);
@@ -106,8 +107,6 @@ const plugins = [
 					const dom = document.createElement('h1');
 					dom.setAttribute('data-flip-id', id);
 
-					console.log("yo I'm in the heading node view for: " + content + ' with id: ' + id);
-
 					refs[id] = { element: dom, animateAbsolute: false, animateNested: false };
 
 					return {
@@ -127,7 +126,7 @@ const plugins = [
 
 		// Register this editor with the EditorFocusService
 		EditorFocusService.register(node.id, view);
-		
+
 		$effect(() => {
 			if (documentNode.state.mode !== 'read') {
 				// When not in read mode, set up the mouseenter handler after a delay
@@ -140,9 +139,14 @@ const plugins = [
 				}, 800);
 
 				const timeoutId2 = setTimeout(() => {
-					view.setProps({ editable: () => {
-						return documentNode.state.focusedContentId === node.id && documentNode.state.mode !== 'read';
-					} });
+					view.setProps({
+						editable: () => {
+							return (
+								documentNode.state.focusedContentId === node.id &&
+								documentNode.state.mode !== 'read'
+							);
+						}
+					});
 				}, 800);
 
 				// Return cleanup function to clear timeout if effect reruns
@@ -158,7 +162,7 @@ const plugins = [
 		});
 
 		return () => {
-			if (view) {
+			if (view && node) {
 				// Unregister this editor when it's destroyed
 				EditorFocusService.unregister(node.id);
 				view.destroy();
@@ -170,9 +174,9 @@ const plugins = [
 <div
 	bind:this={ref}
 	onclick={(e) => {
-        if (documentNode.state.mode !== 'read') {
-            e.stopPropagation();
-        }
+		if (documentNode.state.mode !== 'read') {
+			e.stopPropagation();
+		}
 	}}
 	class={[headingSize, 'prose-h1:inline-block', 'prose-h1:font-semibold']}
 ></div>
