@@ -122,6 +122,7 @@
 		{#if (node.view[viewStateIndex] as ViewState).state === 'expanded'}
 			<!-- should work without the key, but not working -->
 			{#each ChildrenRenderers as { Renderer }, i (node.children[i].last_modified + node.children[i].id)}
+            <div class={node.children[i].type === 'section-container' ? 'mt-5' : ''}>
 				<Renderer
 					bind:node={node.children[i]}
 					onSplit={(newBlocks) => {
@@ -135,6 +136,7 @@
 					{refs}
 					{onUnmount}
 				/>
+            </div>
 			{/each}
 		{:else if (node.view[viewStateIndex] as ViewState).state === 'summary'}
 			{#each SummaryRenderers as { Renderer }, i (node.summary[i].last_modified + node.summary[i].id)}
