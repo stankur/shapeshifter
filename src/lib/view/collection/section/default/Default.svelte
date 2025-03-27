@@ -104,7 +104,6 @@
 
 <div class="container flex flex-col gap-7" bind:this={containerElement}>
 	{#if overRides && overRides.heading}
-		{#key node.heading.id}
 			<div bind:this={headingElement}>
 				<HeadingRenderer 
 					bind:node={node.heading} 
@@ -115,13 +114,12 @@
                         return handleHeadingLevelIncrease(node, findParentSection, onSectionMoved)}} 
 				/>
 			</div>
-		{/key}
 	{/if}
 
 	<div bind:this={contentElement} class="flex flex-col gap-7">
 		{#if (node.view[viewStateIndex] as ViewState).state === 'expanded'}
 			<!-- should work without the key, but not working -->
-			{#each ChildrenRenderers as { Renderer }, i (node.children[i].last_modified + node.children[i].id)}
+			{#each ChildrenRenderers as { Renderer }, i (node.children[i].id)}
             <div class={node.children[i].type === 'section-container' ? 'mt-5' : ''}>
 				<Renderer
 					bind:node={node.children[i]}
@@ -132,6 +130,7 @@
 					}}
 					onConvertToHeading={(paragraphId) => {
 						splitSection(node, paragraphId, addSection);
+                        document.state.animateNextChange = false
 					}}
 					{refs}
 					{onUnmount}
@@ -139,7 +138,7 @@
             </div>
 			{/each}
 		{:else if (node.view[viewStateIndex] as ViewState).state === 'summary'}
-			{#each SummaryRenderers as { Renderer }, i (node.summary[i].last_modified + node.summary[i].id)}
+			{#each SummaryRenderers as { Renderer }, i (node.summary[i].id)}
 				{console.log(i)}
 				{console.log((node.summary[i] as ContentParagraph).content)}
 				<Renderer

@@ -254,7 +254,17 @@ export async function splitSection(
 			level: node.heading.level,
 			activeView: 'content/heading/default'
 		},
-		summary: [],
+		summary: [
+			{
+				type: 'paragraph',
+				id: crypto.randomUUID(),
+				created: new Date().toISOString(),
+				last_modified: new Date().toISOString(),
+				view: [{ type: 'content/paragraph/default' }],
+				content: "New Section's summary",
+				activeView: 'content/paragraph/default'
+			}
+		],
 		children: node.children.slice(paragraphIndex + 1),
 		activeView: 'collection/section/default'
 	};

@@ -84,50 +84,97 @@ export const nested: Document = {
 	created: '2025-02-23T01:04:00Z',
 	last_modified: '2025-02-23T01:04:00Z',
 	content: {
-		type: 'section',
-		id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
+		type: 'section-container',
+		id: 'f6a7b890-1234-5678-9abc-def012345678',
 		created: '2025-02-23T01:04:00Z',
 		last_modified: '2025-02-23T01:04:00Z',
 		view: [
-			{ type: 'collection/section/default', state: 'expanded' },
-			{ type: 'collection/section/static' },
-			{ type: 'collection/section/page' }
-		],
-		activeView: 'collection/section/default',
-		heading: {
-			type: 'heading',
-			level: 1,
-			id: '6ec0bd7f-11c0-43da-975e-2a8ad9ebae0b',
-			created: '2025-02-23T01:04:00Z',
-			last_modified: '2025-02-23T01:04:00Z',
-			content: 'Main Section',
-			view: [{ type: 'content/heading/default' }],
-			activeView: 'content/heading/default'
-		},
-		children: [
+			{ type: 'collection/section-container/default' },
+			{ type: 'collection/section-container/static' },
+			{ type: 'collection/section-container/card', state: { perRow: 3, gap: 4 } },
+			{ type: 'collection/section-container/brick' },
 			{
-				type: 'paragraph',
-				id: '936da01f-9abd-4d9d-80c7-02af85c822a8',
-				created: '2025-02-23T01:04:00Z',
-				last_modified: '2025-02-23T01:04:00Z',
-				content: 'First child paragraph',
-				view: [{ type: 'content/paragraph/default' }],
-				activeView: 'content/paragraph/default'
+				type: 'collection/section-container/table-of-contents',
+				state: {
+					directions: [
+						{
+							type: 'column',
+							gap: 72,
+							interGenerationGap: 32,
+							innerGap: 4,
+							innerDirection: 'column'
+						},
+						{
+							type: 'row',
+							perRow: 3,
+							gap: 16,
+							interGenerationGap: 16,
+							innerGap: 16,
+							innerDirection: 'column'
+						}
+					]
+				}
+			},
+			{
+				type: 'collection/section-container/sidebar',
+				state: { percentageWidth: 30, activeIndex: 0 }
+			},
+			{
+				type: 'collection/section-container/tabs',
+				state: { gap: 16, activeIndex: 0 }
 			}
 		],
-		summary: [
+		activeView: 'collection/section-container/default',
+		children: [
 			{
-				type: 'paragraph',
-				id: 'b7d0d2f8-6584-4af6-a28f-0aec59c6f442',
+				type: 'section',
+				id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
 				created: '2025-02-23T01:04:00Z',
 				last_modified: '2025-02-23T01:04:00Z',
-				content: 'Summary content',
-				view: [{ type: 'content/paragraph/default' }],
-				activeView: 'content/paragraph/default'
+				view: [
+					{ type: 'collection/section/default', state: 'expanded' },
+					{ type: 'collection/section/static' },
+					{ type: 'collection/section/page' }
+				],
+				activeView: 'collection/section/default',
+				heading: {
+					type: 'heading',
+					level: 1,
+					id: '6ec0bd7f-11c0-43da-975e-2a8ad9ebae0b',
+					created: '2025-02-23T01:04:00Z',
+					last_modified: '2025-02-23T01:04:00Z',
+					content: 'Main Section',
+					view: [{ type: 'content/heading/default' }],
+					activeView: 'content/heading/default'
+				},
+				children: [
+					{
+						type: 'paragraph',
+						id: '936da01f-9abd-4d9d-80c7-02af85c822a8',
+						created: '2025-02-23T01:04:00Z',
+						last_modified: '2025-02-23T01:04:00Z',
+						content: 'First child paragraph',
+						view: [{ type: 'content/paragraph/default' }],
+						activeView: 'content/paragraph/default'
+					}
+				],
+				summary: [
+					{
+						type: 'paragraph',
+						id: 'b7d0d2f8-6584-4af6-a28f-0aec59c6f442',
+						created: '2025-02-23T01:04:00Z',
+						last_modified: '2025-02-23T01:04:00Z',
+						content: 'Summary content',
+						view: [{ type: 'content/paragraph/default' }],
+						activeView: 'content/paragraph/default'
+					}
+				]
 			}
 		]
 	}
 };
+
+    
 
 /**
  * a document with one section, one paragraph child, one paragraph summary

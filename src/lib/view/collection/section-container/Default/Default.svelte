@@ -49,7 +49,7 @@
 </script>
 
 <div class="flex flex-col gap-12">
-	{#each ChildrenRenderers as { Renderer }, index (node.children[index].id + node.children[index].last_modified)}
+	{#each ChildrenRenderers as { Renderer }, index (node.children[index].id)}
 		<Renderer
 			node={node.children[index]}
 			{refs}

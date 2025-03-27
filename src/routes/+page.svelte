@@ -37,7 +37,7 @@
 		}
 	});
 
-	let node = $state(sectionContainerDefault as DocumentType);
+	let node = $state(nested as DocumentType);
 	let isPublishing = $state(false);
 	let publishStatus = $state<{ success: boolean; message: string; documentId?: string } | null>(
 		null
