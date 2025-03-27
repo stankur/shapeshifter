@@ -98,7 +98,7 @@ For the action to be accessible where needed, we need to pass callbacks down thr
 
 ```svelte
 <script lang="ts">
-  import { addSectionToContainer } from '$lib/actions/collection.svelte';
+  import { addSectionToContainer } from '$lib/actions/section-container.svelte';
   
   let {
     node, // SectionContainer
@@ -134,7 +134,7 @@ For the action to be accessible where needed, we need to pass callbacks down thr
 
 ```svelte
 <script lang="ts">
-  import { splitSection } from '$lib/actions/collection.svelte';
+  import { splitSection } from '$lib/actions/section-container.svelte';
   
   let {
     node, // Section

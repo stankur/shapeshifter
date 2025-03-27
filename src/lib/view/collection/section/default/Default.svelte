@@ -7,7 +7,7 @@
 	import { registry } from '$lib/viewRegistry.svelte';
 	import { getContext, onMount, type Component } from 'svelte';
 	import DefaultControl from './control/DefaultControl.svelte';
-	import { splitParagraph, splitSection, handleHeadingLevelIncrease } from '$lib/actions/collection.svelte';
+	import { splitParagraph, splitSection, handleHeadingLevelIncrease } from '$lib/actions/collection/section.svelte';
 
 	type Props = {
 		node: Section;

@@ -3,7 +3,7 @@
 	import { type Section, type SectionContainer } from '$lib/model/collection';
 	import { registry } from '$lib/viewRegistry.svelte';
 	import { onMount, tick, type Component } from 'svelte';
-	import { addSectionToContainer } from '$lib/actions/collection.svelte';
+	import { addSectionToContainer } from '$lib/actions/collection/section-container.svelte';
 
 	let {
 		node,

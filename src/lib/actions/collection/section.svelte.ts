@@ -3,6 +3,7 @@ import type { Section, SectionContainer } from '$lib/model/collection';
 import { sectionContainer } from '$lib/model/collection';
 import { EditorFocusService } from '$lib/services/editorFocus';
 import { tick } from 'svelte';
+import { createSectionContainer } from './section-container.svelte';
 
 export async function splitParagraph(
 	node: Section,
@@ -45,174 +46,75 @@ export async function splitParagraph(
 	}
 }
 
-/**
- * adds a new section to the collection with default content for the heading, summary, and content
- *
- * @param node
- * @param headingLevel
- * @returns
- */
-export function addSection(node: SectionContainer, headingLevel: number = 1) {
-	node.children.push({
-		type: 'section',
-		id: crypto.randomUUID(),
-		created: new Date().toISOString(),
-		last_modified: new Date().toISOString(),
-		view: [
-			{ type: 'collection/section/default', state: 'expanded' },
-			{ type: 'collection/section/static' },
-			{ type: 'collection/section/page' }
-		],
-		heading: {
-			type: 'heading',
-			id: crypto.randomUUID(),
-			created: new Date().toISOString(),
-			last_modified: new Date().toISOString(),
-			view: [{ type: 'content/heading/default' }],
-			content: 'New Section',
-			level: headingLevel,
-			activeView: 'content/heading/default'
-		},
-		summary: [
-			{
-				type: 'paragraph',
-				id: crypto.randomUUID(),
-				created: new Date().toISOString(),
-				last_modified: new Date().toISOString(),
-				view: [{ type: 'content/paragraph/default' }],
-				content: "New Section's summary",
-				activeView: 'content/paragraph/default'
-			}
-		],
-		activeView: 'collection/section/default',
-		children: [
-			{
-				type: 'paragraph',
-				id: crypto.randomUUID(),
-				created: new Date().toISOString(),
-				last_modified: new Date().toISOString(),
-				view: [{ type: 'content/paragraph/default' }],
-				content: "New Section's first paragraph",
-				activeView: 'content/paragraph/default'
-			}
-		]
-	});
-}
-
-/**
- * Adds an existing section to a container at the specified index
- *
- * @param container The SectionContainer to add the section to
- * @param section The section to add
- * @param index Optional index to insert the section at
- */
-export function addSectionToContainer(
-	container: SectionContainer,
-	section: Section,
-	index?: number
-) {
-	if (index !== undefined && index >= 0 && index <= container.children.length) {
-		// Insert at the specified index
-		container.children.splice(index, 0, section);
-	} else {
-		// Add to the end
-		container.children.push(section);
-	}
-	container.last_modified = new Date().toISOString();
-}
-
-/**
- * Creates a new section container with default properties
- * 
- * @returns A new section container
- */
-function createSectionContainer(): SectionContainer {
-	return {
-		type: 'section-container',
-		id: crypto.randomUUID(),
-		created: new Date().toISOString(),
-		last_modified: new Date().toISOString(),
-		children: [],
-		view: [
-			{ type: 'collection/section-container/default' },
-			{ type: 'collection/section-container/static' },
-			{ type: 'collection/section-container/card', state: { perRow: 2, gap: 16 } },
-			{ type: 'collection/section-container/brick' },
-			{ type: 'collection/section-container/table-of-contents', state: { directions: [] } },
-			{ type: 'collection/section-container/sidebar', state: { percentageWidth: 30, activeIndex: 0 } },
-			{ type: 'collection/section-container/tabs', state: { gap: 16, activeIndex: 0 } }
-		],
-		activeView: 'collection/section-container/default'
-	};
-}
 
 /**
  * Handles the restructuring when a heading level increases by 1
- * 
- * @param section The section whose heading level would increase
+ *
+ * @param node The section whose heading level would increase
  * @param findParentSection A callback to find a parent section with the appropriate level
  * @param onSectionMoved A callback to notify when the section has been moved
  * @returns True if the level change should be allowed, false otherwise
  */
 export function handleHeadingLevelIncrease(
-	section: Section,
+	node: Section,
 	findParentSection: (level: number) => Section | null,
 	onSectionMoved: (sectionId: string) => void
 ): boolean {
-	const currentLevel = section.heading.level;
+	const currentLevel = node.heading.level;
 	const newLevel = currentLevel + 1;
-	
+
 	// Find a section with level one less than the new level
 	const parentSection = findParentSection(currentLevel);
-	
+
 	// If no parent found, prevent the change
 	if (!parentSection) return false;
-	
+
 	// Increase the heading level
-    console.log("increasing level of section");
-	section.heading.level = newLevel;
-	
+	console.log('increasing level of section');
+	node.heading.level = newLevel;
+
 	// Check if the last child of the parent section is a section container
-	const lastChild = parentSection.children.length > 0 
-		? parentSection.children[parentSection.children.length - 1] 
-		: null;
-	
+	const lastChild =
+		parentSection.children.length > 0
+			? parentSection.children[parentSection.children.length - 1]
+			: null;
+
 	try {
 		// Use the Zod schema to validate if the last child is a section container
 		if (lastChild && sectionContainer.safeParse(lastChild).success) {
 			// If the last child is a section container, add the section to it
-			console.log("adding section to existing section container");
-			(lastChild as SectionContainer).children.push(section);
+			console.log('adding section to existing section container');
+			(lastChild as SectionContainer).children.push(node);
 			lastChild.last_modified = new Date().toISOString();
 		} else {
 			// If the last child is not a section container, create a new one
-			console.log("creating new section container");
+			console.log('creating new section container');
 			const newContainer = createSectionContainer();
-			newContainer.children.push(section);
-			
+			newContainer.children.push(node);
+
 			// Add the new container to the parent section
-			console.log("adding new section container to parent section");
+			console.log('adding new section container to parent section');
 			parentSection.children.push(newContainer);
 		}
 	} catch {
 		// If there's an error with the validation, create a new container
-		console.log("error validating section container, creating new one");
+		console.log('error validating section container, creating new one');
 		const newContainer = createSectionContainer();
-		newContainer.children.push(section);
-		
+		newContainer.children.push(node);
+
 		// Add the new container to the parent section
-		console.log("adding new section container to parent section");
+		console.log('adding new section container to parent section');
 		parentSection.children.push(newContainer);
 	}
-	
+
 	// Update timestamps
-	section.heading.last_modified = new Date().toISOString();
+	node.heading.last_modified = new Date().toISOString();
 	parentSection.last_modified = new Date().toISOString();
-	
+
 	// Notify the container that this section has been moved
-    console.log("notifying container that section has been moved");
-	onSectionMoved(section.id);
-	
+	console.log('notifying container that section has been moved');
+	onSectionMoved(node.id);
+
 	return true;
 }
 
