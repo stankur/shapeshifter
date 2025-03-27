@@ -12,7 +12,7 @@
 	import { getContext } from 'svelte';
 	import type { Document } from '$lib/model/document';
 	import Controls from './Controls.svelte';
-	import { addSection } from '$lib/actions/collection.svelte';
+	import { addSection } from '$lib/actions/collection/section-container.svelte';
 	import {
 		createHeadingNavProps,
 		createSummaryNavProps

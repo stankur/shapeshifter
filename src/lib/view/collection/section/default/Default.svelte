@@ -7,7 +7,11 @@
 	import { registry } from '$lib/viewRegistry.svelte';
 	import { getContext, onMount, type Component } from 'svelte';
 	import DefaultControl from './control/DefaultControl.svelte';
-	import { splitParagraph, splitSection, handleHeadingLevelIncrease } from '$lib/actions/collection.svelte';
+	import {
+		splitParagraph,
+		splitSection,
+		handleHeadingLevelIncrease
+	} from '$lib/actions/collection/section.svelte';
 
 	type Props = {
 		node: Section;
@@ -41,7 +45,7 @@
 		}>
 	);
 	let ChildrenRenderers = $derived(
-		node.children.map((child) => ({
+		node?.children.map((child) => ({
 			Renderer: registry[child.activeView as keyof typeof registry] as Component<{
 				node: typeof child;
 				refs: Refs;
@@ -52,7 +56,7 @@
 		}))
 	);
 	let SummaryRenderers = $derived(
-		node.summary.map((child) => ({
+		node?.summary.map((child) => ({
 			Renderer: registry[child.activeView as keyof typeof registry] as Component<{
 				node: typeof child;
 				refs: Refs;
@@ -69,10 +73,9 @@
 	let controlElement: HTMLDivElement | null = $state(null);
 	let containerElement: HTMLDivElement | null = $state(null);
 
-    $effect(() => {
-        console.log("detected change in children of section: ", node.children);
-    });
-
+	$effect(() => {
+		console.log('detected change in children of section: ', node.children);
+	});
 
 	onMount(() => {
 		if (containerElement && controlElement) {
@@ -95,62 +98,78 @@
 	});
 </script>
 
-<!-- as { state: 'expanded' | 'summary' | 'collapsed' } -->
-<DefaultControl
-	bind:controlElement={controlElement as HTMLDivElement}
-	viewState={node.view[viewStateIndex] as ViewState}
-	{onUnmount}
-/>
+{#if node}
+	<!-- as { state: 'expanded' | 'summary' | 'collapsed' } -->
+	<DefaultControl
+		bind:controlElement={controlElement as HTMLDivElement}
+		viewState={node.view[viewStateIndex] as ViewState}
+		{onUnmount}
+	/>
 
-<div class="container flex flex-col gap-7" bind:this={containerElement}>
-	{#if overRides && overRides.heading}
-		{#key node.heading.id}
+	<div class="container flex flex-col gap-7" bind:this={containerElement}>
+		{#if overRides && overRides.heading}
 			<div bind:this={headingElement}>
-				<HeadingRenderer 
-					bind:node={node.heading} 
-					{refs} 
+				<HeadingRenderer
+					bind:node={
+						() => {
+							console.log('getting the heading of section: ', node?.id);
+
+							return node?.heading;
+						},
+						(v) => (node.heading = v)
+					}
+					{refs}
 					{onUnmount}
 					onLevelIncrease={() => {
-                        console.log("onLevelIncrease in section");
-                        return handleHeadingLevelIncrease(node, findParentSection, onSectionMoved)}} 
+						console.log('onLevelIncrease in section');
+						return handleHeadingLevelIncrease(node, findParentSection, onSectionMoved);
+					}}
 				/>
 			</div>
-		{/key}
-	{/if}
-
-	<div bind:this={contentElement} class="flex flex-col gap-7">
-		{#if (node.view[viewStateIndex] as ViewState).state === 'expanded'}
-			<!-- should work without the key, but not working -->
-			{#each ChildrenRenderers as { Renderer }, i (node.children[i].last_modified + node.children[i].id)}
-            <div class={node.children[i].type === 'section-container' ? 'mt-5' : ''}>
-				<Renderer
-					bind:node={node.children[i]}
-					onSplit={(newBlocks) => {
-						console.log('newBlocks');
-						console.log(newBlocks);
-						splitParagraph(node, 'children', newBlocks, document, i);
-					}}
-					onConvertToHeading={(paragraphId) => {
-						splitSection(node, paragraphId, addSection);
-					}}
-					{refs}
-					{onUnmount}
-				/>
-            </div>
-			{/each}
-		{:else if (node.view[viewStateIndex] as ViewState).state === 'summary'}
-			{#each SummaryRenderers as { Renderer }, i (node.summary[i].last_modified + node.summary[i].id)}
-				{console.log(i)}
-				{console.log((node.summary[i] as ContentParagraph).content)}
-				<Renderer
-					bind:node={node.summary[i]}
-					{refs}
-					onSplit={(newBlocks) => {
-						splitParagraph(node, 'summary', newBlocks, document, i);
-					}}
-					{onUnmount}
-				/>
-			{/each}
 		{/if}
+
+		<div bind:this={contentElement} class="flex flex-col gap-7">
+			{#if (node.view[viewStateIndex] as ViewState).state === 'expanded'}
+				<!-- should work without the key, but not working -->
+				{#each ChildrenRenderers as { Renderer }, i (node.children[i].id)}
+					<div class={node.children[i].type === 'section-container' ? 'mt-5' : ''}>
+						<Renderer
+							bind:node={
+								() => {
+									console.log('getting the child of section: ', node?.children[i]);
+
+									return node?.children[i];
+								},
+								(v) => (node.children[i] = v)
+							}
+							onSplit={(newBlocks) => {
+								console.log('newBlocks');
+								console.log(newBlocks);
+								splitParagraph(node, 'children', newBlocks, document, i);
+							}}
+							onConvertToHeading={(paragraphId) => {
+								splitSection(node, paragraphId, addSection);
+								document.state.animateNextChange = false;
+							}}
+							{refs}
+							{onUnmount}
+						/>
+					</div>
+				{/each}
+			{:else if (node.view[viewStateIndex] as ViewState).state === 'summary'}
+				{#each SummaryRenderers as { Renderer }, i (node.summary[i].id)}
+					{console.log(i)}
+					{console.log((node.summary[i] as ContentParagraph).content)}
+					<Renderer
+						bind:node={node.summary[i]}
+						{refs}
+						onSplit={(newBlocks) => {
+							splitParagraph(node, 'summary', newBlocks, document, i);
+						}}
+						{onUnmount}
+					/>
+				{/each}
+			{/if}
+		</div>
 	</div>
-</div>
+{/if}

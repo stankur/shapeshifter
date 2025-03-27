@@ -107,6 +107,6 @@
 
 <div class="flex flex-col items-center gap-4">
 	<div class=" w-2/3">
-		<Renderer node={node.content} {refs} {onUnmount} />
+		<Renderer bind:node={node.content} {refs} {onUnmount} />
 	</div>
 </div>
