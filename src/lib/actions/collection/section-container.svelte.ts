@@ -22,6 +22,15 @@ export function addSectionToContainer(
 	container.last_modified = new Date().toISOString();
 }
 
+export function removeSectionFromContainer(node: SectionContainer, index: number) {
+	console.log('removing section from container: ', node.id, index);
+	if (index >= 0 && index < node.children.length) {
+		console.log('valid and removing section');
+		node.children.splice(index, 1);
+		node.last_modified = new Date().toISOString();
+	}
+}
+
 /**
  * Creates a new section container with default properties
  *
