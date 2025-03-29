@@ -10,7 +10,8 @@
 	import {
 		handleHeadingLevelIncrease,
 		splitParagraph,
-		splitSection
+		splitSection,
+		handleEnterInHeading
 	} from '$lib/actions/collection/section.svelte';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 
@@ -45,6 +46,7 @@
 			refs: Refs;
 			onUnmount: () => void;
 			onLevelIncrease: () => boolean;
+			onEnterAtEnd: () => boolean;
 		}>
 	);
 	let ChildrenRenderers = $derived(
@@ -114,6 +116,10 @@
 					onLevelIncrease={() => {
 						console.log('onLevelIncrease in section');
 						return handleHeadingLevelIncrease(node, findParentSection, onSectionMoved);
+					}}
+					onEnterAtEnd={() => {
+						console.log('onEnterAtEnd in section');
+						return handleEnterInHeading(node, document);
 					}}
 				/>
 			</div>

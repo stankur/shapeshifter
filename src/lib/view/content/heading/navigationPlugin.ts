@@ -59,6 +59,7 @@ export function createNavigationPlugin(
 				}
 			}
 			return false;
-		}
+		},
+
 	});
 }

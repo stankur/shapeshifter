@@ -3,7 +3,8 @@
 	import { defaultMarkdownParser, schema } from 'prosemirror-markdown';
 	import { exampleSetup } from 'prosemirror-example-setup';
 	import { DOMParser, type Node } from 'prosemirror-model';
-	import { EditorState, type Plugin } from 'prosemirror-state';
+	import { EditorState, type Plugin, Transaction } from 'prosemirror-state';
+	import { keymap } from 'prosemirror-keymap';
 	import { EditorView } from 'prosemirror-view';
 	import { getContext, onMount } from 'svelte';
 	import type { Document } from '$lib/model/document';
@@ -12,7 +13,7 @@
 	import { createNavigationPlugin } from './navigationPlugin';
 	import { createLevelPlugin } from './levelPlugin';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
-    	const getHeadingSize = (level: number) => {
+	const getHeadingSize = (level: number) => {
 		switch (level) {
 			case 1:
 				return 'prose-h1:text-6xl';
@@ -37,6 +38,7 @@
 		getNextEditable: NavigationHandler;
 		getPrevEditable: NavigationHandler;
 		onLevelIncrease: () => boolean;
+		onEnterAtEnd: () => boolean;
 	};
 
 	let {
@@ -47,7 +49,8 @@
 		additionalFlipId,
 		getNextEditable,
 		getPrevEditable,
-		onLevelIncrease
+		onLevelIncrease,
+		onEnterAtEnd
 	}: Props = $props();
 
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
@@ -61,15 +64,39 @@
 
 	let doc: Node = $derived(defaultMarkdownParser.parse(headingContent));
 
-// Create the plugins array
-const plugins = [
-	...exampleSetup({
-		schema,
-		menuBar: false
-	}),
-    createNavigationPlugin(getNextEditable, getPrevEditable, documentNode),
-    createLevelPlugin(node, documentNode, onLevelIncrease)
-];
+	// Create the plugins array
+	// Create a separate Enter key handler plugin for better debugging
+	const enterKeyPlugin = keymap({
+		Enter: (state) => {
+			console.log('Enter key pressed in heading');
+			// Check if cursor is at the end of content
+			const { selection } = state;
+			const atEnd = selection.$head.pos === state.doc.content.size - 1;
+
+			console.log('Cursor at end:', atEnd);
+
+			if (atEnd) {
+				console.log('Calling onEnterAtEnd callback');
+				// Call the onEnterAtEnd callback
+				return onEnterAtEnd();
+			}
+			return false;
+		}
+	});
+
+	// Make sure our Enter key plugin is registered last to have higher priority
+	const plugins = [
+        enterKeyPlugin,
+		...exampleSetup({
+			schema,
+			menuBar: false
+		}),
+		createNavigationPlugin(getNextEditable, getPrevEditable, documentNode),
+		createLevelPlugin(node, documentNode, onLevelIncrease),
+	];
+
+	// Log the plugins to make sure they're registered correctly
+	console.log('Heading plugins:', plugins);
 
 	// Create the editor state
 	let editorState = EditorState.create({
@@ -101,6 +128,8 @@ const plugins = [
 				node.content = newState.doc.textContent;
 				// node.last_modified = new Date().toISOString();
 				// updateParent();
+
+				// We don't need this code anymore since we're using the callback pattern
 
 				view.updateState(newState);
 			},

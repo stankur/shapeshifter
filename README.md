@@ -56,10 +56,4 @@ supabase db push
 
 ## known bugs
 
-When the paragraph editor is about to get destroyed, somehow the node is undefined, and this causes the app to crash. A temporary fix is to check whether the node is defined, and only do the destroy if it is, but this is of course hacky. A proper way would be to understand why the node is undefined at the time of destroy.
-
-### bug with children length change
-
-when we perform things that change the length of the children of a section container, like when we increase the level of a heading, and the section gets sucked into the section above it. The length of the section container's children changes, however, it seems like this change, while detected in the svelte reactivity system, doesn't get reflected to the each block.
-
-Now, while things are seemingly working, something is terribly wrong because as you are editing a section that is deep down the hierarchy, it gets really slow, and boy does rerender happen a lot, I tried using functional binding, to intercept the getter in the binds, and boy it happened about 71 times which is rather crazy. 
+when you press enter on the end of a heading, it should transfer the cursor to what is next in the section, but it doesn't. The next in section does get created, either summary of paragraph child, but the cursor doesn't move.

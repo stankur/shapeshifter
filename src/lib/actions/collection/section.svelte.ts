@@ -4,6 +4,7 @@ import { sectionContainer } from '$lib/model/collection';
 import { EditorFocusService } from '$lib/services/editorFocus';
 import { tick } from 'svelte';
 import { createSectionContainer } from './section-container.svelte';
+import type { ContentParagraph } from '$lib/model/content';
 
 export async function splitParagraph(
 	node: Section,
@@ -45,7 +46,6 @@ export async function splitParagraph(
 		}
 	}
 }
-
 
 /**
  * Handles the restructuring when a heading level increases by 1
@@ -118,13 +118,68 @@ export function handleHeadingLevelIncrease(
 	return true;
 }
 
+/**
+ * Handles Enter key press at the end of a heading
+ *
+ * @param node The section containing the heading
+ * @param document The document node
+ * @returns True if the event was handled, false otherwise
+ */
+export function handleEnterInHeading(node: Section, document: Document): boolean {
+	// Get the section state
+	const viewStateIndex = node.view.findIndex((v) => v.type === node.activeView);
+	const viewState = node.view[viewStateIndex];
+
+	if (!viewState || viewState.type !== 'collection/section/default') {
+		return false;
+	}
+
+	const state = viewState.state;
+
+	// Create a new empty paragraph
+	const newParagraphId = crypto.randomUUID();
+	const newParagraph: ContentParagraph = {
+		type: 'paragraph',
+		id: newParagraphId,
+		created: new Date().toISOString(),
+		last_modified: new Date().toISOString(),
+		view: [{ type: 'content/paragraph/default' }],
+		content: '',
+		activeView: 'content/paragraph/default'
+	};
+
+	// Handle based on section state
+	if (state === 'expanded') {
+		// Add empty paragraph to children
+		node.children.unshift(newParagraph);
+		node.last_modified = new Date().toISOString();
+
+		EditorFocusService.focus(newParagraphId, document, 'start');
+
+		return true;
+	} else if (state === 'summary') {
+		// Add empty paragraph to summary
+		node.summary.unshift(newParagraph);
+		node.last_modified = new Date().toISOString();
+
+		EditorFocusService.focus(newParagraphId, document, 'start');
+
+		return true;
+	} else if (state === 'collapsed') {
+		// Do nothing for collapsed state
+		return true;
+	}
+
+	return false;
+}
+
 export async function splitSection(
 	node: Section,
 	paragraphId: string,
 	document: Document,
 	addSection: (section: Section) => void
 ) {
-    document.state.animateNextChange = false;
+	document.state.animateNextChange = false;
 	const newId = crypto.randomUUID();
 
 	// find the paragraph in chilren section's content, and then remove the children from everything below that
