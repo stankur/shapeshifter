@@ -174,8 +174,6 @@ export const nested: Document = {
 	}
 };
 
-    
-
 /**
  * a document with one section, one paragraph child, one paragraph summary
  */
@@ -235,7 +233,6 @@ export const nestedSummary: Document = {
 		]
 	}
 };
-
 
 /**
  * a document with one untitled section, a paragraph child and section child, one untitled section child

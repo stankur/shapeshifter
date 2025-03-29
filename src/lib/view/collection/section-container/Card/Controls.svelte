@@ -1,16 +1,21 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, getContext } from 'svelte';
 	import { float } from '$lib/view/utils/float.svelte';
+	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
+	import type { SectionContainer } from '$lib/model/collection';
 
 	let {
-		node,
+		path,
 		onUnmount,
 		isCardHovered
 	}: {
-		node: any;
+		path: (string | number)[];
 		onUnmount: () => void;
 		isCardHovered: boolean;
 	} = $props();
+
+	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
+	const node = documentManipulator.getByPath(path) as SectionContainer;
 
 	let isHovered = $state(false);
 

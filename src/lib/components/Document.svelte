@@ -6,6 +6,8 @@
 	import { gsap } from 'gsap';
 	import Flip from 'gsap/dist/Flip';
 	import type { NoHeadingContentSingle } from '../model/collection';
+	import { createDocumentManipulator } from '../documentManipulator.svelte';
+
 	gsap.registerPlugin(Flip);
 
 	export type Refs = Record<
@@ -14,17 +16,18 @@
 	>;
 
 	let { node }: { node: Document } = $props();
-    setContext('document', node);
+	const documentManipulator = createDocumentManipulator(node);
+	setContext('document', node);
+	setContext('documentManipulator', documentManipulator);
+
 	let Renderer = $derived(
 		registry[node.content.activeView as keyof typeof registry] as Component<{
-			node: NoHeadingContentSingle;
+			path: (string | number)[];
 			refs: Refs;
 			onUnmount: () => void;
 		}>
 	);
 	let refs = $state<Refs>({});
-
-	setContext('document', node);
 
 	let flipState: Flip.FlipState | null = $state(null);
 
@@ -107,6 +110,6 @@
 
 <div class="flex flex-col items-center gap-4">
 	<div class=" w-2/3">
-		<Renderer bind:node={node.content} {refs} {onUnmount} />
+		<Renderer path={['content']} {refs} {onUnmount} />
 	</div>
 </div>

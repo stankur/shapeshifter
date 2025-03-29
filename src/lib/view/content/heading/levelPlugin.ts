@@ -21,6 +21,7 @@ export function createLevelPlugin(
 ): Plugin {
   return keymap({
     Tab: (state) => {
+        console.log("Tab key pressed");
       // Check if cursor is at the beginning
       const { selection } = state;
       const atStart = selection.$head.pos === 1;

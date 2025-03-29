@@ -11,10 +11,8 @@
 	import type { NavigationHandler } from '$lib/services/navigation/types';
 	import { createNavigationPlugin } from './navigationPlugin';
 	import { createLevelPlugin } from './levelPlugin';
-
-	let documentNode: Document = getContext('document');
-
-	const getHeadingSize = (level: number) => {
+	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
+    	const getHeadingSize = (level: number) => {
 		switch (level) {
 			case 1:
 				return 'prose-h1:text-6xl';
@@ -28,7 +26,7 @@
 	};
 
 	type Props = {
-		node: ContentHeading;
+		path: (string | number)[];
 		refs: Record<
 			string,
 			{ element: HTMLElement; animateAbsolute: boolean; animateNested: boolean }
@@ -42,7 +40,7 @@
 	};
 
 	let {
-		node = $bindable<ContentHeading>(),
+		path,
 		refs,
 		onUnmount,
 		updateParent,
@@ -51,7 +49,12 @@
 		getPrevEditable,
 		onLevelIncrease
 	}: Props = $props();
+
+	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
+	const node = documentManipulator.getByPath(path) as ContentHeading;
 	let { content, level } = $derived(node);
+
+	let documentNode = getContext('document') as Document;
 
 	let headingContent = $derived(`# ${content}`);
 	let headingSize = $derived(getHeadingSize(level));

@@ -2,38 +2,45 @@
 	import { sectionContainer, type Section } from '$lib/model/collection';
 	import type { ContentHeading } from '$lib/model/content';
 	import { registry } from '$lib/viewRegistry.svelte';
-	import { onDestroy, type Component } from 'svelte';
+	import { onDestroy, type Component, getContext } from 'svelte';
 	import { z } from 'zod';
 	import TableOfContentsChild from './TableOfContentsChild.svelte';
 	import type { Refs } from '$lib/components/Document.svelte';
 	import { registerRef } from '$lib/view/utils/registerRef.svelte';
+	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
+	
 	let {
-		node,
+		path,
 		directions,
 		refs,
 		onUnmount
 	}: {
-		node: z.infer<typeof sectionContainer>;
+		path: (string | number)[];
 		directions: { type: string; perRow?: number; gap?: number, interGenerationGap?: number, innerGap?: number, innerDirection?: string }[];
 		refs: Refs;
 		onUnmount: () => void;
 	} = $props();
+	
+	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
+	const node = documentManipulator.getByPath(path) as z.infer<typeof sectionContainer>;
 	let { children } = $derived(node);
 
 	let ChildrenRenderers = $derived(
-		children.map((child) => ({
+		children.map((child, childIndex) => ({
 			child,
+			childIndex,
 			HeadingRenderer: registry[
 				child.heading.activeView as keyof typeof registry
 			] as unknown as Component<{
-				node: ContentHeading;
+				path: (string | number)[];
 				refs: Refs;
 				onUnmount: () => void;
 			}>,
-			SummaryRenderers: child.summary.map((summaryChild: any) => ({
+			SummaryRenderers: child.summary.map((summaryChild: any, summaryIndex: number) => ({
 				summaryChild,
+				summaryIndex,
 				Renderer: registry[summaryChild.activeView as keyof typeof registry] as Component<{
-					node: typeof summaryChild;
+					path: (string | number)[];
 					refs: Refs;
 					onUnmount: () => void;
 				}>
@@ -78,7 +85,7 @@
 				}
 			}} -->
 
-	{#each ChildrenRenderers as { child, HeadingRenderer, SummaryRenderers }}
+	{#each ChildrenRenderers as { child, childIndex, HeadingRenderer, SummaryRenderers }}
 		<div
 			class="item flex-col {currentDirection.type === 'row' ? 'row-item' : 'flex'}"
 			data-flip-id={getTOCChildId(child)}
@@ -86,13 +93,13 @@
 			style:--innerDirection={`${currentDirection.innerDirection || 'column'}`}
 			style:--innerGap={`${currentDirection.innerGap || 0}px`}
 		>
-			<HeadingRenderer node={child.heading} {refs} {onUnmount} />
-			{#each SummaryRenderers as { summaryChild, Renderer }}
-				<Renderer node={summaryChild} {refs} {onUnmount} />
+			<HeadingRenderer path={[...path, 'children', childIndex, 'heading']} {refs} {onUnmount} />
+			{#each SummaryRenderers as { summaryChild, summaryIndex, Renderer }}
+				<Renderer path={[...path, 'children', childIndex, 'summary', summaryIndex]} {refs} {onUnmount} />
 			{/each}
 			{#if child.children.length === 1 && child.children[0].type === 'section-container' && childrenDirections.length}
 				<TableOfContentsChild
-					node={child.children[0]}
+					path={[...path, 'children', childIndex, 'children', 0]}
 					directions={childrenDirections}
 					{refs}
 					{onUnmount}

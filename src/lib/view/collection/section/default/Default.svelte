@@ -8,13 +8,14 @@
 	import { getContext, onMount, type Component } from 'svelte';
 	import DefaultControl from './control/DefaultControl.svelte';
 	import {
+		handleHeadingLevelIncrease,
 		splitParagraph,
-		splitSection,
-		handleHeadingLevelIncrease
+		splitSection
 	} from '$lib/actions/collection/section.svelte';
+	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 
 	type Props = {
-		node: Section;
+		path: (string | number)[];
 		refs: Refs;
 		onUnmount: () => void;
 		overRides: { heading: boolean };
@@ -24,7 +25,7 @@
 	};
 	type ViewState = { state: 'expanded' | 'summary' | 'collapsed' };
 	let {
-		node = $bindable<Section>(),
+		path,
 		refs,
 		onUnmount,
 		overRides = { heading: true },
@@ -34,20 +35,22 @@
 	}: Props = $props();
 
 	let document = getContext('document') as Document;
+	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
+	const node = documentManipulator.getByPath(path) as Section;
 
-	let { activeView, view } = $derived(node);
+	let { activeView, view } = node;
 	let HeadingRenderer = $derived(
 		registry[node.heading.activeView as keyof typeof registry] as unknown as Component<{
-			node: ContentHeading;
+			path: (string | number)[];
 			refs: Refs;
 			onUnmount: () => void;
 			onLevelIncrease: () => boolean;
 		}>
 	);
 	let ChildrenRenderers = $derived(
-		node?.children.map((child) => ({
+		node.children.map((child) => ({
 			Renderer: registry[child.activeView as keyof typeof registry] as Component<{
-				node: typeof child;
+				path: (string | number)[];
 				refs: Refs;
 				onUnmount: () => void;
 				onSplit: (newBlocks: [string, string]) => void;
@@ -56,9 +59,9 @@
 		}))
 	);
 	let SummaryRenderers = $derived(
-		node?.summary.map((child) => ({
+		node.summary.map((child) => ({
 			Renderer: registry[child.activeView as keyof typeof registry] as Component<{
-				node: typeof child;
+				path: (string | number)[];
 				refs: Refs;
 				onUnmount: () => void;
 				onSplit: (newBlocks: [string, string]) => void;
@@ -72,10 +75,6 @@
 	let contentElement: HTMLDivElement | null = $state(null);
 	let controlElement: HTMLDivElement | null = $state(null);
 	let containerElement: HTMLDivElement | null = $state(null);
-
-	$effect(() => {
-		console.log('detected change in children of section: ', node.children);
-	});
 
 	onMount(() => {
 		if (containerElement && controlElement) {
@@ -98,26 +97,18 @@
 	});
 </script>
 
-{#if node}
-	<!-- as { state: 'expanded' | 'summary' | 'collapsed' } -->
-	<DefaultControl
-		bind:controlElement={controlElement as HTMLDivElement}
-		viewState={node.view[viewStateIndex] as ViewState}
-		{onUnmount}
-	/>
+<DefaultControl
+	bind:controlElement={controlElement as HTMLDivElement}
+	viewState={node.view[viewStateIndex] as ViewState}
+	{onUnmount}
+/>
 
-	<div class="container flex flex-col gap-7" bind:this={containerElement}>
-		{#if overRides && overRides.heading}
+<div class="container flex flex-col gap-7" bind:this={containerElement}>
+	{#if overRides && overRides.heading}
+		{#key node.heading.id}
 			<div bind:this={headingElement}>
 				<HeadingRenderer
-					bind:node={
-						() => {
-							console.log('getting the heading of section: ', node?.id);
-
-							return node?.heading;
-						},
-						(v) => (node.heading = v)
-					}
+					path={[...path, 'heading']}
 					{refs}
 					{onUnmount}
 					onLevelIncrease={() => {
@@ -126,50 +117,43 @@
 					}}
 				/>
 			</div>
-		{/if}
+		{/key}
+	{/if}
 
-		<div bind:this={contentElement} class="flex flex-col gap-7">
-			{#if (node.view[viewStateIndex] as ViewState).state === 'expanded'}
-				<!-- should work without the key, but not working -->
-				{#each ChildrenRenderers as { Renderer }, i (node.children[i].id)}
-					<div class={node.children[i].type === 'section-container' ? 'mt-5' : ''}>
-						<Renderer
-							bind:node={
-								() => {
-									console.log('getting the child of section: ', node?.children[i]);
-
-									return node?.children[i];
-								},
-								(v) => (node.children[i] = v)
-							}
-							onSplit={(newBlocks) => {
-								console.log('newBlocks');
-								console.log(newBlocks);
-								splitParagraph(node, 'children', newBlocks, document, i);
-							}}
-							onConvertToHeading={(paragraphId) => {
-								splitSection(node, paragraphId, addSection);
-								document.state.animateNextChange = false;
-							}}
-							{refs}
-							{onUnmount}
-						/>
-					</div>
-				{/each}
-			{:else if (node.view[viewStateIndex] as ViewState).state === 'summary'}
-				{#each SummaryRenderers as { Renderer }, i (node.summary[i].id)}
-					{console.log(i)}
-					{console.log((node.summary[i] as ContentParagraph).content)}
+	<div bind:this={contentElement} class="flex flex-col gap-7">
+		{#if (node.view[viewStateIndex] as ViewState).state === 'expanded'}
+			{console.log('children renderers length in section: ', ChildrenRenderers.length)}
+			<!-- should work without the key, but not working -->
+			{#each ChildrenRenderers as { Renderer }, i (node.children[i].last_modified + node.children[i].id)}
+				<div class={node.children[i].type === 'section-container' ? 'mt-5' : ''}>
 					<Renderer
-						bind:node={node.summary[i]}
-						{refs}
+						path={[...path, 'children', i]}
 						onSplit={(newBlocks) => {
-							splitParagraph(node, 'summary', newBlocks, document, i);
+							console.log('newBlocks');
+							console.log(newBlocks);
+							splitParagraph(node, 'children', newBlocks, document, i);
 						}}
+						onConvertToHeading={(paragraphId) => {
+							splitSection(node, paragraphId, document, addSection);
+						}}
+						{refs}
 						{onUnmount}
 					/>
-				{/each}
-			{/if}
-		</div>
+				</div>
+			{/each}
+		{:else if (node.view[viewStateIndex] as ViewState).state === 'summary'}
+			{#each SummaryRenderers as { Renderer }, i (node.summary[i].last_modified + node.summary[i].id)}
+				{console.log(i)}
+				{console.log((node.summary[i] as ContentParagraph).content)}
+				<Renderer
+					path={[...path, 'summary', i]}
+					{refs}
+					onSplit={(newBlocks) => {
+						splitParagraph(node, 'summary', newBlocks, document, i);
+					}}
+					{onUnmount}
+				/>
+			{/each}
+		{/if}
 	</div>
-{/if}
+</div>

@@ -1,16 +1,17 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, getContext } from 'svelte';
 	import type { z } from 'zod';
 	import type { sectionContainer } from '$lib/model/collection';
 	import { float } from '$lib/view/utils/float.svelte';
+	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 
 	let {
-		node,
+		path,
 		onUnmount,
 		directions,
 		isTableHovered
 	}: {
-		node: z.infer<typeof sectionContainer>;
+		path: (string | number)[];
 		onUnmount: () => void;
 		directions: {
 			type: string;
@@ -22,6 +23,9 @@
 		}[];
 		isTableHovered: boolean;
 	} = $props();
+	
+	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
+	const node = documentManipulator.getByPath(path) as z.infer<typeof sectionContainer>;
 
 	let isHovered = $state(false);
 

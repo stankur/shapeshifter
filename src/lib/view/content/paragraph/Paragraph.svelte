@@ -13,9 +13,10 @@
 	import type { NavigationHandler } from '$lib/services/navigation/types';
 	import { createNavigationPlugin } from '../heading/navigationPlugin';
 	import ParagraphControls from './ParagraphControls.svelte';
+	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 
 	type Props = {
-		node: ContentParagraph;
+		path: (string | number)[];
 		refs: Record<
 			string,
 			{ element: HTMLElement; animateAbsolute: boolean; animateNested: boolean }
@@ -29,7 +30,7 @@
 		getPrevEditable?: NavigationHandler;
 	};
 	let {
-		node = $bindable<ContentParagraph>(),
+		path,
 		refs,
 		additionalFlipId,
 		updateParent,
@@ -39,9 +40,11 @@
 		getNextEditable,
 		getPrevEditable
 	}: Props = $props();
-	// let enterPressed = $state<boolean>(false);
-	let { content } = $derived(node);
+	
 	let documentNode: Document = getContext('document');
+	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
+	const node = $derived(documentManipulator.getByPath(path) as ContentParagraph);
+	let { content } = $derived(node);
 	let isParagraphHovered = $state(false);
 
 	// Create the plugins array
@@ -186,7 +189,7 @@
 			e.stopPropagation();
 		}
 	}}
-	class="leading-7 relative"
+	class="mt-6 leading-7 first:mt-0 relative"
 	bind:this={ref}
 	onmouseenter={() => isParagraphHovered = true}
 	onmouseleave={() => isParagraphHovered = false}
