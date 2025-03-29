@@ -1,50 +1,49 @@
 # Active Context
 
 ## Current Focus
-We're implementing document structure updates when heading levels change. This includes:
-
-1. When a heading level increases (e.g., H1 → H2), the section moves up in the hierarchy and becomes a child of a section with a lower heading level.
-2. When a heading level decreases (e.g., H2 → H1), the section breaks out of its current container, taking any subsections with higher heading levels with it.
-
-This enhances the document editing experience by maintaining proper hierarchical structure as users modify heading levels.
+We're implementing a path-based component access pattern to replace the two-way binding approach. This change addresses issues with deeply nested objects, where two-way binding creates friction when accessing state from adjacent components. The new approach uses a centralized global reactive state accessed through paths.
 
 ## Implementation Approach
-1. Added heading level change functionality
-   - Implemented `handleHeadingLevelIncrease` function in collection.svelte.ts
-   - Updated `levelPlugin.ts` to call callbacks when heading levels change
-   - Added callback propagation through the component hierarchy
+1. Enhanced DocumentManipulator
+   - Created a centralized document state accessible via paths
+   - Implemented `getByPath` function to access nodes by path
+   - Leveraged Svelte 5's reactivity for direct mutations
 
-2. Implemented document restructuring for heading level increases
-   - Section finds a parent section with the appropriate level
-   - Section moves to become a child of that parent section
-   - Document structure updates to maintain hierarchy
+2. Updated component props
+   - Changed component props from `node` to `path`
+   - Components now receive paths instead of direct node references
+   - Child components receive extended paths (e.g., `[...path, 'children', index]`)
 
-3. Planned document restructuring for heading level decreases
-   - Section will break out of its current container
-   - Section will take any subsections with higher heading levels
-   - Document structure will update to maintain hierarchy
+3. Maintained reactivity
+   - Components retrieve nodes using `documentManipulator.getByPath(path)`
+   - Direct mutations to retrieved objects are reactive
+   - No need for explicit setters due to Svelte 5's reactivity system
 
-4. Connected components through the hierarchy
-   - Section Container provides findParentSection and onSectionMoved callbacks
-   - Section component passes these to the Heading component
-   - Heading component triggers the appropriate action when level changes
+4. Preserved callback patterns
+   - Kept existing callback patterns for actions
+   - Maintained the component hierarchy pattern
+   - Actions still operate on node objects directly
 
 ## Recent Changes
-- Implemented `handleHeadingLevelIncrease` function in collection.svelte.ts
-- Updated `levelPlugin.ts` to call callbacks when heading levels change
-- Added onLevelIncrease callback to Heading component
-- Updated Section component to handle heading level increases
-- Updated Section Container to provide findParentSection and onSectionMoved callbacks
+- Updated DocumentManipulator with path-based access functionality
+- Modified components to use paths instead of direct node references:
+  - Section container components (Default, Sidebar, Card, TableOfContents, Tabs)
+  - Section components (Default)
+  - Content components (Heading, Paragraph)
+  - Control components (for Card, TableOfContents, Tabs)
+- Maintained existing callback patterns for actions
+- Ensured reactivity through direct mutations
 
 ## Next Steps
-- Implement the heading level decrease functionality
-- Test both heading level increase and decrease functionality
-- Handle edge cases (e.g., first section in a document)
-- Update documentation with the new functionality
-- Consider adding visual indicators for structure changes
+- Continue implementing document structure updates for heading level changes
+- Test the path-based approach with complex nested structures
+- Optimize performance for large documents
+- Update documentation with the new access pattern
+- Consider adding debugging tools for path-based access
 
 ## Active Decisions
-- Using specialized callbacks at each level rather than passing generic ones
+- Using path-based access instead of two-way binding for nested objects
+- Centralizing state in the document model
 - Leveraging Svelte 5's reactivity system for direct mutations
-- Following a consistent pattern for controls and actions
-- Documenting patterns for future feature implementations
+- Maintaining existing callback patterns for actions
+- Following a consistent pattern for component props (paths instead of nodes)

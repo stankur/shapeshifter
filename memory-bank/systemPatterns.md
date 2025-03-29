@@ -88,8 +88,36 @@ flowchart TD
 
 ## State Management
 - Document model for state representation
+- Path-based component access
 - Direct model-view updates
 - Supabase real-time updates
+
+### Path-Based Component Access
+```mermaid
+flowchart TD
+    Document[Document Model] --> DM[DocumentManipulator]
+    DM --> GetByPath[getByPath Function]
+    Component[Component] --> Path[Path Prop]
+    Path --> GetByPath
+    GetByPath --> Node[Node Object]
+    Node --> DirectMutation[Direct Mutation]
+    DirectMutation --> Reactivity[Svelte 5 Reactivity]
+```
+
+1. **Centralized State**
+   - Document model serves as the single source of truth
+   - State is accessed through paths rather than direct references
+   - Components only access the parts of the state they need
+
+2. **Path Propagation**
+   - Parent components pass paths to child components
+   - Child components extend paths for their children
+   - Example: `[...path, 'children', index]`
+
+3. **Direct Mutations**
+   - Components retrieve nodes using `documentManipulator.getByPath(path)`
+   - Direct mutations to retrieved objects trigger reactivity
+   - No need for explicit setters due to Svelte 5's reactivity system
 
 ## Extension Points
 1. **View Types**
@@ -134,22 +162,20 @@ flowchart TD
     UI --> Trigger[Action Trigger]
 ```
 
-1. **Action Definition**
-   - Core logic defined in actions file
-   - Direct mutations leveraging Svelte 5 reactivity
-   - Clear parameter typing
+### Path-Based Component Pattern
+```mermaid
+flowchart TD
+    Document[Document Model] --> Path[Path]
+    Path --> Component[Component]
+    Component --> ChildPath[Child Path]
+    ChildPath --> ChildComponent[Child Component]
+    Component --> Action[Action]
+    Action --> NodeMutation[Node Mutation]
+    NodeMutation --> Document
+```
 
-2. **Callback Propagation**
-   - Top-level containers define base implementations
-   - Specialized callbacks created for each child
-   - Context-aware functions passed down the hierarchy
-
-3. **UI Controls**
-   - Floating controls for user interaction
-   - Visibility based on hover state
-   - Consistent positioning and styling
-
-4. **Content Transformation**
-   - Paragraph to heading conversion
-   - Section splitting and reorganization
-   - Content structure manipulation
+3. **Path-Based Access**
+   - Components receive paths instead of direct node references
+   - Components access nodes through the DocumentManipulator
+   - Actions operate on node objects retrieved by path
+   - Changes to nodes are automatically reactive
