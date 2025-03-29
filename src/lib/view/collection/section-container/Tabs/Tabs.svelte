@@ -8,19 +8,22 @@
 	import { getContext, onMount } from 'svelte';
 	import type { Document } from '$lib/model/document';
 	import Controls from './Controls.svelte';
+	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 
 	const document = getContext('document') as Document;
+	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 
 	type SectionContainer = z.infer<typeof sectionContainer>;
 	type ViewState = { state: { gap: number; activeIndex: number } };
 
 	type Props = {
-		node: SectionContainer;
+		path: (string | number)[];
 		refs: Refs;
 		onUnmount: () => void;
 	};
 
-	let { node = $bindable(), refs, onUnmount }: Props = $props();
+	let { path, refs, onUnmount }: Props = $props();
+	const node = documentManipulator.getByPath(path) as SectionContainer;
 	let { view, activeView } = $derived(node);
 
 	let viewStateIndex = $derived(view.findIndex((v) => v.type === activeView));
@@ -31,7 +34,7 @@
 			HeadingRenderer: registry[
 				child.heading.activeView as keyof typeof registry
 			] as unknown as Component<{
-				node: ContentHeading;
+				path: (string | number)[];
 				refs: Refs;
 				additionalFlipId?: string;
 				onUnmount: () => void;
@@ -45,7 +48,7 @@
 
 	let ActiveSectionRenderer = $derived(
 		registry[node.children[activeIndex].activeView as keyof typeof registry] as Component<{
-			node: Section;
+			path: (string | number)[];
 			refs: Refs;
 			onUnmount: () => void;
 			overRides?: { heading: boolean };
@@ -114,7 +117,7 @@
 	onmouseleave={hideTabsControls}
 >
 	{#if document.state.mode === 'customize'}
-		<Controls {node} {onUnmount} {isTabsHovered} />
+		<Controls path={path} {onUnmount} {isTabsHovered} />
 	{/if}
 
 	<!-- Tabs navigation -->
@@ -128,7 +131,7 @@
 					onclick={() => setActiveSection(index)}
 				>
 					<HeadingRenderer
-						node={node.children[index].heading}
+						path={[...path, 'children', index, 'heading']}
 						additionalFlipId={'tab-item-' + index}
 						{refs}
 						{onUnmount}
@@ -148,7 +151,7 @@
 	{#key activeIndex}
 		<div class="pt-5">
 			<ActiveSectionRenderer
-				node={node.children[activeIndex]}
+				path={[...path, 'children', activeIndex]}
 				overRides={{ heading: false }}
 				{refs}
 				{onUnmount}

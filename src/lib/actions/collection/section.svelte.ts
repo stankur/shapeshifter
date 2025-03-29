@@ -121,8 +121,10 @@ export function handleHeadingLevelIncrease(
 export async function splitSection(
 	node: Section,
 	paragraphId: string,
+	document: Document,
 	addSection: (section: Section) => void
 ) {
+    document.state.animateNextChange = false;
 	const newId = crypto.randomUUID();
 
 	// find the paragraph in chilren section's content, and then remove the children from everything below that
