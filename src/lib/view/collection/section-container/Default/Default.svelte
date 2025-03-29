@@ -4,22 +4,27 @@
 	import { registry } from '$lib/viewRegistry.svelte';
 	import type { Component } from 'svelte';
 	import { addSectionToContainer } from '$lib/actions/collection.svelte';
+	import { getContext } from 'svelte';
+	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 
 	let {
-		node,
+		path,
 		refs,
 		onUnmount
 	}: {
-		node: SectionContainer;
+		path: (string | number)[];
 		refs: Refs;
 		onUnmount: () => void;
 	} = $props();
-	let { children } = $derived(node);
+	
+	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
+	const node = documentManipulator.getByPath(path) as SectionContainer;
+	let { children } = node;
 
 	let ChildrenRenderers = $derived(
 		children.map((child) => ({
 			Renderer: registry[child.activeView as keyof typeof registry] as Component<{
-				node: Section;
+				path: (string | number)[];
 				refs: Refs;
 				onUnmount: () => void;
 				addSection: (section: Section) => void;
@@ -32,7 +37,7 @@
 	{console.log('children renderers length in section container: ', ChildrenRenderers.length)}
 	{#each ChildrenRenderers as { Renderer }, index}
 		<Renderer
-			node={node.children[index]}
+			path={[...path, 'children', index]}
 			{refs}
 			{onUnmount}
 			addSection={(section) => {

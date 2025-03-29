@@ -18,15 +18,17 @@
 		createSummaryNavProps
 	} from './navigation';
 	import type { NavigationHandler } from '$lib/services/navigation/types';
+	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 
 	const document = getContext('document') as Document;
+	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 
 	type SectionContainer = z.infer<typeof sectionContainer>;
 	type SectionContainerViewState = z.infer<typeof sectionContainerCardViewState>;
 
 	// Define component types with navigation props
 	type HeadingComponentProps = {
-		node: ContentHeading;
+		path: (string | number)[];
 		refs: Refs;
 		onUnmount: () => void;
 		updateParent?: () => void;
@@ -35,8 +37,8 @@
 		documentNode?: Document;
 	};
 	
-	type ContentComponentProps<T> = {
-		node: T; 
+	type ContentComponentProps = {
+		path: (string | number)[]; 
 		refs: Refs;
 		onUnmount: () => void;
 		updateParent?: () => void;
@@ -47,14 +49,16 @@
 	};
 
 	let {
-		node,
+		path,
 		refs,
 		onUnmount
 	}: {
-		node: SectionContainer;
+		path: (string | number)[];
 		refs: Refs;
 		onUnmount: () => void;
 	} = $props();
+	
+	const node = documentManipulator.getByPath(path) as SectionContainer;
 	let { children, view, activeView } = $derived(node);
 
 	let SectionRenderers = $derived(
@@ -64,11 +68,12 @@
 			HeadingRenderer: registry[
 				child.heading.activeView as keyof typeof registry
 			] as unknown as Component<HeadingComponentProps>,
-			SummaryRenderers: child.summary.map((summaryChild) => ({
+			SummaryRenderers: child.summary.map((summaryChild, summaryIndex) => ({
 				summaryChild,
+				summaryIndex,
 				Renderer: registry[
 					summaryChild.activeView as keyof typeof registry
-                ] as unknown as Component<ContentComponentProps<typeof summaryChild>>
+                ] as unknown as Component<ContentComponentProps>
 			}))
 		}))
 	);
@@ -93,21 +98,21 @@
 
 <div class="card-container" onmouseenter={showCardControls} onmouseleave={hideCardControls}>
 	{#if document.state.mode === 'customize'}
-		<Controls {node} {onUnmount} {isCardHovered} />
+		<Controls path={path} {onUnmount} {isCardHovered} />
 	{/if}
 
 	<div class="container flex flex-wrap" style:--perRow={perRow} style:--gap={`${gap}px`}>
 		{#each SectionRenderers as { child, sectionIndex, HeadingRenderer, SummaryRenderers }}
 			<div class="card border-1 border-black p-5">
 				<HeadingRenderer
-					node={child.heading}
+					path={[...path, 'children', sectionIndex, 'heading']}
 					{refs}
 					{onUnmount}
 					{...createHeadingNavProps(child, node, sectionIndex, document)}
 				/>
-				{#each SummaryRenderers as { summaryChild, Renderer }}
+				{#each SummaryRenderers as { summaryChild, summaryIndex, Renderer }}
 					<Renderer
-						node={summaryChild}
+						path={[...path, 'children', sectionIndex, 'summary', summaryIndex]}
 						{refs}
 						{onUnmount}
 						{...createSummaryNavProps(child, node, summaryChild.id, sectionIndex, document)}

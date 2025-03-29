@@ -8,9 +8,10 @@
 	import { getContext, onMount, type Component } from 'svelte';
 	import DefaultControl from './control/DefaultControl.svelte';
 	import { splitParagraph, splitSection } from '$lib/actions/collection.svelte';
+	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 
 	type Props = {
-		node: Section;
+		path: (string | number)[];
 		refs: Refs;
 		onUnmount: () => void;
 		overRides: { heading: boolean };
@@ -18,7 +19,7 @@
 	};
 	type ViewState = { state: 'expanded' | 'summary' | 'collapsed' };
 	let {
-		node = $bindable<Section>(),
+		path,
 		refs,
 		onUnmount,
 		overRides = { heading: true },
@@ -26,11 +27,13 @@
 	}: Props = $props();
 
 	let document = getContext('document') as Document;
+	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
+	const node = documentManipulator.getByPath(path) as Section;
 
-	let { activeView, view } = $derived(node);
+	let { activeView, view } = node;
 	let HeadingRenderer = $derived(
 		registry[node.heading.activeView as keyof typeof registry] as unknown as Component<{
-			node: ContentHeading;
+			path: (string | number)[];
 			refs: Refs;
 			onUnmount: () => void;
 		}>
@@ -38,7 +41,7 @@
 	let ChildrenRenderers = $derived(
 		node.children.map((child) => ({
 			Renderer: registry[child.activeView as keyof typeof registry] as Component<{
-				node: typeof child;
+				path: (string | number)[];
 				refs: Refs;
 				onUnmount: () => void;
 				onSplit: (newBlocks: [string, string]) => void;
@@ -49,7 +52,7 @@
 	let SummaryRenderers = $derived(
 		node.summary.map((child) => ({
 			Renderer: registry[child.activeView as keyof typeof registry] as Component<{
-				node: typeof child;
+				path: (string | number)[];
 				refs: Refs;
 				onUnmount: () => void;
 				onSplit: (newBlocks: [string, string]) => void;
@@ -100,7 +103,7 @@
 	{#if overRides && overRides.heading}
 		{#key node.heading.id}
 			<div bind:this={headingElement}>
-				<HeadingRenderer bind:node={node.heading} {refs} {onUnmount} />
+				<HeadingRenderer path={[...path, 'heading']} {refs} {onUnmount} />
 			</div>
 		{/key}
 	{/if}
@@ -112,7 +115,7 @@
 			{#each ChildrenRenderers as { Renderer }, i (node.children[i].last_modified + node.children[i].id)}
 				{console.log("node.children[i].id: ", node.children[i].id)}
 				<Renderer
-					bind:node={node.children[i]}
+					path={[...path, 'children', i]}
 					onSplit={(newBlocks) => {
 						console.log('newBlocks');
 						console.log(newBlocks);
@@ -130,7 +133,7 @@
 				{console.log(i)}
 				{console.log((node.summary[i] as ContentParagraph).content)}
 				<Renderer
-					bind:node={node.summary[i]}
+					path={[...path, 'summary', i]}
 					{refs}
 					onSplit={(newBlocks) => {
 						splitParagraph(node, 'summary', newBlocks, document, i);

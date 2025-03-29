@@ -9,34 +9,40 @@
 	import Controls from './Controls.svelte';
 	import { getContext } from 'svelte';
 	import type { Document } from '$lib/model/document';
+	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 
 	const document = getContext('document') as Document;
+	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 
 	let {
-		node,
+		path,
 		refs,
 		onUnmount
 	}: {
-		node: z.infer<typeof sectionContainer>;
+		path: (string | number)[];
 		refs: Refs;
 		onUnmount: () => void;
 	} = $props();
+	
+	const node = documentManipulator.getByPath(path) as z.infer<typeof sectionContainer>;
 	let { children, view, activeView } = $derived(node);
 
 	let ChildrenRenderers = $derived(
-		children.map((child) => ({
+		children.map((child, childIndex) => ({
 			child,
+			childIndex,
 			HeadingRenderer: registry[
 				child.heading.activeView as keyof typeof registry
 			] as unknown as Component<{
-				node: ContentHeading;
+				path: (string | number)[];
 				refs: Refs;
 				onUnmount: () => void;
 			}>,
-			SummaryRenderers: child.summary.map((summaryChild: any) => ({
+			SummaryRenderers: child.summary.map((summaryChild: any, summaryIndex: number) => ({
 				summaryChild,
+				summaryIndex,
 				Renderer: registry[summaryChild.activeView as keyof typeof registry] as Component<{
-					node: typeof summaryChild;
+					path: (string | number)[];
 					refs: Refs;
 					onUnmount: () => void;
 				}>
@@ -77,7 +83,7 @@
 </script>
 
 {#if document.state.mode === 'customize'}
-	<Controls {directions} {node} {onUnmount} {isTableHovered}/>
+	<Controls {directions} path={path} {onUnmount} {isTableHovered}/>
 {/if}
 <div
 	class="container flex flex-wrap"
@@ -87,7 +93,7 @@
 	onmouseenter={showTableControls}
 	onmouseleave={hideTableControls}
 >
-	{#each ChildrenRenderers as { child, HeadingRenderer, SummaryRenderers }}
+	{#each ChildrenRenderers as { child, childIndex, HeadingRenderer, SummaryRenderers }}
 		<div
 			class="item flex flex-col"
 			style:--interGenerationGap={`${currentDirection.interGenerationGap}px`}
@@ -96,16 +102,16 @@
 				class={['toc-parent flex', currentDirection.innerDirection === 'column' ? 'flex-col' : '']}
 				style:--innerGap={`${currentDirection.innerGap}px`}
 			>
-				<HeadingRenderer node={child.heading} {refs} {onUnmount} />
+				<HeadingRenderer path={[...path, 'children', childIndex, 'heading']} {refs} {onUnmount} />
 				<div class="flex flex-col">
-					{#each SummaryRenderers as { summaryChild, Renderer }}
-						<Renderer node={summaryChild} {refs} {onUnmount} />
+					{#each SummaryRenderers as { summaryChild, summaryIndex, Renderer }}
+						<Renderer path={[...path, 'children', childIndex, 'summary', summaryIndex]} {refs} {onUnmount} />
 					{/each}
 				</div>
 			</div>
 			{#if child.children.length === 1 && child.children[0].type === 'section-container' && directions.length}
 				<TableOfContentsChild
-					node={child.children[0]}
+					path={[...path, 'children', childIndex, 'children', 0]}
 					directions={childrenDirections}
 					{refs}
 					{onUnmount}

@@ -10,9 +10,11 @@
 	import { EditorFocusService } from '$lib/services/editorFocus';
 	import type { NavigationHandler } from '$lib/services/navigation/types';
 	import { createNavigationPlugin } from './navigationPlugin';
-import { createLevelPlugin } from './levelPlugin';
+	import { createLevelPlugin } from './levelPlugin';
+	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 
 	let documentNode: Document = getContext('document');
+	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 
 	const getHeadingSize = (level: number) => {
 		switch (level) {
@@ -28,20 +30,20 @@ import { createLevelPlugin } from './levelPlugin';
 	};
 
 	type Props = {
-		node: ContentHeading;
+		path: (string | number)[];
 		refs: Record<
 			string,
 			{ element: HTMLElement; animateAbsolute: boolean; animateNested: boolean }
 		>;
 		onUnmount: () => void;
-		updateParent: () => void;
+		updateParent?: () => void;
 		additionalFlipId?: string;
-		getNextEditable: NavigationHandler;
-		getPrevEditable: NavigationHandler;
+		getNextEditable?: NavigationHandler;
+		getPrevEditable?: NavigationHandler;
 	};
 
 	let {
-		node = $bindable<ContentHeading>(),
+		path,
 		refs,
 		onUnmount,
 		updateParent,
@@ -49,31 +51,32 @@ import { createLevelPlugin } from './levelPlugin';
 		getNextEditable,
 		getPrevEditable
 	}: Props = $props();
+	
+	const node = $derived(documentManipulator.getByPath(path) as ContentHeading);
 	let { content, level } = $derived(node);
 
 	let headingContent = $derived(`# ${content}`);
 	let headingSize = $derived(getHeadingSize(level));
 
 	let doc: Node = $derived(defaultMarkdownParser.parse(headingContent));
-	
-// Create the plugins array
-const plugins = [
-	...exampleSetup({
-		schema,
-		menuBar: false
-	}),
-    createNavigationPlugin(getNextEditable, getPrevEditable, documentNode),
-    createLevelPlugin(node, documentNode)
-];
-	
-	
+
+	// Create the plugins array
+	const plugins = [
+		...exampleSetup({
+			schema,
+			menuBar: false
+		}),
+		createNavigationPlugin(getNextEditable, getPrevEditable, documentNode),
+		createLevelPlugin(node, documentNode)
+	];
+
 	// Create the editor state
 	let editorState = EditorState.create({
 		schema,
 		doc: defaultMarkdownParser.parse(headingContent),
 		plugins
 	});
-	
+
 	// Update editor state when content changes
 	$effect(() => {
 		const newDoc = defaultMarkdownParser.parse(`# ${content}`);
@@ -127,7 +130,7 @@ const plugins = [
 
 		// Register this editor with the EditorFocusService
 		EditorFocusService.register(node.id, view);
-		
+
 		$effect(() => {
 			if (documentNode.state.mode !== 'read') {
 				// When not in read mode, set up the mouseenter handler after a delay
@@ -140,9 +143,14 @@ const plugins = [
 				}, 800);
 
 				const timeoutId2 = setTimeout(() => {
-					view.setProps({ editable: () => {
-						return documentNode.state.focusedContentId === node.id && documentNode.state.mode !== 'read';
-					} });
+					view.setProps({
+						editable: () => {
+							return (
+								documentNode.state.focusedContentId === node.id &&
+								documentNode.state.mode !== 'read'
+							);
+						}
+					});
 				}, 800);
 
 				// Return cleanup function to clear timeout if effect reruns
@@ -170,9 +178,9 @@ const plugins = [
 <div
 	bind:this={ref}
 	onclick={(e) => {
-        if (documentNode.state.mode !== 'read') {
-            e.stopPropagation();
-        }
+		if (documentNode.state.mode !== 'read') {
+			e.stopPropagation();
+		}
 	}}
 	class={[headingSize, 'prose-h1:inline-block', 'prose-h1:font-semibold']}
 ></div>
