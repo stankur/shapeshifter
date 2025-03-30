@@ -6,6 +6,7 @@
 	import { addSectionToContainer, removeSectionFromContainer } from '$lib/actions/collection/section-container.svelte';
 	import { getContext } from 'svelte';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
+	import Controls from './Controls.svelte';
 
 	let {
 		path,
@@ -16,6 +17,8 @@
 		refs: Refs;
 		onUnmount: () => void;
 	} = $props();
+	
+	let isDefaultHovered = $state(false);
 
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 	const node = documentManipulator.getByPath(path) as SectionContainer;
@@ -35,7 +38,11 @@
 	);
 </script>
 
-<div class="flex flex-col gap-12">
+<div 
+	class="flex flex-col gap-12"
+	onmouseenter={() => isDefaultHovered = true}
+	onmouseleave={() => isDefaultHovered = false}
+>
 	{console.log('children renderers length in section container: ', ChildrenRenderers.length)}
 	{#each ChildrenRenderers as { Renderer }, index}
 		<Renderer
@@ -63,3 +70,5 @@
 		/>
 	{/each}
 </div>
+
+<Controls {path} {onUnmount} {isDefaultHovered} />
