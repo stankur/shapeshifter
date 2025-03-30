@@ -2,10 +2,13 @@ import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 import { getDocumentByUsernameAndSlug } from '$lib/services/supabase/supabase';
 
-export const load: PageLoad = async ({ params }) => {
-	const { username, slug } = params;
+export const ssr = false;
 
-	const result = await getDocumentByUsernameAndSlug(username, slug);
+export const load: PageLoad = async ({ params, parent }) => {
+	const { username, slug } = params;
+    const { supabase } = await parent();
+
+	const result = await getDocumentByUsernameAndSlug(supabase, username, slug);
 
 	if (!result.success || !result.document) {
 		throw error(404, {

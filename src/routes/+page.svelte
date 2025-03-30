@@ -13,12 +13,15 @@
 		sectionContainerTOCCard,
 		sidebarExample
 	} from '$lib/model/examples';
-	import { saveDocument, getSession, supabase, getUserProfile } from '$lib/services/supabase/supabase';
+	import { saveDocument, getSession, getUserProfile } from '$lib/services/supabase/supabase';
 	import { onMount } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import UsernameInput from '$lib/components/UsernameInput.svelte';
 	import TitleInput from '$lib/components/TitleInput.svelte';
 	import { handlePublish, handleSignIn, handleSignOut } from '$lib/services/supabase/documentActions';
+	import { page } from '$app/state';
+
+    const supabase = page.data.supabase;
 
 	let { data } = $props();
 	let session = $state(data.session);
@@ -27,7 +30,7 @@
 	// Manually check for session on mount
 	onMount(async () => {
 		try {
-			const currentSession = await getSession();
+			const currentSession = await getSession(supabase);
 			if (currentSession) {
 				console.log('Found session on mount:', currentSession);
 				session = currentSession;
@@ -49,7 +52,7 @@
 		const publishingState = { value: isPublishing };
 		const publishStatusState = { value: publishStatus };
 		
-		await handlePublish(node, publishingState, publishStatusState);
+		await handlePublish(data.supabase,node, publishingState, publishStatusState, session?.user?.id);
 		
 		isPublishing = publishingState.value;
 		publishStatus = publishStatusState.value;
@@ -77,7 +80,7 @@
 <div class="mb-4 flex justify-end gap-2">
 	{#if isAuthenticated && session}
 		<div class="mr-2 flex items-center gap-4">
-			<UsernameInput {session} />
+			<UsernameInput {session} {supabase} />
 			<TitleInput document={node} />
 			<button class="text-sm text-gray-600 underline hover:text-gray-800" onclick={onSignOut}>
 				Sign out
@@ -163,7 +166,7 @@
 	>
 		<p>{publishStatus.message}</p>
 		{#if publishStatus.success && session?.user}
-			{#await getUserProfile(session.user.id) then profile}
+			{#await getUserProfile(supabase, session.user.id) then profile}
 				{#if profile?.username}
 					<div class="mt-2">
 						<a

@@ -5,6 +5,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 
 // Handle document publishing
 export async function handlePublish(
+    supabase: SupabaseClient,
 	document: Document,
 	isPublishing: { value: boolean },
 	publishStatus: {
@@ -26,7 +27,9 @@ export async function handlePublish(
 	}
 
 	try {
-		const result = await saveDocument(document, userId);
+        console.log('handling publish with document: ', document);
+        console.log('handling publish with userId: ', userId);
+		const result = await saveDocument(supabase, document, userId);
 
 		if (result.success) {
 			const documentId = result.data?.id;

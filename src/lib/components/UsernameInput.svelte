@@ -2,8 +2,9 @@
 <script lang="ts">
 	import { getUserProfile, updateUsername } from '$lib/services/supabase/supabase';
 	import type { Session } from '@supabase/supabase-js';
-
-	let { session } = $props<{ session: Session }>();
+	import type { SupabaseClient } from '@supabase/supabase-js';
+    
+	let { session, supabase } = $props<{ session: Session, supabase: SupabaseClient }>();
 	let username = $state('');
 	let usernameError = $state('');
 	let isSavingUsername = $state(false);
@@ -11,7 +12,7 @@
 	async function loadUsername() {
 		if (session?.user?.id) {
 			try {
-				const profile = await getUserProfile(session.user.id);
+				const profile = await getUserProfile(supabase, session.user.id);
 				username = profile?.username || '';
 			} catch (error) {
 				console.error('Error loading username:', error);
@@ -28,7 +29,7 @@
 		
 		isSavingUsername = true;
 		try {
-			const result = await updateUsername(session.user.id, newUsername);
+			const result = await updateUsername(supabase, session.user.id, newUsername);
 			if (!result.success) {
 				usernameError = result.error || 'Failed to update username';
 			} else {

@@ -54,7 +54,7 @@
 		isLoadingDocument = true;
 
 		try {
-			const result = await getDocumentBySlugForCurrentUser(slug, session?.user?.id as string);
+			const result = await getDocumentBySlugForCurrentUser(supabase, slug, session?.user?.id as string);
 
 			if (result.success && result.document) {
 				document = result.document;
@@ -84,7 +84,7 @@
 
 	onMount(async () => {
 		try {
-			const currentSession = await getSession();
+			const currentSession = await getSession(supabase);
 			if (currentSession) {
 				console.log('Found session on mount:', currentSession);
 				session = currentSession;
@@ -103,7 +103,7 @@
 		const publishStatusState = { value: publishStatus };
 
 		// Pass the user ID from the session to ensure consistency
-		await handlePublish(document, publishingState, publishStatusState, session?.user?.id);
+		await handlePublish(data.supabase, document, publishingState, publishStatusState, session?.user?.id);
 
 		isPublishing = publishingState.value;
 		publishStatus = publishStatusState.value;
@@ -163,7 +163,7 @@
 	<div class="mb-4 flex justify-end gap-2">
 		{#if isAuthenticated && session}
 			<div class="mr-2 flex items-center gap-4">
-				<UsernameInput {session} />
+				<UsernameInput {session} {supabase} />
 				{#if document}
 					<TitleInput {document} />
 				{/if}
@@ -251,7 +251,7 @@
 		>
 			<p>{publishStatus.message}</p>
 			{#if publishStatus.success && session?.user && document}
-				{#await getUserProfile(session.user.id) then profile}
+				{#await getUserProfile(supabase, session.user.id) then profile}
 					{#if profile?.username}
 						<div class="mt-2">
 							<a

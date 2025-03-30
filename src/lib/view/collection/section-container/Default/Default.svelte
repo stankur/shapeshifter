@@ -3,21 +3,27 @@
 	import { type Section, type SectionContainer } from '$lib/model/collection';
 	import { registry } from '$lib/viewRegistry.svelte';
 	import type { Component } from 'svelte';
-	import { addSectionToContainer, removeSectionFromContainer } from '$lib/actions/collection/section-container.svelte';
+	import {
+		addSectionToContainer,
+		removeSectionFromContainer
+	} from '$lib/actions/collection/section-container.svelte';
 	import { getContext } from 'svelte';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 	import Controls from './Controls.svelte';
+	import type { Document } from '$lib/model/document';
 
 	let {
 		path,
 		refs,
-		onUnmount,
+		onUnmount
 	}: {
 		path: (string | number)[];
 		refs: Refs;
 		onUnmount: () => void;
 	} = $props();
-	
+
+	const document = getContext('document') as Document;
+
 	let isDefaultHovered = $state(false);
 
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
@@ -38,10 +44,10 @@
 	);
 </script>
 
-<div 
+<div
 	class="flex flex-col gap-12"
-	onmouseenter={() => isDefaultHovered = true}
-	onmouseleave={() => isDefaultHovered = false}
+	onmouseenter={() => (isDefaultHovered = true)}
+	onmouseleave={() => (isDefaultHovered = false)}
 >
 	{console.log('children renderers length in section container: ', ChildrenRenderers.length)}
 	{#each ChildrenRenderers as { Renderer }, index}
@@ -71,4 +77,6 @@
 	{/each}
 </div>
 
-<Controls {path} {onUnmount} {isDefaultHovered} />
+{#if document.state.mode === 'customize'}
+	<Controls {path} {onUnmount} {isDefaultHovered} />
+{/if}

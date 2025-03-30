@@ -1,15 +1,7 @@
-import { createClient } from '@supabase/supabase-js';
-import type { Database } from '$lib/types/supabase';
 import type { Document } from '$lib/model/document';
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
-// These will be replaced with actual environment variables
-const supabaseUrl: string = PUBLIC_SUPABASE_URL;
-const supabaseAnonKey: string = PUBLIC_SUPABASE_ANON_KEY;
+import type { SupabaseClient } from '@supabase/supabase-js';
 
-// Browser client (for client-side operations)
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
-
-export async function getUserProfile(userId: string) {
+export async function getUserProfile(supabase: SupabaseClient, userId: string) {
 	const { data, error } = await supabase
 		.from('profiles')
 		.select('username')
@@ -20,7 +12,7 @@ export async function getUserProfile(userId: string) {
 	return data;
 }
 
-export async function updateUsername(userId: string, username: string) {
+export async function updateUsername(supabase: SupabaseClient, userId: string, username: string) {
 	// First check if username is taken
 	const { data: existing } = await supabase
 		.from('profiles')
@@ -44,7 +36,7 @@ export async function updateUsername(userId: string, username: string) {
 	return { success: true };
 }
 
-export async function getSession() {
+export async function getSession(supabase: SupabaseClient) {
 	const {
 		data: { session }
 	} = await supabase.auth.getSession();
@@ -52,7 +44,7 @@ export async function getSession() {
 	return session;
 }
 
-export async function saveDocument(document: Document, userId?: string) {
+export async function saveDocument(supabase: SupabaseClient, document: Document, userId?: string) {
 	try {
 		let user_id: string;
 
@@ -94,6 +86,7 @@ export async function saveDocument(document: Document, userId?: string) {
 }
 
 export async function getDocumentByUsernameAndSlug(
+	supabase: SupabaseClient,
 	username: string,
 	slug: string
 ): Promise<{ success: boolean; document?: Document; error?: unknown }> {
@@ -133,6 +126,7 @@ export async function getDocumentByUsernameAndSlug(
 }
 
 export async function getDocumentBySlugForCurrentUser(
+	supabase: SupabaseClient,
 	slug: string,
 	userId: string
 ): Promise<{ success: boolean; document?: Document; error?: unknown }> {
