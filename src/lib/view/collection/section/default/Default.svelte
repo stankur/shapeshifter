@@ -19,7 +19,7 @@
 		path: (string | number)[];
 		refs: Refs;
 		onUnmount: () => void;
-		overRides: { heading: boolean };
+		overRides?: { heading?: boolean; accommodateControls?: boolean };
 		addSection: (newSection: Section) => void;
 		findParentSection: (level: number) => Section | null;
 		onSectionMoved: () => void;
@@ -29,11 +29,14 @@
 		path,
 		refs,
 		onUnmount,
-		overRides = { heading: true },
+		overRides = {},
 		addSection,
 		findParentSection,
 		onSectionMoved
 	}: Props = $props();
+
+	const defaultOverRides = { heading: true, accommodateControls: false };
+	overRides = { ...defaultOverRides, ...overRides };
 
 	let document = getContext('document') as Document;
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
@@ -80,7 +83,9 @@
 
 	onMount(() => {
 		if (containerElement && controlElement) {
-			containerElement.style.paddingLeft = `${controlElement.clientWidth}px`;
+			if (overRides?.accommodateControls) {
+				containerElement.style.paddingLeft = `${controlElement.clientWidth}px`;
+			}
 
 			// Determine which element to use as reference for the floating control
 			const referenceElement = overRides?.heading ? headingElement : contentElement;

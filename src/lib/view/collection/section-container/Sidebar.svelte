@@ -63,6 +63,7 @@
 			path: (string | number)[];
 			refs: Refs;
 			onUnmount: () => void;
+			overRides?: { heading?: boolean, accommodateControls?: boolean };
 		}>
 	);
 
@@ -107,7 +108,7 @@
 
 		<!-- Content -->
 		<div class="content grow basis-0 pt-0 p-2" style:width="{100 -sidebarState.percentageWidth}%">
-			<ActiveSectionRenderer path={[...path, 'children', sidebarState.activeIndex]} {refs} {onUnmount} />
+			<ActiveSectionRenderer overRides={{accommodateControls: true}} path={[...path, 'children', sidebarState.activeIndex]} {refs} {onUnmount} />
 		</div>
 	</div>
 {/key}

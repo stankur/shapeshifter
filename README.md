@@ -61,3 +61,7 @@ when you press enter on the end of a heading, it should transfer the cursor to w
 authentication is rather messy, and somewhat working, but logic is somewhat strange due to initially created with Cline.
 
 There are duplicated logic across the slug specific editor and the default editor just located at the base URL.
+
+pressing tab on a heading should not work when the parent's heading is one level below. This is because we have a constraint where a direct child should not be more than 1 level higher than their parent. But somehow it works when I was in the sidebar view, and I pressed tab on the headings there.
+
+In sidebar view, if you consider the active section being rendered, there are two consecutive appearances of  a heading. However if you update one, the other does not get updated.

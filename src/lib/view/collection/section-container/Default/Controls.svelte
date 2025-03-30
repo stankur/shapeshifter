@@ -45,6 +45,11 @@
 		node.activeView = 'collection/section-container/table-of-contents';
 	}
 
+    function switchToSidebar() {
+        onUnmount();
+        node.activeView = 'collection/section-container/sidebar';
+    }
+
 	onMount(() => {
 		return float(referenceElement, floatingElement)();
 	});
@@ -68,7 +73,11 @@
 	</button>
 	<button class="rounded-md bg-blue-500 p-2 text-white" onclick={switchToTableOfContents}>
 		toc
-	</button>
+	</button>   
+    <button class="rounded-md bg-blue-500 p-2 text-white" onclick={switchToSidebar}>
+        sidebar
+    </button>
+
 </div>
 
 <div bind:this={referenceElement} class="reference-element w-full"></div>
