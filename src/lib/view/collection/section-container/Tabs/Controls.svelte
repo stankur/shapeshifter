@@ -35,6 +35,11 @@
 		node.activeView = 'collection/section-container/table-of-contents';
 	}
 
+	function switchToCard() {
+		onUnmount();
+		node.activeView = 'collection/section-container/card';
+	}
+
 	onMount(() => {
 		return float(referenceElement, floatingElement)();
 	});
@@ -52,6 +57,9 @@
 >
 	<button class="rounded-md bg-blue-500 p-2 text-white" onclick={switchToTableOfContents}>
 		toc
+	</button>
+	<button class="rounded-md bg-blue-500 p-2 text-white" onclick={switchToCard}>
+		card
 	</button>
 </div>
 

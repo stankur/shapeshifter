@@ -13,10 +13,7 @@
 	import type { Document } from '$lib/model/document';
 	import Controls from './Controls.svelte';
 	import { addSection } from '$lib/actions/collection/section-container.svelte';
-	import {
-		createHeadingNavProps,
-		createSummaryNavProps
-	} from './navigation';
+	import { createHeadingNavProps, createSummaryNavProps } from './navigation';
 	import type { NavigationHandler } from '$lib/services/navigation/types';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 
@@ -36,9 +33,9 @@
 		getPrevEditable?: NavigationHandler;
 		documentNode?: Document;
 	};
-	
+
 	type ContentComponentProps = {
-		path: (string | number)[]; 
+		path: (string | number)[];
 		refs: Refs;
 		onUnmount: () => void;
 		updateParent?: () => void;
@@ -57,7 +54,7 @@
 		refs: Refs;
 		onUnmount: () => void;
 	} = $props();
-	
+
 	const node = documentManipulator.getByPath(path) as SectionContainer;
 	let { children, view, activeView } = $derived(node);
 
@@ -73,7 +70,7 @@
 				summaryIndex,
 				Renderer: registry[
 					summaryChild.activeView as keyof typeof registry
-                ] as unknown as Component<ContentComponentProps>
+				] as unknown as Component<ContentComponentProps>
 			}))
 		}))
 	);
@@ -98,7 +95,7 @@
 
 <div class="card-container" onmouseenter={showCardControls} onmouseleave={hideCardControls}>
 	{#if document.state.mode === 'customize'}
-		<Controls path={path} {onUnmount} {isCardHovered} />
+		<Controls {path} {onUnmount} {isCardHovered} />
 	{/if}
 
 	<div class="container flex flex-wrap" style:--perRow={perRow} style:--gap={`${gap}px`}>
@@ -121,10 +118,15 @@
 			</div>
 		{/each}
 
-		<button onclick={() => {
-            onUnmount()
+		{#if document.state.mode !== 'read'}
+			<button
+				onclick={() => {
+					onUnmount();
 
-            addSection(node, node.children[0].heading.level)}}>Add Section</button>
+					addSection(node, node.children[0].heading.level);
+				}}>Add Section</button
+			>
+		{/if}
 	</div>
 </div>
 
