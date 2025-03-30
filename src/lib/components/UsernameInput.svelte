@@ -1,6 +1,6 @@
 <!-- UsernameInput.svelte -->
 <script lang="ts">
-	import { getUserProfile, updateUsername } from '$lib/supabase';
+	import { getUserProfile, updateUsername } from '$lib/services/supabase/supabase';
 	import type { Session } from '@supabase/supabase-js';
 
 	let { session } = $props<{ session: Session }>();

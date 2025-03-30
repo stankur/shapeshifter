@@ -11,12 +11,13 @@
 			console.log('Auth state changed:', event, newSession);
 
 			// Only invalidate on meaningful state changes
-			if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
-				console.log('Invalidating auth state due to event:', event);
-				invalidate('supabase:auth');
-			} else if (event === 'INITIAL_SESSION' && newSession) {
-				// Only invalidate if we have a session with INITIAL_SESSION
-				console.log('Invalidating auth state due to initial session with data');
+			if (
+				event === 'SIGNED_IN' ||
+				event === 'SIGNED_OUT' ||
+				event === 'USER_UPDATED' ||
+				(event === 'INITIAL_SESSION' && newSession) ||
+				newSession?.expires_at !== session?.expires_at
+			) {
 				invalidate('supabase:auth');
 			}
 		});

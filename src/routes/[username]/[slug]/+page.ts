@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
-import { getDocumentByUsernameAndSlug } from '$lib/supabase';
+import { getDocumentByUsernameAndSlug } from '$lib/utils/supabase';
 
 export const load: PageLoad = async ({ params }) => {
 	const { username, slug } = params;

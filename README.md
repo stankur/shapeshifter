@@ -57,3 +57,7 @@ supabase db push
 ## known bugs
 
 when you press enter on the end of a heading, it should transfer the cursor to what is next in the section, but it doesn't. The next in section does get created, either summary of paragraph child, but the cursor doesn't move.
+
+authentication is rather messy, and somewhat working, but logic is somewhat strange due to initially created with Cline.
+
+There are duplicated logic across the slug specific editor and the default editor just located at the base URL.

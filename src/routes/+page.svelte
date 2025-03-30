@@ -13,11 +13,12 @@
 		sectionContainerTOCCard,
 		sidebarExample
 	} from '$lib/model/examples';
-	import { saveDocument, signInWithGoogle, signOut, getSession, supabase, getUserProfile } from '$lib/supabase';
+	import { saveDocument, getSession, supabase, getUserProfile } from '$lib/services/supabase/supabase';
 	import { onMount } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import UsernameInput from '$lib/components/UsernameInput.svelte';
 	import TitleInput from '$lib/components/TitleInput.svelte';
+	import { handlePublish, handleSignIn, handleSignOut } from '$lib/services/supabase/documentActions';
 
 	let { data } = $props();
 	let session = $state(data.session);
@@ -44,73 +45,33 @@
 	);
 	let isSigningIn = $state(false);
 
-	async function handlePublish() {
-		isPublishing = true;
-		publishStatus = null;
-
-		// Validate title
-		if (!node.title?.trim()) {
-			publishStatus = {
-				success: false,
-				message: 'Please enter a document title'
-			};
-			isPublishing = false;
-			return;
-		}
-
-		try {
-			const result = await saveDocument(node);
-
-			if (result.success) {
-				const documentId = result.data?.id;
-				publishStatus = {
-					success: true,
-					message: 'Document published successfully!',
-					documentId
-				};
-			} else {
-				publishStatus = {
-					success: false,
-					message: typeof result.error === 'string' ? result.error : 'Failed to publish document. Please try again.'
-				};
-			}
-		} catch (error) {
-			console.error('Error publishing document:', error);
-			publishStatus = {
-				success: false,
-				message: 'An unexpected error occurred. Please try again.'
-			};
-		} finally {
-			isPublishing = false;
-
-			// Clear success message after 3 seconds
-			if (publishStatus?.success) {
-				setTimeout(() => {
-					publishStatus = null;
-				}, 3000);
-			}
-		}
+	async function onPublish() {
+		const publishingState = { value: isPublishing };
+		const publishStatusState = { value: publishStatus };
+		
+		await handlePublish(node, publishingState, publishStatusState);
+		
+		isPublishing = publishingState.value;
+		publishStatus = publishStatusState.value;
+	}
+	
+	async function onSignIn() {
+		const signingInState = { value: isSigningIn };
+		
+		await handleSignIn(supabase, signingInState, window.location.href);
+		
+		isSigningIn = signingInState.value;
+	}
+	
+	async function onSignOut() {
+		const sessionState = { value: session };
+		
+		await handleSignOut(supabase, sessionState);
+		
+		session = sessionState.value;
 	}
 
-	async function handleSignIn() {
-		isSigningIn = true;
-		try {
-			await signInWithGoogle();
-		} catch (error) {
-			console.error('Error signing in:', error);
-		} finally {
-			isSigningIn = false;
-		}
-	}
 
-	async function handleSignOut() {
-		try {
-			await signOut();
-			session = null; // Directly clear the session state
-		} catch (error) {
-			console.error('Error signing out:', error);
-		}
-	}
 </script>
 
 <div class="mb-4 flex justify-end gap-2">
@@ -118,13 +79,13 @@
 		<div class="mr-2 flex items-center gap-4">
 			<UsernameInput {session} />
 			<TitleInput document={node} />
-			<button class="text-sm text-gray-600 underline hover:text-gray-800" on:click={handleSignOut}>
+			<button class="text-sm text-gray-600 underline hover:text-gray-800" onclick={onSignOut}>
 				Sign out
 			</button>
 		</div>
 		<button
 			class="flex cursor-pointer items-center rounded-md bg-blue-500 p-2 text-white transition-colors duration-200 hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
-			on:click={handlePublish}
+			onclick={onPublish}
 			disabled={isPublishing}
 		>
 			{#if isPublishing}
@@ -150,7 +111,7 @@
 	{:else}
 		<button
 			class="flex cursor-pointer items-center rounded-md border border-gray-300 bg-white p-2 text-gray-700 transition-colors duration-200 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-			on:click={handleSignIn}
+			onclick={onSignIn}
 			disabled={isSigningIn}
 		>
 			{#if isSigningIn}
