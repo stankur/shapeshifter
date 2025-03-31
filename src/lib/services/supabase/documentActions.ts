@@ -3,71 +3,50 @@ import { saveDocument } from '$lib/services/supabase/supabase';
 import { invalidate } from '$app/navigation';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
+export type Result = {
+	success: boolean;
+	error?: string;
+};
+
 // Handle document publishing
 export async function handlePublish(
-    supabase: SupabaseClient,
+	supabase: SupabaseClient,
 	document: Document,
-	isPublishing: { value: boolean },
-	publishStatus: {
-		value: { success: boolean; message: string; documentId?: string } | null;
-	},
 	userId?: string
-): Promise<void> {
-	isPublishing.value = true;
-	publishStatus.value = null;
-
+): Promise<Result> {
 	// Validate title
 	if (!document.title?.trim()) {
-		publishStatus.value = {
+		return {
 			success: false,
-			message: 'Please enter a document title'
+			error: 'Please enter a document title'
 		};
-		isPublishing.value = false;
-		return;
 	}
 
 	try {
-        console.log('handling publish with document: ', document);
-        console.log('handling publish with userId: ', userId);
+		console.log('handling publish with document: ', document);
+		console.log('handling publish with userId: ', userId);
 		const result = await saveDocument(supabase, document, userId);
 
 		if (result.success) {
-			const documentId = result.data?.id;
-			publishStatus.value = {
-				success: true,
-				message: 'Document published successfully!',
-				documentId
+			return {
+				success: true
 			};
 		} else {
-			publishStatus.value = {
+			return {
 				success: false,
-				message:
-					typeof result.error === 'string'
-						? result.error
-						: 'Failed to publish document. Please try again.'
+				error: result.error as string
 			};
 		}
 	} catch (error) {
-		console.error('Error publishing document:', error);
-		publishStatus.value = {
+		return {
 			success: false,
-			message: 'An unexpected error occurred. Please try again.'
+			error: (error as Error).message || 'An unknown error occurred'
 		};
-	} finally {
-		isPublishing.value = false;
-
-		// Clear success message after 3 seconds
-		if (publishStatus.value?.success) {
-			setTimeout(() => {
-				publishStatus.value = null;
-			}, 3000);
-		}
 	}
 }
 
 // Handle sign in
-export async function handleSignIn(supabase: SupabaseClient, isSigningIn: { value: boolean }, redirectTo: string) {
-	isSigningIn.value = true;
+export async function handleSignIn(supabase: SupabaseClient, redirectTo: string): Promise<Result> {
 	try {
 		await supabase.auth.signInWithOAuth({
 			provider: 'google',
@@ -77,18 +56,31 @@ export async function handleSignIn(supabase: SupabaseClient, isSigningIn: { valu
 		});
 	} catch (error) {
 		console.error('Error signing in:', error);
-	} finally {
-		isSigningIn.value = false;
+		return {
+			success: false,
+			error: (error as Error).message
+		};
 	}
+
+	return {
+		success: true
+	};
 }
 
 // Handle sign out
-export async function handleSignOut(supabase: SupabaseClient, session: { value: null | object }) {
+export async function handleSignOut(supabase: SupabaseClient): Promise<Result> {
 	try {
 		await supabase.auth.signOut();
-		session.value = null; // Directly clear the session state
 		invalidate('supabase:auth');
 	} catch (error) {
 		console.error('Error signing out:', error);
+		return {
+			success: false,
+			error: (error as Error).message
+		};
 	}
+
+	return {
+		success: true
+	};
 }
