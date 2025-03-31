@@ -16,6 +16,7 @@
 	import { createHeadingNavProps, createSummaryNavProps } from './navigation';
 	import type { NavigationHandler } from '$lib/services/navigation/types';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
+	import Chip from '$lib/components/Chip.svelte';
 
 	const document = getContext('document') as Document;
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
@@ -119,13 +120,13 @@
 		{/each}
 
 		{#if document.state.mode !== 'read'}
-			<button
+			<Chip
 				onclick={() => {
 					onUnmount();
-
 					addSection(node, node.children[0].heading.level);
-				}}>Add Section</button
-			>
+				}}
+				label="Add Section"
+			/>
 		{/if}
 	</div>
 </div>
