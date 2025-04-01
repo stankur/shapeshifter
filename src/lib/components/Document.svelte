@@ -7,6 +7,8 @@
 	import Flip from 'gsap/dist/Flip';
 	import type { NoHeadingContentSingle } from '../model/collection';
 	import { createDocumentManipulator } from '../documentManipulator.svelte';
+    import SectionWrite from '$lib/view/collection/section/write/Write.svelte';
+    import SectionContainerWrite from '$lib/view/collection/section-container/Write.svelte';
 
 	gsap.registerPlugin(Flip);
 
@@ -108,8 +110,17 @@
 	</select>
 {/if}
 
+
 <div class="flex flex-col items-center gap-4">
 	<div class=" w-2/3">
-		<Renderer path={['content']} {refs} {onUnmount} />
+        {#if node.state.mode !== 'write'}
+            <Renderer path={['content']} {refs} {onUnmount} />
+        {:else}
+            {#if node.content.type === 'section'}
+                <SectionWrite path={['content']} {refs} {onUnmount} />
+            {:else if node.content.type === 'section-container'}
+                <SectionContainerWrite path={['content']} {refs} {onUnmount} />
+            {/if}
+        {/if}
 	</div>
 </div>
