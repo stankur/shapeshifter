@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, getContext } from 'svelte';
-	import { float } from '$lib/view/utils/float.svelte';
+	import { float, calculateZIndex } from '$lib/view/utils/float.svelte';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 	import type { SectionContainer } from '$lib/model/collection';
 
@@ -41,7 +41,9 @@
 	}
 
 	onMount(() => {
-		return float(referenceElement, floatingElement)();
+		// Calculate z-index based on path length
+		const zIndex = calculateZIndex(path);
+		return float(referenceElement, floatingElement, 'left-start', true, zIndex)();
 	});
 </script>
 

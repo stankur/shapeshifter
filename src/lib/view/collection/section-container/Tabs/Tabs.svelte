@@ -59,6 +59,7 @@
 	function setActiveSection(index: number) {
 		onUnmount();
 		// Update the activeIndex in the state
+		document.state.animateNextChange = false;
 		(node.view[viewStateIndex] as ViewState).state.activeIndex = index;
 	}
 

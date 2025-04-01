@@ -1,13 +1,15 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { float } from '$lib/view/utils/float.svelte';
+	import { float, calculateZIndex } from '$lib/view/utils/float.svelte';
 
 	let {
 		onConvertToHeading,
-		isParagraphHovered
+		isParagraphHovered,
+		path
 	}: {
 		onConvertToHeading: () => void;
 		isParagraphHovered: boolean;
+		path: (string | number)[];
 	} = $props();
 
 	let isHovered = $state(false);
@@ -23,7 +25,9 @@
 	}
 
 	onMount(() => {
-		return float(referenceElement, floatingElement, 'left')();
+		// Calculate z-index based on path length
+		const zIndex = calculateZIndex(path);
+		return float(referenceElement, floatingElement, 'left', true, zIndex)();
 	});
 </script>
 

@@ -197,6 +197,7 @@
 	{#if onConvertToHeading && documentNode.state.mode !== 'read'}
 		<ParagraphControls 
 			{isParagraphHovered} 
+			{path}
 			onConvertToHeading={() => onConvertToHeading(node.id)} 
 		/>
 	{/if}

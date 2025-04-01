@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, getContext } from 'svelte';
-	import { float } from '$lib/view/utils/float.svelte';
+	import { float, calculateZIndex } from '$lib/view/utils/float.svelte';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 	import type { SectionContainer } from '$lib/model/collection';
 
@@ -13,7 +13,7 @@
 		onUnmount: () => void;
 		isDefaultHovered: boolean;
 	} = $props();
-	
+
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 	const node = documentManipulator.getByPath(path) as SectionContainer;
 
@@ -45,13 +45,15 @@
 		node.activeView = 'collection/section-container/table-of-contents';
 	}
 
-    function switchToSidebar() {
-        onUnmount();
-        node.activeView = 'collection/section-container/sidebar';
-    }
+	function switchToSidebar() {
+		onUnmount();
+		node.activeView = 'collection/section-container/sidebar';
+	}
 
 	onMount(() => {
-		return float(referenceElement, floatingElement)();
+		// Calculate z-index based on path length
+		const zIndex = calculateZIndex(path);
+		return float(referenceElement, floatingElement, 'left-start', true, zIndex)();
 	});
 </script>
 
@@ -65,19 +67,12 @@
 		isHovered || isDefaultHovered ? 'visible' : 'invisible'
 	]}
 >
-	<button class="rounded-md bg-blue-500 p-2 text-white mb-1" onclick={switchToTabs}>
-		tabs
-	</button>
-	<button class="rounded-md bg-blue-500 p-2 text-white mb-1" onclick={switchToCard}>
-		card
-	</button>
+	<button class="mb-1 rounded-md bg-blue-500 p-2 text-white" onclick={switchToTabs}> tabs </button>
+	<button class="mb-1 rounded-md bg-blue-500 p-2 text-white" onclick={switchToCard}> card </button>
 	<button class="rounded-md bg-blue-500 p-2 text-white" onclick={switchToTableOfContents}>
 		toc
-	</button>   
-    <button class="rounded-md bg-blue-500 p-2 text-white" onclick={switchToSidebar}>
-        sidebar
-    </button>
-
+	</button>
+	<button class="rounded-md bg-blue-500 p-2 text-white" onclick={switchToSidebar}> sidebar </button>
 </div>
 
 <div bind:this={referenceElement} class="reference-element w-full"></div>

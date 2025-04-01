@@ -65,3 +65,5 @@ There are duplicated logic across the slug specific editor and the default edito
 pressing tab on a heading should not work when the parent's heading is one level below. This is because we have a constraint where a direct child should not be more than 1 level higher than their parent. But somehow it works when I was in the sidebar view, and I pressed tab on the headings there.
 
 In sidebar view, if you consider the active section being rendered, there are two consecutive appearances of  a heading. However if you update one, the other does not get updated.
+
+There's a bug right now in which we wouldn't want animation when switching tabs, or switching the active item in the sidebar. Strangely enough it works during customize mode, but not when viewing a published document.

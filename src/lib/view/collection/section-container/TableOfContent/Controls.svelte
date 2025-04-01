@@ -2,7 +2,7 @@
 	import { onMount, getContext } from 'svelte';
 	import type { z } from 'zod';
 	import type { sectionContainer } from '$lib/model/collection';
-	import { float } from '$lib/view/utils/float.svelte';
+	import { float, calculateZIndex } from '$lib/view/utils/float.svelte';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 
 	let {
@@ -23,7 +23,7 @@
 		}[];
 		isTableHovered: boolean;
 	} = $props();
-	
+
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 	const node = documentManipulator.getByPath(path) as z.infer<typeof sectionContainer>;
 
@@ -41,7 +41,9 @@
 	}
 
 	onMount(() => {
-		return float(referenceElement, floatingElement)();
+		// Calculate z-index based on path length
+		const zIndex = calculateZIndex(path);
+		return float(referenceElement, floatingElement, 'left-start', true, zIndex)();
 	});
 </script>
 

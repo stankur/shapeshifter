@@ -7,7 +7,7 @@
 	import type { Refs } from '$lib/components/Document.svelte';
 	import { getContext } from 'svelte';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
-
+	import type { Document } from '$lib/model/document';
 	type SectionContainer = z.infer<typeof sectionContainer>;
 
 	let {
@@ -20,6 +20,7 @@
 		onUnmount: () => void;
 	} = $props();
 	
+    const document = getContext('document') as Document;
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 	const node = documentManipulator.getByPath(path) as SectionContainer;
 	let { children, view, activeView } = $derived(node);
@@ -71,6 +72,7 @@
 	function setActiveSection(index: number) {
 		onUnmount();
 		// Update the activeIndex in the state
+        document.state.animateNextChange = false;
 		sidebarState.activeIndex = index;
 	}
 </script>
