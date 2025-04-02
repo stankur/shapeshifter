@@ -137,7 +137,7 @@
 			{console.log('children renderers length in section: ', ChildrenRenderers.length)}
 			<!-- should work without the key, but not working -->
 			{#each ChildrenRenderers as { Renderer }, i (node.children[i].last_modified + node.children[i].id)}
-				<div class={node.children[i].type === 'section-container' ? 'mt-5' : ''}>
+				<div class={node.children[i].type === 'section-container' && node.children[i].activeView === "collection/section-container/default" ? 'mt-5' : ''}>
 					<Renderer
 						path={[...path, 'children', i]}
 						onSplit={(newBlocks) => {
