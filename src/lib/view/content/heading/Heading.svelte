@@ -32,6 +32,9 @@
 			string,
 			{ element: HTMLElement; animateAbsolute: boolean; animateNested: boolean }
 		>;
+		overrides?: {
+            class?: string;
+		};
 		onUnmount: () => void;
 		updateParent: () => void;
 		additionalFlipId?: string;
@@ -45,6 +48,7 @@
 		path,
 		refs,
 		onUnmount,
+		overrides = {},
 		updateParent,
 		additionalFlipId,
 		getNextEditable,
@@ -52,6 +56,11 @@
 		onLevelIncrease,
 		onEnterAtEnd
 	}: Props = $props();
+
+    const defaultOverrides = {
+        class: ''
+    }
+    overrides = { ...defaultOverrides, ...overrides };
 
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 	const node = documentManipulator.getByPath(path) as ContentHeading;
@@ -210,7 +219,7 @@
 			e.stopPropagation();
 		}
 	}}
-	class={[headingSize, 'prose-h1:inline-block', 'prose-h1:font-semibold']}
+	class={[headingSize, 'prose-h1:inline-block', 'prose-h1:font-semibold', overrides.class]}
 ></div>
 
 <svelte:document

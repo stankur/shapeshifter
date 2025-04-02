@@ -19,7 +19,7 @@
 		path: (string | number)[];
 		refs: Refs;
 		onUnmount: () => void;
-		overRides?: { heading?: boolean; accommodateControls?: boolean };
+		overrides?: { heading?: boolean; accommodateControls?: boolean };
 		addSection: (newSection: Section) => void;
 		findParentSection: (level: number) => Section | null;
 		onSectionMoved: () => void;
@@ -29,14 +29,14 @@
 		path,
 		refs,
 		onUnmount,
-		overRides = {},
+		overrides = {},
 		addSection,
 		findParentSection,
 		onSectionMoved
 	}: Props = $props();
 
 	const defaultOverRides = { heading: true, accommodateControls: false };
-	overRides = { ...defaultOverRides, ...overRides };
+	overrides = { ...defaultOverRides, ...overrides };
 
 	let document = getContext('document') as Document;
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
@@ -68,6 +68,7 @@
 			Renderer: registry[child.activeView as keyof typeof registry] as Component<{
 				path: (string | number)[];
 				refs: Refs;
+                overrides?: { class?: string };
 				onUnmount: () => void;
 				onSplit: (newBlocks: [string, string]) => void;
 			}>
@@ -83,14 +84,14 @@
 
 	onMount(() => {
 		if (containerElement && controlElement) {
-			if (overRides?.accommodateControls) {
+			if (overrides?.accommodateControls) {
 				containerElement.style.paddingLeft = `${controlElement.clientWidth}px`;
 			}
 
 			// Determine which element to use as reference for the floating control
-			const referenceElement = overRides?.heading ? headingElement : contentElement;
+			const referenceElement = overrides?.heading ? headingElement : contentElement;
 			// Use 'left' for heading, 'left-start' for content
-			const placement = overRides?.heading ? 'left' : 'left-start';
+			const placement = overrides?.heading ? 'left' : 'left-start';
 
 			if (referenceElement) {
 				return float(
@@ -111,7 +112,7 @@
 />
 
 <div class="container flex flex-col gap-7" bind:this={containerElement}>
-	{#if overRides && overRides.heading}
+	{#if overrides && overrides.heading}
 		{#key node.heading.id}
 			<div bind:this={headingElement}>
 				<HeadingRenderer
@@ -159,6 +160,7 @@
 				<Renderer
 					path={[...path, 'summary', i]}
 					{refs}
+                    overrides={{ class: 'prose-p:text-xs prose-p:text-gray-500' }}
 					onSplit={(newBlocks) => {
 						splitParagraph(node, 'summary', newBlocks, document, i);
 					}}

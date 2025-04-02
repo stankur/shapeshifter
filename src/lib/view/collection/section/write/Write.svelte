@@ -20,7 +20,7 @@
 		path: (string | number)[];
 		refs: Refs;
 		onUnmount: () => void;
-		overRides?: { heading?: boolean; accommodateControls?: boolean };
+		overrides?: { heading?: boolean; accommodateControls?: boolean };
 		addSection?: (newSection: Section) => void;
 		findParentSection?: (level: number) => Section | null;
 		onSectionMoved?: () => void;
@@ -30,14 +30,14 @@
 		path,
 		refs,
 		onUnmount,
-		overRides = {},
+		overrides = {},
 		addSection = () => {},
 		findParentSection = () => null,
 		onSectionMoved = () => {}
 	}: Props = $props();
 
 	const defaultOverRides = { heading: true, accommodateControls: false };
-	overRides = { ...defaultOverRides, ...overRides };
+	overrides = { ...defaultOverRides, ...overrides };
 
 	let document = getContext('document') as Document;
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
@@ -79,7 +79,7 @@
 </script>
 
 <div class="container flex flex-col gap-7">
-	{#if overRides && overRides.heading}
+	{#if overrides && overrides.heading}
 		{#key node.heading.id}
 			<HeadingRenderer
 				path={[...path, 'heading']}

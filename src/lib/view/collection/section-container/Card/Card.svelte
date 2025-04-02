@@ -32,6 +32,9 @@
 		updateParent?: () => void;
 		getNextEditable?: NavigationHandler;
 		getPrevEditable?: NavigationHandler;
+        overrides?: {
+            class?: string;
+        };
 		documentNode?: Document;
 	};
 
@@ -39,6 +42,9 @@
 		path: (string | number)[];
 		refs: Refs;
 		onUnmount: () => void;
+        overrides?: {
+            class?: string;
+        };
 		updateParent?: () => void;
 		onSplit?: (blocks: [string, string]) => void;
 		getNextEditable?: NavigationHandler;
@@ -101,18 +107,25 @@
 
 	<div class="container flex flex-wrap" style:--perRow={perRow} style:--gap={`${gap}px`}>
 		{#each SectionRenderers as { child, sectionIndex, HeadingRenderer, SummaryRenderers }}
-			<div class="card border-1 border-black p-5">
+			<div class="card border-1 border-gray-400 p-5">
 				<HeadingRenderer
 					path={[...path, 'children', sectionIndex, 'heading']}
 					{refs}
 					{onUnmount}
 					{...createHeadingNavProps(child, node, sectionIndex, document)}
+                    overrides={{
+                        class: 'prose-h1:text-xl',
+                    }}
+
 				/>
 				{#each SummaryRenderers as { summaryChild, summaryIndex, Renderer }}
 					<Renderer
 						path={[...path, 'children', sectionIndex, 'summary', summaryIndex]}
 						{refs}
 						{onUnmount}
+                        overrides={{
+                            class: 'prose-p:text-xs prose-p:text-gray-500',
+                        }}
 						{...createSummaryNavProps(child, node, summaryChild.id, sectionIndex, document)}
 					/>
 				{/each}
