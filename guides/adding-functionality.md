@@ -28,57 +28,57 @@ All core functionality should be defined in the appropriate actions file (e.g., 
 ```typescript
 /**
  * Splits a section at a paragraph, creating a new section with the paragraph as its heading
- * 
+ *
  * @param node The section to split
  * @param paragraphId The ID of the paragraph to convert to a heading
  * @param addSection Callback to add the new section to the container
  */
 export function splitSection(
-  node: Section,
-  paragraphId: string,
-  addSection: (section: Section) => void
+	node: Section,
+	paragraphId: string,
+	addSection: (section: Section) => void
 ) {
-  const newId = crypto.randomUUID();
-  const paragraphIndex = node.children.findIndex((child) => child.id === paragraphId);
-  
-  // Validation
-  if (paragraphIndex === -1 || node.children[paragraphIndex].type !== 'paragraph') {
-    return;
-  }
+	const newId = crypto.randomUUID();
+	const paragraphIndex = node.children.findIndex((child) => child.id === paragraphId);
 
-  const paragraph = node.children[paragraphIndex];
+	// Validation
+	if (paragraphIndex === -1 || node.children[paragraphIndex].type !== 'paragraph') {
+		return;
+	}
 
-  // Create new section
-  const newSection: Section = {
-    type: 'section',
-    id: newId,
-    created: new Date().toISOString(),
-    last_modified: new Date().toISOString(),
-    view: [
-      { type: 'collection/section/default', state: 'expanded' },
-      { type: 'collection/section/static' },
-      { type: 'collection/section/page' }
-    ],
-    heading: {
-      type: 'heading',
-      id: paragraphId,
-      created: paragraph.created,
-      last_modified: new Date().toISOString(),
-      view: [{ type: 'content/heading/default' }],
-      content: paragraph.content,
-      level: node.heading.level,
-      activeView: 'content/heading/default'
-    },
-    summary: [],
-    children: node.children.slice(paragraphIndex + 1),
-    activeView: 'collection/section/default'
-  };
+	const paragraph = node.children[paragraphIndex];
 
-  // Directly mutate the original section - Svelte 5 will detect this change
-  node.children = node.children.slice(0, paragraphIndex);
+	// Create new section
+	const newSection: Section = {
+		type: 'section',
+		id: newId,
+		created: new Date().toISOString(),
+		last_modified: new Date().toISOString(),
+		view: [
+			{ type: 'collection/section/default', state: 'expanded' },
+			{ type: 'collection/section/static' },
+			{ type: 'collection/section/page' }
+		],
+		heading: {
+			type: 'heading',
+			id: paragraphId,
+			created: paragraph.created,
+			last_modified: new Date().toISOString(),
+			view: [{ type: 'content/heading/default' }],
+			content: paragraph.content,
+			level: node.heading.level,
+			activeView: 'content/heading/default'
+		},
+		summary: [],
+		children: node.children.slice(paragraphIndex + 1),
+		activeView: 'collection/section/default'
+	};
 
-  // Add the new section using the provided callback
-  addSection(newSection);
+	// Directly mutate the original section - Svelte 5 will detect this change
+	node.children = node.children.slice(0, paragraphIndex);
+
+	// Add the new section using the provided callback
+	addSection(newSection);
 }
 ```
 
@@ -98,35 +98,30 @@ For the action to be accessible where needed, we need to pass callbacks down thr
 
 ```svelte
 <script lang="ts">
-  import { addSectionToContainer } from '$lib/actions/section-container.svelte';
-  
-  let {
-    node, // SectionContainer
-    refs,
-    onUnmount
-  } = $props();
-  
-  let { children } = $derived(node);
+	import { addSectionToContainer } from '$lib/actions/section-container.svelte';
 
-  let ChildrenRenderers = $derived(
-    children.map((child, index) => ({
-      child,
-      Renderer: registry[child.activeView as keyof typeof registry],
-      // Create a specialized addSection function for each child
-      addSectionForChild: (section: Section) => addSectionToContainer(node, section, index + 1)
-    }))
-  );
+	let {
+		node, // SectionContainer
+		refs,
+		onUnmount
+	} = $props();
+
+	let { children } = $derived(node);
+
+	let ChildrenRenderers = $derived(
+		children.map((child, index) => ({
+			child,
+			Renderer: registry[child.activeView as keyof typeof registry],
+			// Create a specialized addSection function for each child
+			addSectionForChild: (section: Section) => addSectionToContainer(node, section, index + 1)
+		}))
+	);
 </script>
 
 <div class="flex flex-col gap-12">
-  {#each ChildrenRenderers as { child, Renderer, addSectionForChild }}
-    <Renderer 
-      node={child} 
-      {refs} 
-      {onUnmount} 
-      addSection={addSectionForChild}
-    />
-  {/each}
+	{#each ChildrenRenderers as { child, Renderer, addSectionForChild }}
+		<Renderer node={child} {refs} {onUnmount} addSection={addSectionForChild} />
+	{/each}
 </div>
 ```
 
@@ -134,26 +129,26 @@ For the action to be accessible where needed, we need to pass callbacks down thr
 
 ```svelte
 <script lang="ts">
-  import { splitSection } from '$lib/actions/section-container.svelte';
-  
-  let {
-    node, // Section
-    refs,
-    onUnmount,
-    addSection // Function passed from parent
-  } = $props();
-  
-  // Other component logic...
+	import { splitSection } from '$lib/actions/section-container.svelte';
+
+	let {
+		node, // Section
+		refs,
+		onUnmount,
+		addSection // Function passed from parent
+	} = $props();
+
+	// Other component logic...
 </script>
 
 <!-- Pass the functionality down to child components -->
 <Renderer
-  bind:node={node.children[i]}
-  onConvertToHeading={(paragraphId) => {
-    splitSection(node, paragraphId, addSection);
-  }}
-  {refs}
-  {onUnmount}
+	bind:node={node.children[i]}
+	onConvertToHeading={(paragraphId) => {
+		splitSection(node, paragraphId, addSection);
+	}}
+	{refs}
+	{onUnmount}
 />
 ```
 
@@ -161,30 +156,30 @@ For the action to be accessible where needed, we need to pass callbacks down thr
 
 ```svelte
 <script lang="ts">
-  let {
-    node, // Paragraph
-    refs,
-    onUnmount,
-    onConvertToHeading // Function passed from parent
-  } = $props();
-  
-  let isParagraphHovered = $state(false);
+	let {
+		node, // Paragraph
+		refs,
+		onUnmount,
+		onConvertToHeading // Function passed from parent
+	} = $props();
+
+	let isParagraphHovered = $state(false);
 </script>
 
 <div
-  class="relative"
-  bind:this={ref}
-  onmouseenter={() => isParagraphHovered = true}
-  onmouseleave={() => isParagraphHovered = false}
+	class="relative"
+	bind:this={ref}
+	onmouseenter={() => (isParagraphHovered = true)}
+	onmouseleave={() => (isParagraphHovered = false)}
 >
-  <!-- Paragraph content -->
-  
-  {#if onConvertToHeading && documentNode.state.mode !== 'read'}
-    <ParagraphControls 
-      {isParagraphHovered} 
-      onConvertToHeading={() => onConvertToHeading(node.id)} 
-    />
-  {/if}
+	<!-- Paragraph content -->
+
+	{#if onConvertToHeading && documentNode.state.mode !== 'read'}
+		<ParagraphControls
+			{isParagraphHovered}
+			onConvertToHeading={() => onConvertToHeading(node.id)}
+		/>
+	{/if}
 </div>
 ```
 
@@ -196,57 +191,54 @@ UI controls provide the interface for users to trigger actions. Follow the patte
 
 ```svelte
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { float } from '$lib/view/utils/float.svelte';
+	import { onMount } from 'svelte';
+	import { float } from '$lib/view/utils/float.svelte';
 
-  let {
-    onConvertToHeading,
-    isParagraphHovered
-  } = $props();
+	let { onConvertToHeading, isParagraphHovered } = $props();
 
-  let isHovered = $state(false);
-  let floatingElement: HTMLDivElement;
-  let referenceElement: HTMLDivElement;
+	let isHovered = $state(false);
+	let floatingElement: HTMLDivElement;
+	let referenceElement: HTMLDivElement;
 
-  function showControls() {
-    isHovered = true;
-  }
+	function showControls() {
+		isHovered = true;
+	}
 
-  function hideControls() {
-    isHovered = false;
-  }
+	function hideControls() {
+		isHovered = false;
+	}
 
-  onMount(() => {
-    return float(referenceElement, floatingElement, 'left')();
-  });
+	onMount(() => {
+		return float(referenceElement, floatingElement, 'left')();
+	});
 </script>
 
 <div
-  bind:this={floatingElement}
-  onmouseenter={showControls}
-  onmouseleave={hideControls}
-  class={[
-    'floating-controls flex items-center space-x-2 rounded bg-white/80 px-2 py-1 shadow-sm backdrop-blur-sm',
-    isHovered || isParagraphHovered ? 'visible' : 'invisible'
-  ]}
+	bind:this={floatingElement}
+	onmouseenter={showControls}
+	onmouseleave={hideControls}
+	class={[
+		'floating-controls flex items-center space-x-2 rounded bg-white/80 px-2 py-1 shadow-sm backdrop-blur-sm',
+		isHovered || isParagraphHovered ? 'visible' : 'invisible'
+	]}
 >
-  <button
-    class="text-sm font-semibold text-gray-700 hover:text-blue-600"
-    onclick={onConvertToHeading}
-    title="Convert to heading and create new section"
-  >
-    H
-  </button>
+	<button
+		class="text-sm font-semibold text-gray-700 hover:text-blue-600"
+		onclick={onConvertToHeading}
+		title="Convert to heading and create new section"
+	>
+		H
+	</button>
 </div>
 
 <div bind:this={referenceElement} class="reference-element w-full"></div>
 
 <style lang="postcss">
-  .floating-controls {
-    position: absolute;
-    width: max-content;
-    z-index: 10;
-  }
+	.floating-controls {
+		position: absolute;
+		width: max-content;
+		z-index: 10;
+	}
 </style>
 ```
 
@@ -266,22 +258,26 @@ Let's walk through the complete process of adding the "Convert Paragraph to Head
 
 ```typescript
 export function splitSection(
-  node: Section,
-  paragraphId: string,
-  addSection: (section: Section) => void
+	node: Section,
+	paragraphId: string,
+	addSection: (section: Section) => void
 ) {
-  // Implementation as shown above
+	// Implementation as shown above
 }
 
-export function addSectionToContainer(container: SectionContainer, section: Section, index?: number) {
-  if (index !== undefined && index >= 0 && index <= container.children.length) {
-    // Direct mutation - Svelte 5 will detect this
-    container.children.splice(index, 0, section);
-  } else {
-    // Direct mutation - Svelte 5 will detect this
-    container.children.push(section);
-  }
-  container.last_modified = new Date().toISOString();
+export function addSectionToContainer(
+	container: SectionContainer,
+	section: Section,
+	index?: number
+) {
+	if (index !== undefined && index >= 0 && index <= container.children.length) {
+		// Direct mutation - Svelte 5 will detect this
+		container.children.splice(index, 0, section);
+	} else {
+		// Direct mutation - Svelte 5 will detect this
+		container.children.push(section);
+	}
+	container.last_modified = new Date().toISOString();
 }
 ```
 
@@ -290,25 +286,20 @@ export function addSectionToContainer(container: SectionContainer, section: Sect
 ```svelte
 <!-- Section Container Component -->
 <script>
-  // Create specialized addSection functions for each child
-  let ChildrenRenderers = $derived(
-    children.map((child, index) => ({
-      child,
-      Renderer: registry[child.activeView as keyof typeof registry],
-      addSectionForChild: (section: Section) => addSectionToContainer(node, section, index + 1)
-    }))
-  );
+	// Create specialized addSection functions for each child
+	let ChildrenRenderers = $derived(
+		children.map((child, index) => ({
+			child,
+			Renderer: registry[child.activeView as keyof typeof registry],
+			addSectionForChild: (section: Section) => addSectionToContainer(node, section, index + 1)
+		}))
+	);
 </script>
 
 <div>
-  {#each ChildrenRenderers as { child, Renderer, addSectionForChild }}
-    <Renderer 
-      node={child} 
-      {refs} 
-      {onUnmount} 
-      addSection={addSectionForChild}
-    />
-  {/each}
+	{#each ChildrenRenderers as { child, Renderer, addSectionForChild }}
+		<Renderer node={child} {refs} {onUnmount} addSection={addSectionForChild} />
+	{/each}
 </div>
 ```
 
@@ -317,29 +308,29 @@ export function addSectionToContainer(container: SectionContainer, section: Sect
 ```svelte
 <!-- Section Component -->
 <script>
-  type Props = {
-    node: Section;
-    refs: Refs;
-    onUnmount: () => void;
-    overRides: { heading: boolean };
-    addSection: (section: Section) => void;
-  };
-  
-  let { node, refs, onUnmount, overRides = { heading: true }, addSection } = $props();
+	type Props = {
+		node: Section;
+		refs: Refs;
+		onUnmount: () => void;
+		overrides: { heading: boolean };
+		addSection: (section: Section) => void;
+	};
+
+	let { node, refs, onUnmount, overrides = { heading: true }, addSection } = $props();
 </script>
 
 <div>
-  <!-- Other content -->
-  {#each ChildrenRenderers as { Renderer }, i}
-    <Renderer
-      bind:node={node.children[i]}
-      onConvertToHeading={(paragraphId) => {
-        splitSection(node, paragraphId, addSection);
-      }}
-      {refs}
-      {onUnmount}
-    />
-  {/each}
+	<!-- Other content -->
+	{#each ChildrenRenderers as { Renderer }, i}
+		<Renderer
+			bind:node={node.children[i]}
+			onConvertToHeading={(paragraphId) => {
+				splitSection(node, paragraphId, addSection);
+			}}
+			{refs}
+			{onUnmount}
+		/>
+	{/each}
 </div>
 ```
 
@@ -348,43 +339,46 @@ export function addSectionToContainer(container: SectionContainer, section: Sect
 ```svelte
 <!-- Paragraph Component -->
 <script>
-  type Props = {
-    node: ContentParagraph;
-    refs: Record<string, { element: HTMLElement; animateAbsolute: boolean; animateNested: boolean }>;
-    additionalFlipId?: string;
-    updateParent: () => void;
-    onUnmount: () => void;
-    onSplit: (blocks: [string, string]) => void;
-    onConvertToHeading?: (paragraphId: string) => void;
-    getNextEditable?: NavigationHandler;
-    getPrevEditable?: NavigationHandler;
-  };
-  
-  let { 
-    node, 
-    refs, 
-    onUnmount, 
-    onSplit, 
-    onConvertToHeading,
-    // Other props 
-  } = $props();
-  
-  let isParagraphHovered = $state(false);
+	type Props = {
+		node: ContentParagraph;
+		refs: Record<
+			string,
+			{ element: HTMLElement; animateAbsolute: boolean; animateNested: boolean }
+		>;
+		additionalFlipId?: string;
+		updateParent: () => void;
+		onUnmount: () => void;
+		onSplit: (blocks: [string, string]) => void;
+		onConvertToHeading?: (paragraphId: string) => void;
+		getNextEditable?: NavigationHandler;
+		getPrevEditable?: NavigationHandler;
+	};
+
+	let {
+		node,
+		refs,
+		onUnmount,
+		onSplit,
+		onConvertToHeading
+		// Other props
+	} = $props();
+
+	let isParagraphHovered = $state(false);
 </script>
 
 <div
-  class="relative"
-  onmouseenter={() => isParagraphHovered = true}
-  onmouseleave={() => isParagraphHovered = false}
+	class="relative"
+	onmouseenter={() => (isParagraphHovered = true)}
+	onmouseleave={() => (isParagraphHovered = false)}
 >
-  <!-- Paragraph content -->
-  
-  {#if onConvertToHeading && documentNode.state.mode !== 'read'}
-    <ParagraphControls 
-      {isParagraphHovered} 
-      onConvertToHeading={() => onConvertToHeading(node.id)} 
-    />
-  {/if}
+	<!-- Paragraph content -->
+
+	{#if onConvertToHeading && documentNode.state.mode !== 'read'}
+		<ParagraphControls
+			{isParagraphHovered}
+			onConvertToHeading={() => onConvertToHeading(node.id)}
+		/>
+	{/if}
 </div>
 ```
 
@@ -393,12 +387,9 @@ export function addSectionToContainer(container: SectionContainer, section: Sect
 ```svelte
 <!-- ParagraphControls Component -->
 <script>
-  let {
-    onConvertToHeading,
-    isParagraphHovered
-  } = $props();
-  
-  // Control implementation as shown above
+	let { onConvertToHeading, isParagraphHovered } = $props();
+
+	// Control implementation as shown above
 </script>
 
 <!-- Control UI -->

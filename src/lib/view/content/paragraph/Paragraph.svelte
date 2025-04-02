@@ -28,6 +28,7 @@
 		onConvertToHeading?: (paragraphId: string) => void;
 		getNextEditable?: NavigationHandler;
 		getPrevEditable?: NavigationHandler;
+        overrides?: { class?: string };
 	};
 	let {
 		path,
@@ -38,8 +39,14 @@
 		onSplit,
 		onConvertToHeading,
 		getNextEditable,
-		getPrevEditable
+		getPrevEditable,
+        overrides
 	}: Props = $props();
+
+    const defaultOverrides = {
+        class: ''
+    }
+    overrides = { ...defaultOverrides, ...overrides };
 	
 	let documentNode: Document = getContext('document');
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
@@ -189,7 +196,7 @@
 			e.stopPropagation();
 		}
 	}}
-	class="mt-6 leading-7 first:mt-0 relative"
+	class="mt-6 leading-7 first:mt-0 relative {overrides.class}"
 	bind:this={ref}
 	onmouseenter={() => isParagraphHovered = true}
 	onmouseleave={() => isParagraphHovered = false}

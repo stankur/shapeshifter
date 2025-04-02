@@ -19,8 +19,8 @@
 		refs: Refs;
 		onUnmount: () => void;
 	} = $props();
-	
-    const document = getContext('document') as Document;
+
+	const document = getContext('document') as Document;
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 	const node = documentManipulator.getByPath(path) as SectionContainer;
 	let { children, view, activeView } = $derived(node);
@@ -44,6 +44,7 @@
 				refs: Refs;
 				additionalFlipId?: string;
 				onUnmount: () => void;
+				overrides?: { class?: string };
 			}>,
 			SummaryRenderers: child.summary.map((summaryChild, summaryIndex) => ({
 				summaryChild,
@@ -53,6 +54,7 @@
 					refs: Refs;
 					additionalFlipId?: string;
 					onUnmount: () => void;
+					overrides?: { class?: string };
 				}>
 			}))
 		}))
@@ -64,7 +66,7 @@
 			path: (string | number)[];
 			refs: Refs;
 			onUnmount: () => void;
-			overRides?: { heading?: boolean, accommodateControls?: boolean };
+			overrides?: { heading?: boolean; accommodateControls?: boolean };
 		}>
 	);
 
@@ -80,7 +82,7 @@
 {#key children[sidebarState.activeIndex].id}
 	<div class="flex">
 		<!-- Sidebar -->
-		<div class="sidebar shrink-0" style:width="{sidebarState.percentageWidth}%">
+		<div class="border-r-1 border-gray-300 shrink-0" style:width="{sidebarState.percentageWidth}%">
 			{#each ChildrenRenderers as { child, index, HeadingRenderer, SummaryRenderers }}
 				<div class="sidebar-item first:pt-0 p-5" on:click={() => setActiveSection(index)}>
 					<div class="heading">
@@ -89,6 +91,7 @@
 							additionalFlipId={'sidebar-item-' + index}
 							{refs}
 							{onUnmount}
+							overrides={{ class: 'prose-h1:text-xl' }}
 						/>
 					</div>
 
@@ -100,6 +103,7 @@
 									additionalFlipId={'sidebar-item-' + index}
 									{refs}
 									{onUnmount}
+									overrides={{ class: 'prose-p:text-xs prose-p:text-gray-500' }}
 								/>
 							{/each}
 						</div>
@@ -109,16 +113,18 @@
 		</div>
 
 		<!-- Content -->
-		<div class="content grow basis-0 pt-0 p-2" style:width="{100 -sidebarState.percentageWidth}%">
-			<ActiveSectionRenderer overRides={{accommodateControls: true}} path={[...path, 'children', sidebarState.activeIndex]} {refs} {onUnmount} />
+		<div class="content grow basis-0 p-2 pt-0" style:width="{100 - sidebarState.percentageWidth}%">
+			<ActiveSectionRenderer
+				overrides={{ accommodateControls: true }}
+				path={[...path, 'children', sidebarState.activeIndex]}
+				{refs}
+				{onUnmount}
+			/>
 		</div>
 	</div>
 {/key}
 
 <style>
-	.sidebar {
-		border-right: 1px solid black;
-	}
 
 	.sidebar-item {
 		cursor: pointer;

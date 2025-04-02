@@ -38,6 +38,7 @@
 				refs: Refs;
 				additionalFlipId?: string;
 				onUnmount: () => void;
+				overrides?: { class?: string };
 			}>
 		}))
 	);
@@ -51,7 +52,7 @@
 			path: (string | number)[];
 			refs: Refs;
 			onUnmount: () => void;
-			overRides?: { heading: boolean };
+			overrides?: { heading: boolean };
 		}>
 	);
 
@@ -118,20 +119,21 @@
 	onmouseleave={hideTabsControls}
 >
 	{#if document.state.mode === 'customize'}
-		<Controls path={path} {onUnmount} {isTabsHovered} />
+		<Controls {path} {onUnmount} {isTabsHovered} />
 	{/if}
 
 	<!-- Tabs navigation -->
 	<div class="tabs-container">
 		<div class="tabs-scroll flex overflow-x-scroll" style:gap="{gap}px" bind:this={tabsScroll}>
-			{#each ChildrenRenderers as {  index, HeadingRenderer }}
+			{#each ChildrenRenderers as { index, HeadingRenderer }}
 				<div
-					class="cursor-pointer p-5 whitespace-nowrap {index === activeIndex
-						? 'border-b-2 border-black'
+					class="cursor-pointer p-5 pb-2 whitespace-nowrap {index === activeIndex
+						? 'border-b-1 border-black'
 						: ''}"
 					onclick={() => setActiveSection(index)}
 				>
 					<HeadingRenderer
+						overrides={{ class: 'prose-h1:text-xl' }}
 						path={[...path, 'children', index, 'heading']}
 						additionalFlipId={'tab-item-' + index}
 						{refs}
@@ -153,7 +155,7 @@
 		<div class="pt-5">
 			<ActiveSectionRenderer
 				path={[...path, 'children', activeIndex]}
-				overRides={{ heading: false }}
+				overrides={{ heading: false }}
 				{refs}
 				{onUnmount}
 			/>
