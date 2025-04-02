@@ -127,7 +127,7 @@
 		<div class="tabs-scroll flex overflow-x-scroll" style:gap="{gap}px" bind:this={tabsScroll}>
 			{#each ChildrenRenderers as { index, HeadingRenderer }}
 				<div
-					class="cursor-pointer p-5 pb-2 whitespace-nowrap {index === activeIndex
+					class="cursor-pointer p-5 pt-2 pb-2 whitespace-nowrap {index === activeIndex
 						? 'border-b-1 border-black'
 						: ''}"
 					onclick={() => setActiveSection(index)}
