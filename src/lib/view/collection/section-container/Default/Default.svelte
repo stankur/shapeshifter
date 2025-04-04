@@ -38,7 +38,7 @@
 				onUnmount: () => void;
 				addSection: (section: Section) => void;
 				findParentSection: (level: number) => Section | null;
-				onSectionMoved: () => void;
+				removeSectionFromContainer: () => void;
 			}>
 		}))
 	);
@@ -70,7 +70,7 @@
 				console.log('no parent section found for level: ', level);
 				return null;
 			}}
-			onSectionMoved={() => {
+			removeSectionFromContainer={() => {
 				removeSectionFromContainer(node, index);
 			}}
 		/>

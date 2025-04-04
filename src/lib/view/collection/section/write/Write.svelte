@@ -23,9 +23,8 @@
 		overrides?: { heading?: boolean; accommodateControls?: boolean };
 		addSection?: (newSection: Section) => void;
 		findParentSection?: (level: number) => Section | null;
-		onSectionMoved?: () => void;
+		removeSectionFromContainer?: () => void;
 	};
-	type ViewState = { state: 'expanded' | 'summary' | 'collapsed' };
 	let {
 		path,
 		refs,
@@ -33,7 +32,7 @@
 		overrides = {},
 		addSection = () => {},
 		findParentSection = () => null,
-		onSectionMoved = () => {}
+		removeSectionFromContainer = () => {}
 	}: Props = $props();
 
 	const defaultOverRides = { heading: true, accommodateControls: false };
@@ -74,8 +73,6 @@
 			}>
 		}))
 	);
-
-	let viewStateIndex = $derived(view.findIndex((v) => v.type === activeView));
 </script>
 
 <div class="container flex flex-col gap-7">
@@ -87,7 +84,7 @@
 				{onUnmount}
 				onLevelIncrease={() => {
 					console.log('onLevelIncrease in section');
-					return handleHeadingLevelIncrease(node, findParentSection, onSectionMoved);
+					return handleHeadingLevelIncrease(node, findParentSection, removeSectionFromContainer);
 				}}
 				onEnterAtEnd={() => {
 					console.log('onEnterAtEnd in section');

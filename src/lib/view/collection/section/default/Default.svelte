@@ -22,7 +22,7 @@
 		overrides?: { heading?: boolean; accommodateControls?: boolean };
 		addSection: (newSection: Section) => void;
 		findParentSection: (level: number) => Section | null;
-		onSectionMoved: () => void;
+		removeSectionFromContainer: () => void;
 	};
 	type ViewState = { state: 'expanded' | 'summary' | 'collapsed' };
 	let {
@@ -32,7 +32,7 @@
 		overrides = {},
 		addSection,
 		findParentSection,
-		onSectionMoved
+		removeSectionFromContainer
 	}: Props = $props();
 
 	const defaultOverRides = { heading: true, accommodateControls: false };
@@ -68,7 +68,7 @@
 			Renderer: registry[child.activeView as keyof typeof registry] as Component<{
 				path: (string | number)[];
 				refs: Refs;
-                overrides?: { class?: string };
+				overrides?: { class?: string };
 				onUnmount: () => void;
 				onSplit: (newBlocks: [string, string]) => void;
 			}>
@@ -121,7 +121,7 @@
 					{onUnmount}
 					onLevelIncrease={() => {
 						console.log('onLevelIncrease in section');
-						return handleHeadingLevelIncrease(node, findParentSection, onSectionMoved);
+						return handleHeadingLevelIncrease(node, findParentSection, removeSectionFromContainer);
 					}}
 					onEnterAtEnd={() => {
 						console.log('onEnterAtEnd in section');
@@ -137,7 +137,12 @@
 			{console.log('children renderers length in section: ', ChildrenRenderers.length)}
 			<!-- should work without the key, but not working -->
 			{#each ChildrenRenderers as { Renderer }, i (node.children[i].last_modified + node.children[i].id)}
-				<div class={node.children[i].type === 'section-container' && node.children[i].activeView === "collection/section-container/default" ? 'mt-5' : ''}>
+				<div
+					class={node.children[i].type === 'section-container' &&
+					node.children[i].activeView === 'collection/section-container/default'
+						? 'mt-5'
+						: ''}
+				>
 					<Renderer
 						path={[...path, 'children', i]}
 						onSplit={(newBlocks) => {
@@ -160,7 +165,7 @@
 				<Renderer
 					path={[...path, 'summary', i]}
 					{refs}
-                    overrides={{ class: 'prose-p:text-xs prose-p:text-gray-500' }}
+					overrides={{ class: 'prose-p:text-xs prose-p:text-gray-500' }}
 					onSplit={(newBlocks) => {
 						splitParagraph(node, 'summary', newBlocks, document, i);
 					}}

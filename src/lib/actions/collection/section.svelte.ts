@@ -47,73 +47,70 @@ export async function splitParagraph(
 	}
 }
 
+// there is a temporary state where the children of a section are not meant to be the children
+// so it has to be moved upward to ba direct siblings of the section
+function adjustChildren(node: Section, newContainer: SectionContainer) {
+    const index = newContainer.children.findIndex((child) => child.id === node.id);
+    const sectionContainers = node.children.filter((child) => child.type === 'section-container');
+    let sectionSeen = 0;
+    for (let i = 0; i < sectionContainers.length; i++) {
+        const child = sectionContainers[i];
+        const sectionContainer = child as SectionContainer;
+
+        for (let j = 0; j < sectionContainer.children.length; j++) {
+            newContainer.children.splice(index + sectionSeen + j + 1, 0, sectionContainer.children[j]);
+        }
+        sectionSeen += sectionContainer.children.length;
+    }
+
+    const sectionContainerIds = sectionContainers.map((child) => child.id);
+    node.children = node.children.filter((child) => !sectionContainerIds.includes(child.id));
+}
+
 /**
  * Handles the restructuring when a heading level increases by 1
  *
  * @param node The section whose heading level would increase
- * @param findParentSection A callback to find a parent section with the appropriate level
- * @param onSectionMoved A callback to notify when the section has been moved
+ * @param findParentSection A callback to find a parent section with the appropriate level in the section container of the node
+ * @param removeSectionFromContainer A callback to notify when the section has been moved
  * @returns True if the level change should be allowed, false otherwise
  */
 export function handleHeadingLevelIncrease(
 	node: Section,
 	findParentSection: (level: number) => Section | null,
-	onSectionMoved: (sectionId: string) => void
+	removeSectionFromContainer: (sectionId: string) => void
 ): boolean {
 	const currentLevel = node.heading.level;
 	const newLevel = currentLevel + 1;
 
-	// Find a section with level one less than the new level
 	const parentSection = findParentSection(currentLevel);
-
-	// If no parent found, prevent the change
 	if (!parentSection) return false;
 
-	// Increase the heading level
 	console.log('increasing level of section');
 	node.heading.level = newLevel;
 
-	// Check if the last child of the parent section is a section container
 	const lastChild =
 		parentSection.children.length > 0
 			? parentSection.children[parentSection.children.length - 1]
 			: null;
 
-	try {
-		// Use the Zod schema to validate if the last child is a section container
-		if (lastChild && sectionContainer.safeParse(lastChild).success) {
-			// If the last child is a section container, add the section to it
-			console.log('adding section to existing section container');
-			(lastChild as SectionContainer).children.push(node);
-			lastChild.last_modified = new Date().toISOString();
-		} else {
-			// If the last child is not a section container, create a new one
-			console.log('creating new section container');
-			const newContainer = createSectionContainer();
-			newContainer.children.push(node);
+	let newContainer: SectionContainer = createSectionContainer();
 
-			// Add the new container to the parent section
-			console.log('adding new section container to parent section');
-			parentSection.children.push(newContainer);
-		}
-	} catch {
-		// If there's an error with the validation, create a new container
-		console.log('error validating section container, creating new one');
-		const newContainer = createSectionContainer();
-		newContainer.children.push(node);
-
-		// Add the new container to the parent section
-		console.log('adding new section container to parent section');
+	if (lastChild && sectionContainer.safeParse(lastChild).success) {
+		newContainer = lastChild as SectionContainer;
+		(lastChild as SectionContainer).children.push(node);
+		lastChild.last_modified = new Date().toISOString();
+	} else {
 		parentSection.children.push(newContainer);
+        newContainer = parentSection.children[parentSection.children.length - 1] as SectionContainer;
+		newContainer.children.push(node);
 	}
 
-	// Update timestamps
 	node.heading.last_modified = new Date().toISOString();
 	parentSection.last_modified = new Date().toISOString();
 
-	// Notify the container that this section has been moved
-	console.log('notifying container that section has been moved');
-	onSectionMoved(node.id);
+	removeSectionFromContainer(node.id);
+    adjustChildren(node, newContainer);
 
 	return true;
 }
