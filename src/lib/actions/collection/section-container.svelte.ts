@@ -27,6 +27,8 @@ export function removeSectionFromContainer(node: SectionContainer, index: number
 	if (index >= 0 && index < node.children.length) {
 		console.log('valid and removing section');
 		node.children.splice(index, 1);
+        console.log('just removed section');
+
 		node.last_modified = new Date().toISOString();
 	}
 }
