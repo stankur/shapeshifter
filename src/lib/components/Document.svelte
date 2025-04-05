@@ -7,8 +7,9 @@
 	import Flip from 'gsap/dist/Flip';
 	import type { NoHeadingContentSingle } from '../model/collection';
 	import { createDocumentManipulator } from '../documentManipulator.svelte';
-    import SectionWrite from '$lib/view/collection/section/write/Write.svelte';
-    import SectionContainerWrite from '$lib/view/collection/section-container/Write.svelte';
+	import SectionWrite from '$lib/view/collection/section/write/Write.svelte';
+	import SectionContainerWrite from '$lib/view/collection/section-container/Write.svelte';
+    import { Toggle } from 'flowbite-svelte';
 
 	gsap.registerPlugin(Flip);
 
@@ -17,10 +18,13 @@
 		{ element: HTMLElement; animateAbsolute: boolean; animateNested: boolean }
 	>;
 
+    let writerContext = $state({showSummary: true});
+
 	let { node }: { node: Document } = $props();
 	const documentManipulator = createDocumentManipulator(node);
 	setContext('document', node);
 	setContext('documentManipulator', documentManipulator);
+    setContext('writerContext', writerContext);
 
 	let Renderer = $derived(
 		registry[node.content.activeView as keyof typeof registry] as Component<{
@@ -96,33 +100,37 @@
 				});
 			});
 		} else {
-            node.state.animateNextChange = true;
-            flipState = null;
-        }
+			node.state.animateNextChange = true;
+			flipState = null;
+		}
 	});
 
-    $inspect(node)
+	$inspect(node);
+
+    
 </script>
 
-{#if !isDocumentViewPage}
-	<select bind:value={node.state.mode}>
-		<option value="write">Write</option>
-		<option value="customize">Customize</option>
-		<option value="read">Read</option>
-	</select>
-{/if}
-
+<div class="flex gap-7">
+	{#if !isDocumentViewPage}
+		<select bind:value={node.state.mode}>
+			<option value="write">Write</option>
+			<option value="customize">Customize</option>
+			<option value="read">Read</option>
+		</select>
+	{/if}
+    <Toggle checked={writerContext.showSummary} onchange={() => {
+        writerContext.showSummary = !writerContext.showSummary;
+    }} />
+</div>
 
 <div class="flex flex-col items-center gap-4">
 	<div class=" w-2/3">
-        {#if node.state.mode !== 'write'}
-            <Renderer path={['content']} {refs} {onUnmount} />
-        {:else}
-            {#if node.content.type === 'section'}
-                <SectionWrite path={['content']} {refs} {onUnmount} />
-            {:else if node.content.type === 'section-container'}
-                <SectionContainerWrite path={['content']} {refs} {onUnmount} />
-            {/if}
-        {/if}
+		{#if node.state.mode !== 'write'}
+			<Renderer path={['content']} {refs} {onUnmount} />
+		{:else if node.content.type === 'section'}
+			<SectionWrite path={['content']} {refs} {onUnmount} />
+		{:else if node.content.type === 'section-container'}
+			<SectionContainerWrite path={['content']} {refs} {onUnmount} />
+		{/if}
 	</div>
 </div>
