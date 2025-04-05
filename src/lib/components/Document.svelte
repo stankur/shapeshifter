@@ -100,6 +100,8 @@
             flipState = null;
         }
 	});
+
+    $inspect(node)
 </script>
 
 {#if !isDocumentViewPage}

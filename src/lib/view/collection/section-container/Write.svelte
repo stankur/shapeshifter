@@ -29,7 +29,7 @@
 			onUnmount: () => void;
 			addSection: (section: Section) => void;
 			findParentSection: (level: number) => Section | null;
-			onSectionMoved: () => void;
+			removeSectionFromContainer: () => void;
 		}>;
 	};
 
@@ -52,7 +52,9 @@
 			}
 
 			return {
-				Renderer: registry[child.activeView as keyof typeof registry] as ChildrenRenderersType['Renderer']
+				Renderer: registry[
+					child.activeView as keyof typeof registry
+				] as ChildrenRenderersType['Renderer']
 			};
 		})
 	);
@@ -80,7 +82,7 @@
 				console.log('no parent section found for level: ', level);
 				return null;
 			}}
-			onSectionMoved={() => {
+			removeSectionFromContainer={() => {
 				removeSectionFromContainer(node, index);
 			}}
 		/>
