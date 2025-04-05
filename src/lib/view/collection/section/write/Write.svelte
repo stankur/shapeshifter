@@ -25,7 +25,6 @@
 		findParentSection?: (level: number) => Section | null;
 		removeSectionFromContainer?: () => void;
 	};
-	type ViewState = { state: 'expanded' | 'summary' | 'collapsed' };
 	let {
 		path,
 		refs,
@@ -36,6 +35,7 @@
 		removeSectionFromContainer = () => {}
 	}: Props = $props();
 
+    const writerContext = getContext('writerContext') as {showSummary: boolean};
 	const defaultOverRides = { heading: true, accommodateControls: false };
 	overrides = { ...defaultOverRides, ...overrides };
 
@@ -43,7 +43,6 @@
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 	const node = documentManipulator.getByPath(path) as Section;
 
-	let { activeView, view } = node;
 	let HeadingRenderer = $derived(
 		registry[node.heading.activeView as keyof typeof registry] as unknown as Component<{
 			path: (string | number)[];
@@ -74,12 +73,10 @@
 			}>
 		}))
 	);
-
-	let viewStateIndex = $derived(view.findIndex((v) => v.type === activeView));
 </script>
 
 <div class="container flex flex-col gap-7">
-	{#if overrides && overrides.heading}
+	{#if (overrides.heading !== undefined && overrides.heading) || defaultOverRides.heading}
 		{#key node.heading.id}
 			<HeadingRenderer
 				path={[...path, 'heading']}
@@ -98,20 +95,22 @@
 	{/if}
 
 	<div class="flex flex-col gap-7">
-		<SummaryContainer>
-			{#each SummaryRenderers as { Renderer }, i (node.summary[i].last_modified + node.summary[i].id)}
-				{console.log(i)}
-				{console.log((node.summary[i] as ContentParagraph).content)}
-				<Renderer
-					path={[...path, 'summary', i]}
-					{refs}
-					onSplit={(newBlocks) => {
-						splitParagraph(node, 'summary', newBlocks, document, i);
-					}}
-					{onUnmount}
-				/>
-			{/each}
-		</SummaryContainer>
+		{#if writerContext.showSummary}
+			<SummaryContainer>
+				{#each SummaryRenderers as { Renderer }, i (node.summary[i].last_modified + node.summary[i].id)}
+					{console.log(i)}
+					{console.log((node.summary[i] as ContentParagraph).content)}
+					<Renderer
+						path={[...path, 'summary', i]}
+						{refs}
+						onSplit={(newBlocks) => {
+							splitParagraph(node, 'summary', newBlocks, document, i);
+						}}
+						{onUnmount}
+					/>
+				{/each}
+			</SummaryContainer>
+		{/if}
 		<div>
 			{#each ChildrenRenderers as { Renderer }, i (node.children[i].last_modified + node.children[i].id)}
 				{#if node.children[i].type === 'section-container'}
