@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Refs } from '$lib/components/Document.svelte';
-	import type { Section } from '$lib/model/collection';
+	import type { Section, SectionContainer } from '$lib/model/collection';
 	import type { ContentHeading, ContentParagraph } from '$lib/model/content';
 	import type { Document } from '$lib/model/document';
 	import { float } from '$lib/view/utils/float.svelte';
@@ -8,6 +8,7 @@
 	import { getContext, onMount, type Component } from 'svelte';
 	import {
 		handleHeadingLevelIncrease,
+		handleHeadingLevelDecrease,
 		splitParagraph,
 		splitSection,
 		handleEnterInHeading
@@ -22,7 +23,9 @@
 		onUnmount: () => void;
 		overrides?: { heading?: boolean; accommodateControls?: boolean };
 		addSection?: (newSection: Section) => void;
-		findParentSection?: (level: number) => Section | null;
+		findPrecedingSection?: (level: number) => Section | null;
+		findParentSection?: () => Section | null;
+		findParentSectionContainer?: () => SectionContainer | null;
 		removeSectionFromContainer?: () => void;
 	};
 	let {
@@ -31,7 +34,9 @@
 		onUnmount,
 		overrides = {},
 		addSection = () => {},
+		findPrecedingSection = () => null,
 		findParentSection = () => null,
+		findParentSectionContainer = () => null,
 		removeSectionFromContainer = () => {}
 	}: Props = $props();
 
@@ -49,6 +54,7 @@
 			refs: Refs;
 			onUnmount: () => void;
 			onLevelIncrease: () => boolean;
+			onLevelDecrease: () => boolean;
 			onEnterAtEnd: () => boolean;
 		}>
 	);
@@ -84,7 +90,32 @@
 				{onUnmount}
 				onLevelIncrease={() => {
 					console.log('onLevelIncrease in section');
-					return handleHeadingLevelIncrease(node, findParentSection, removeSectionFromContainer);
+					return handleHeadingLevelIncrease(node, findPrecedingSection, removeSectionFromContainer);
+				}}
+				onLevelDecrease={() => {
+					console.log('onLevelDecrease in section');
+					return handleHeadingLevelDecrease(
+						node, 
+						findParentSectionContainer, 
+						findParentSection, 
+						removeSectionFromContainer,
+						() => {
+							// Find the grandparent section container
+							// This is the container that contains the parent section
+							const parentSection = findParentSection();
+							if (!parentSection) return null;
+							
+							// Get the path to the parent section's container
+							// This would be the grandparent container for the current section
+							const parentSectionContainer = findParentSectionContainer();
+							if (!parentSectionContainer) return null;
+							
+							// Find the container that contains the parent section container
+							// This is done by looking at the parent section's parent
+							// We assume every section is in a container
+							return documentManipulator.getByPath([...path.slice(0, -6)]) as SectionContainer;
+						}
+					);
 				}}
 				onEnterAtEnd={() => {
 					console.log('onEnterAtEnd in section');

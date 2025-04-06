@@ -41,6 +41,7 @@
 		getNextEditable: NavigationHandler;
 		getPrevEditable: NavigationHandler;
 		onLevelIncrease: () => boolean;
+		onLevelDecrease: () => boolean;
 		onEnterAtEnd: () => boolean;
 	};
 
@@ -54,6 +55,7 @@
 		getNextEditable,
 		getPrevEditable,
 		onLevelIncrease,
+		onLevelDecrease,
 		onEnterAtEnd
 	}: Props = $props();
 
@@ -101,7 +103,7 @@
 			menuBar: false
 		}),
 		createNavigationPlugin(getNextEditable, getPrevEditable, documentNode),
-		createLevelPlugin(node, documentNode, onLevelIncrease),
+		createLevelPlugin(node, documentNode, onLevelIncrease, onLevelDecrease),
 	];
 
 	// Log the plugins to make sure they're registered correctly

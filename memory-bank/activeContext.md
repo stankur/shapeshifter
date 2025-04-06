@@ -35,8 +35,8 @@ We're implementing a path-based component access pattern to replace the two-way 
 - Ensured reactivity through direct mutations
 
 ## Next Steps
-- Continue implementing document structure updates for heading level changes
-- Test the path-based approach with complex nested structures
+- Test the heading level decrease functionality with complex nested structures
+- Address UI update issues (currently requires mode switching to see changes)
 - Optimize performance for large documents
 - Update documentation with the new access pattern
 - Consider adding debugging tools for path-based access

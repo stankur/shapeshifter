@@ -28,7 +28,9 @@
 			refs: Refs;
 			onUnmount: () => void;
 			addSection: (section: Section) => void;
-			findParentSection: (level: number) => Section | null;
+			findPrecedingSection: (level: number) => Section | null;
+			findParentSection: () => Section | null;
+			findParentSectionContainer: () => SectionContainer | null;
 			removeSectionFromContainer: () => void;
 		}>;
 	};
@@ -71,7 +73,7 @@
 				onUnmount();
 				addSectionToContainer(node, section, index + 1);
 			}}
-			findParentSection={(level) => {
+			findPrecedingSection={(level) => {
 				// Look for a section before the current one with the specified level
 				for (let i = index - 1; i >= 0; i--) {
 					if (node.children[i].heading.level === level) {
@@ -79,8 +81,26 @@
 					}
 				}
 
-				console.log('no parent section found for level: ', level);
+				console.log('no preceding section found for level: ', level);
 				return null;
+			}}
+			findParentSection={() => {
+				// Try to find the parent section in the document hierarchy
+				// This would be the section that contains this section container
+				// We need to go up the path to find it
+				try {
+					// The path is like [..., 'children', index]
+					// We need to go up to [...] to find the parent section
+					const parentPath = path.slice(0, -2);
+					return documentManipulator.getByPath(parentPath) as Section;
+				} catch (e) {
+					console.log('Error finding parent section:', e);
+					return null;
+				}
+			}}
+			findParentSectionContainer={() => {
+				// Return the current section container as the parent container
+				return node;
 			}}
 			removeSectionFromContainer={() => {
 				removeSectionFromContainer(node, index);

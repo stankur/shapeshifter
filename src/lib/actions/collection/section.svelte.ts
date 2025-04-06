@@ -1,10 +1,47 @@
 import type { Document } from '$lib/model/document';
-import type { Section, SectionContainer } from '$lib/model/collection';
+import type { NoHeadingContentSingle, Section, SectionContainer } from '$lib/model/collection';
 import { sectionContainer } from '$lib/model/collection';
 import { EditorFocusService } from '$lib/services/editorFocus';
 import { tick } from 'svelte';
-import { createSectionContainer } from './section-container.svelte';
+import {
+	createSectionContainer,
+	moveSiblingsToSection,
+	addSectionAfter
+} from './section-container.svelte';
 import type { ContentParagraph } from '$lib/model/content';
+
+/**
+ * Moves children after a section container to be children of a section
+ *
+ * @param parentSection The parent section
+ * @param sectionContainerId The ID of the section container
+ * @param targetSection The section to move children to
+ * @returns The children that were moved
+ */
+export function moveChildrenToSection(
+	parentSection: Section,
+	sectionContainerId: string,
+	targetSection: Section
+): NoHeadingContentSingle[] {
+	const containerIndex = parentSection.children.findIndex(
+		(child) => child.id === sectionContainerId
+	);
+	if (containerIndex === -1) return [];
+
+	const childrenAfter = parentSection.children.slice(containerIndex + 1);
+
+	// Add children to target section
+	for (const child of childrenAfter) {
+		targetSection.children.push(child);
+	}
+
+	// Remove children from parent section
+	parentSection.children.splice(containerIndex + 1, childrenAfter.length);
+	parentSection.last_modified = new Date().toISOString();
+	targetSection.last_modified = new Date().toISOString();
+
+	return childrenAfter;
+}
 
 export async function splitParagraph(
 	node: Section,
@@ -50,40 +87,102 @@ export async function splitParagraph(
 // there is a temporary state where the children of a section are not meant to be the children
 // so it has to be moved upward to ba direct siblings of the section
 function adjustChildren(node: Section, newContainer: SectionContainer) {
-    const index = newContainer.children.findIndex((child) => child.id === node.id);
-    const sectionContainers = node.children.filter((child) => child.type === 'section-container');
-    let sectionSeen = 0;
-    for (let i = 0; i < sectionContainers.length; i++) {
-        const child = sectionContainers[i];
-        const sectionContainer = child as SectionContainer;
+	const index = newContainer.children.findIndex((child) => child.id === node.id);
+	const sectionContainers = node.children.filter((child) => child.type === 'section-container');
+	let sectionSeen = 0;
+	for (let i = 0; i < sectionContainers.length; i++) {
+		const child = sectionContainers[i];
+		const sectionContainer = child as SectionContainer;
 
-        for (let j = 0; j < sectionContainer.children.length; j++) {
-            newContainer.children.splice(index + sectionSeen + j + 1, 0, sectionContainer.children[j]);
-        }
-        sectionSeen += sectionContainer.children.length;
+		for (let j = 0; j < sectionContainer.children.length; j++) {
+			newContainer.children.splice(index + sectionSeen + j + 1, 0, sectionContainer.children[j]);
+		}
+		sectionSeen += sectionContainer.children.length;
+	}
+
+	const sectionContainerIds = sectionContainers.map((child) => child.id);
+	node.children = node.children.filter((child) => !sectionContainerIds.includes(child.id));
+}
+
+
+/**
+ * Handles the restructuring when a heading level decreases by 1
+ *
+ * @param node The section whose heading level would decrease
+ * @param findParentSectionContainer A callback to find the parent section container that contains this section
+ * @param findParentSection A callback to find the actual parent section of this section (one level up in hierarchy)
+ * @param removeSectionFromContainer A callback to remove this section from its current container
+ * @param findGrandparentSectionContainer A callback to find the container that contains the parent section
+ * @returns True if the level change should be allowed, false otherwise
+ */
+export function handleHeadingLevelDecrease(
+	node: Section,
+	findParentSectionContainer: () => SectionContainer | null,
+	findParentSection: () => Section | null,
+	removeSectionFromContainer: () => void,
+	findGrandparentSectionContainer: () => SectionContainer | null
+): boolean {
+	const currentLevel = node.heading.level;
+    console.log('current level in handleHeadingLevelDecrease: ', currentLevel);
+	if (currentLevel <= 1) return false;
+	
+	// Check if this section has direct section children that would violate the constraint
+	const sectionContainers = node.children.filter(child => child.type === 'section-container');
+    if (sectionContainers.length > 0) {
+        console.log('section containers length in handleHeadingLevelDecrease: ', sectionContainers.length);
+        return false;
     }
-
-    const sectionContainerIds = sectionContainers.map((child) => child.id);
-    node.children = node.children.filter((child) => !sectionContainerIds.includes(child.id));
+	
+	// Find parent section container, parent section, and grandparent section container
+	const parentSectionContainer = findParentSectionContainer();
+	const parentSection = findParentSection();
+	const grandparentSectionContainer = findGrandparentSectionContainer();
+	
+	if (!parentSectionContainer || !parentSection || !grandparentSectionContainer) return false;
+	
+	// Find the index of the parent section in the grandparent section container
+	const parentSectionIndex = grandparentSectionContainer.children.findIndex(
+		child => child.id === parentSection.id
+	);
+	
+	if (parentSectionIndex === -1) return false;
+	
+	// Step 1: Move siblings after this section to be children of this section
+	moveSiblingsToSection(parentSectionContainer, node.id);
+    console.log('moved siblings to section');
+	
+	// Step 2: Remove this section from its container and move children after container
+	removeSectionFromContainer();
+	moveChildrenToSection(parentSection, parentSectionContainer.id, node);
+	
+	// Step 3: Add this section to the grandparent section container after the parent section
+	addSectionAfter(grandparentSectionContainer, node, parentSection.id);
+	
+	// Update the heading level
+	node.heading.level = currentLevel - 1;
+	node.heading.last_modified = new Date().toISOString();
+	node.last_modified = new Date().toISOString();
+	
+	return true;
 }
 
 /**
  * Handles the restructuring when a heading level increases by 1
  *
  * @param node The section whose heading level would increase
- * @param findParentSection A callback to find a parent section with the appropriate level in the section container of the node
+ * @param findPrecedingSection A callback to find a preceding sibling section with the appropriate level in the same container
  * @param removeSectionFromContainer A callback to notify when the section has been moved
  * @returns True if the level change should be allowed, false otherwise
  */
 export function handleHeadingLevelIncrease(
 	node: Section,
-	findParentSection: (level: number) => Section | null,
+	findPrecedingSection: (level: number) => Section | null,
 	removeSectionFromContainer: (sectionId: string) => void
 ): boolean {
 	const currentLevel = node.heading.level;
 	const newLevel = currentLevel + 1;
 
-	const parentSection = findParentSection(currentLevel);
+	const parentSection = findPrecedingSection(currentLevel);
 	if (!parentSection) return false;
 
 	console.log('increasing level of section');
@@ -102,7 +201,7 @@ export function handleHeadingLevelIncrease(
 		lastChild.last_modified = new Date().toISOString();
 	} else {
 		parentSection.children.push(newContainer);
-        newContainer = parentSection.children[parentSection.children.length - 1] as SectionContainer;
+		newContainer = parentSection.children[parentSection.children.length - 1] as SectionContainer;
 		newContainer.children.push(node);
 	}
 
@@ -110,11 +209,11 @@ export function handleHeadingLevelIncrease(
 	parentSection.last_modified = new Date().toISOString();
 
 	removeSectionFromContainer(node.id);
-    adjustChildren(node, newContainer);
+	adjustChildren(node, newContainer);
 
 	return true;
 }
-  
+
 /**
  * Handles Enter key press at the end of a heading
  *

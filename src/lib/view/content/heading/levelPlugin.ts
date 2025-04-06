@@ -12,12 +12,14 @@ import type { Document } from '$lib/model/document';
  * @param headingNode The heading node to modify
  * @param documentNode The document node to update
  * @param onLevelIncrease Optional callback when level increases, returns whether change is allowed
+ * @param onLevelDecrease Optional callback when level decreases, returns whether change is allowed
  * @returns A ProseMirror plugin for handling heading level changes
  */
 export function createLevelPlugin(
   headingNode: ContentHeading,
   documentNode: Document,
-  onLevelIncrease?: () => boolean
+  onLevelIncrease?: () => boolean,
+  onLevelDecrease?: () => boolean
 ): Plugin {
   return keymap({
     Tab: (state) => {
@@ -74,12 +76,25 @@ export function createLevelPlugin(
     Backspace: (state) => {
       const { selection } = state;
       const atStart = selection.$head.pos === 1;
+      console.log('in backspace plugin');
       
       if (atStart) {
-        // Decrease heading level (min 1)
-        const newLevel = Math.max(headingNode.level - 1, 1);
-        if (newLevel !== headingNode.level) {
-          headingNode.level = newLevel;
+        console.log('in backspace plugin at start');
+        console.log(onLevelDecrease)
+        // If callback provided, let it determine if change is allowed
+        if (onLevelDecrease) {
+          console.log('in backspace plugin at start if onLevelDecrease');
+          const allowed = onLevelDecrease();
+          console.log('in backspace plugin at start if onLevelDecrease allowed', allowed);
+          documentNode.state.animateNextChange = false;
+          if (!allowed) {
+            return true; // Consume event but don't change level
+          }
+        }
+        
+        // Only decrease if level > 1
+        if (headingNode.level > 1) {
+          headingNode.level -= 1;
           documentNode.state.animateNextChange = false;
           return true;
         }
