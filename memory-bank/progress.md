@@ -15,10 +15,11 @@
 - Paragraph-to-heading conversion
 - UI controls for content transformation
 - Heading level increase with document restructuring
+- Heading level decrease with document restructuring
 - Path-based component access pattern
 
 ## What's Left to Build
-- Heading level decrease with document restructuring
+- Fix UI update issues with heading level changes (currently requires mode switching)
 - Complete navigation system for all view types
 - Keyboard shortcuts for common operations
 - Additional content transformation capabilities
@@ -48,17 +49,32 @@ This pattern provides several benefits:
 - Consistent access pattern across all components
 - Maintained reactivity through Svelte 5's reactivity system
 
-We've also implemented document structure updates when heading levels increase. Now when a user presses Tab or Space at the beginning of a heading, the system will:
+We've implemented document structure updates for both heading level increases and decreases:
 
-1. Check if there's a parent section with the appropriate level (one level lower than the new heading level)
-2. If found, increase the heading level and move the section to become a child of that parent section
+**Heading Level Increase (Tab/Space at start of heading):**
+1. Check if there's a preceding section with the appropriate level (one level lower than the new heading level)
+2. If found, increase the heading level and move the section to become a child of that preceding section
 3. Update the document structure accordingly
 
-We still need to implement the heading level decrease functionality, which will handle the case when a heading level goes down and needs to break out of its current container, taking any subsections with higher heading levels with it.
+**Heading Level Decrease (Backspace at start of heading):**
+1. Check if decreasing the level would violate the constraint (section cannot have direct section children whose level is more than 1 above its level)
+2. If safe, perform a three-step restructuring process:
+   - Step 1: Move siblings after the section to be children of that section
+   - Step 2: Remove the section from its container and move children after container to the section
+   - Step 3: Add the section to the grandparent section container after the parent section
+3. Update the heading level and document structure
+
+This implementation required clarifying the distinction between:
+- findPrecedingSection: Finds a preceding sibling section with the appropriate level
+- findParentSection: Finds the actual parent section in the hierarchy
+- findParentSectionContainer: Finds the container that holds the current section
+- findGrandparentSectionContainer: Finds the container that holds the parent section
+
+There is currently a UI update issue where changes don't appear immediately unless the user switches modes and goes back to write mode. This needs to be addressed in future updates.
 
 ## Known Issues
-- Heading level decrease functionality not yet implemented
-- Edge cases in heading level increase (e.g., first section in a document)
+- UI update issues with heading level changes (requires mode switching to see changes)
+- Edge cases in heading level increase and decrease operations
 - Navigation between different view types needs refinement
 - Some edge cases in cursor positioning when navigating between blocks
 - Need to implement navigation for all container types

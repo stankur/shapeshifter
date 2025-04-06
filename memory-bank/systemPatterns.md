@@ -63,6 +63,21 @@ flowchart TD
 - Multiple view types (Card, Table of Contents, Tabs)
 - Hierarchical document model
 - Section splitting for content reorganization
+- Heading level management with document restructuring
+
+```mermaid
+flowchart TD
+    HeadingLevel[Heading Level Changes] --> Increase[Level Increase]
+    HeadingLevel --> Decrease[Level Decrease]
+    
+    Increase --> CheckPreceding[Check for Preceding Section]
+    Increase --> MoveToChild[Move to Child Position]
+    
+    Decrease --> CheckConstraint[Check Hierarchy Constraint]
+    Decrease --> Step1[Step 1: Move Siblings to Children]
+    Step1 --> Step2[Step 2: Remove from Container]
+    Step2 --> Step3[Step 3: Add to Grandparent Container]
+```
 
 ### UI Components
 1. **Section Containers**
@@ -179,3 +194,30 @@ flowchart TD
    - Components access nodes through the DocumentManipulator
    - Actions operate on node objects retrieved by path
    - Changes to nodes are automatically reactive
+
+### Section Hierarchy Management
+```mermaid
+flowchart TD
+    Section[Section Component] --> Callbacks[Section Callbacks]
+    Callbacks --> FindPreceding[findPrecedingSection]
+    Callbacks --> FindParent[findParentSection]
+    Callbacks --> FindContainer[findParentSectionContainer]
+    Callbacks --> FindGrandparent[findGrandparentSectionContainer]
+    
+    FindPreceding --> Increase[Heading Level Increase]
+    FindParent --> Decrease[Heading Level Decrease]
+    FindContainer --> Decrease
+    FindGrandparent --> Decrease
+```
+
+1. **Section Relationship Functions**
+   - `findPrecedingSection`: Finds a preceding sibling section with a specific level
+   - `findParentSection`: Finds the actual parent section in the hierarchy
+   - `findParentSectionContainer`: Finds the container that holds the current section
+   - `findGrandparentSectionContainer`: Finds the container that holds the parent section
+
+2. **Heading Level Operations**
+   - Level increase: Moves a section to become a child of a preceding section
+   - Level decrease: Moves a section out of its container to the grandparent container
+   - Both operations maintain document hierarchy constraints
+   - Both operations restructure the document to maintain logical organization
