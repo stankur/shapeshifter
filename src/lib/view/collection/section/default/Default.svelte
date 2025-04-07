@@ -41,8 +41,9 @@
 	}: Props = $props();
 
 	const defaultOverRides = { heading: true, accommodateControls: false };
-	overrides = { ...defaultOverRides, ...overrides };
+	let mergedOverrides = $derived({ ...defaultOverRides, heading: overrides.heading, accommodateControls: overrides.accommodateControls });
 
+    $inspect(`mergedOverrides:`, mergedOverrides)
 	let document = getContext('document') as Document;
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 	const node = documentManipulator.getByPath(path) as Section;
@@ -90,14 +91,21 @@
 
 	onMount(() => {
 		if (containerElement && controlElement) {
-			if (overrides?.accommodateControls) {
-				containerElement.style.paddingLeft = `${controlElement.clientWidth}px`;
+			if (mergedOverrides.accommodateControls) {
+                console.log("for section", node.id, " with title ", node.heading.content)
+                console.log('accommodateControls is true, setting paddingLeft to', controlElement.clientWidth)
+				containerElement.style.paddingLeft = `${controlElement.clientWidth}px`
+			} else {
+                console.log("for section", node.id, " with title ", node.heading.content)
+                console.log('accommodateControls is false, setting paddingLeft to 0px')
+				containerElement.style.paddingLeft = '0px'
 			}
 
+
 			// Determine which element to use as reference for the floating control
-			const referenceElement = overrides?.heading ? headingElement : contentElement;
+			const referenceElement = mergedOverrides?.heading ? headingElement : contentElement;
 			// Use 'left' for heading, 'left-start' for content
-			const placement = overrides?.heading ? 'left' : 'left-start';
+			const placement = mergedOverrides?.heading ? 'left' : 'left-start';
 
 			if (referenceElement) {
 				return float(
@@ -109,6 +117,17 @@
 			}
 		}
 	});
+
+    $effect(() => {
+        if (containerElement && controlElement) {
+            if (mergedOverrides.accommodateControls) {
+                containerElement.style.paddingLeft = `${controlElement.clientWidth}px`
+            } else {
+                containerElement.style.paddingLeft = '0px'
+            }
+        }
+    })
+    
 </script>
 
 <DefaultControl

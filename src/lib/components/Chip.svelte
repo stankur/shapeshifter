@@ -7,6 +7,6 @@
 
 </script>
 
-<div {onclick} class="h-fit w-fit rounded-md p-2 text-xs bg-black text-white cursor-pointer">
+<div {onclick} class="h-fit w-fit rounded-md p-2 text-xs bg-black text-white cursor-pointer select-none">
     {label}
 </div>
