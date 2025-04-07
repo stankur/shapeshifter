@@ -32,9 +32,9 @@
 		updateParent?: () => void;
 		getNextEditable?: NavigationHandler;
 		getPrevEditable?: NavigationHandler;
-        overrides?: {
-            class?: string;
-        };
+		overrides?: {
+			class?: string;
+		};
 		documentNode?: Document;
 	};
 
@@ -42,9 +42,9 @@
 		path: (string | number)[];
 		refs: Refs;
 		onUnmount: () => void;
-        overrides?: {
-            class?: string;
-        };
+		overrides?: {
+			class?: string;
+		};
 		updateParent?: () => void;
 		onSplit?: (blocks: [string, string]) => void;
 		getNextEditable?: NavigationHandler;
@@ -82,12 +82,12 @@
 		}))
 	);
 
-	let perRow = $derived(
-		(view.find((v) => v.type === activeView) as { state: SectionContainerViewState }).state.perRow
-	);
 	let gap = $derived(
 		(view.find((v) => v.type === activeView) as { state: SectionContainerViewState }).state.gap
 	);
+
+	// Minimum width for cards
+	const minCardWidth = 250;
 
 	let isCardHovered = $state(false);
 
@@ -105,7 +105,7 @@
 		<Controls {path} {onUnmount} {isCardHovered} />
 	{/if}
 
-	<div class="container flex flex-wrap" style:--perRow={perRow} style:--gap={`${gap}px`}>
+	<div class="card-grid" style:--gap={`${gap}px`} style:--min-card-width={`${minCardWidth}px`}>
 		{#each SectionRenderers as { child, sectionIndex, HeadingRenderer, SummaryRenderers }}
 			<div class="card border-1 border-gray-400 p-5">
 				<HeadingRenderer
@@ -148,10 +148,14 @@
 	.card-container {
 		position: relative;
 	}
-	.card {
-		flex: 0 0 calc((99.9% - (var(--perRow) - 1) * var(--gap)) / var(--perRow));
-	}
-	.container {
+
+	.card-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(var(--min-card-width), 1fr));
 		gap: var(--gap);
+	}
+
+	.card {
+		min-width: var(--min-card-width);
 	}
 </style>

@@ -91,7 +91,7 @@ export const nested: Document = {
 		view: [
 			{ type: 'collection/section-container/default' },
 			{ type: 'collection/section-container/static' },
-			{ type: 'collection/section-container/card', state: { perRow: 3, gap: 4 } },
+			{ type: 'collection/section-container/card', state: { gap: 4 } },
 			{ type: 'collection/section-container/brick' },
 			{
 				type: 'collection/section-container/table-of-contents',
@@ -312,7 +312,7 @@ export const card: Document = {
 		view: [
 			{ type: 'collection/section-container/default' },
 			{ type: 'collection/section-container/static' },
-			{ type: 'collection/section-container/card', state: { perRow: 3, gap: 16 } },
+			{ type: 'collection/section-container/card', state: { gap: 16 } },
 			{ type: 'collection/section-container/brick' },
 			{
 				type: 'collection/section-container/table-of-contents',
@@ -586,7 +586,7 @@ const nestedSectionContainer: (num: number) => z.infer<typeof sectionContainer> 
 	view: [
 		{ type: 'collection/section-container/default' },
 		{ type: 'collection/section-container/static' },
-		{ type: 'collection/section-container/card', state: { perRow: 3, gap: 4 } },
+		{ type: 'collection/section-container/card', state: { gap: 4 } },
 		{ type: 'collection/section-container/brick' },
 		{
 			type: 'collection/section-container/table-of-contents',
@@ -687,7 +687,7 @@ export const sectionContainerTOC: Document = {
 		view: [
 			{ type: 'collection/section-container/default' },
 			{ type: 'collection/section-container/static' },
-			{ type: 'collection/section-container/card', state: { perRow: 3, gap: 4 } },
+			{ type: 'collection/section-container/card', state: {  gap: 4 } },
 			{ type: 'collection/section-container/brick' },
 			{
 				type: 'collection/section-container/table-of-contents',
@@ -744,7 +744,7 @@ export const sectionContainerDefault: Document = {
 		view: [
 			{ type: 'collection/section-container/default' },
 			{ type: 'collection/section-container/static' },
-			{ type: 'collection/section-container/card', state: { perRow: 3, gap: 4 } },
+			{ type: 'collection/section-container/card', state: { gap: 4 } },
 			{ type: 'collection/section-container/brick' },
 			{
 				type: 'collection/section-container/table-of-contents',
@@ -802,7 +802,7 @@ export const sectionContainerTOCCard: Document = {
 		view: [
 			{ type: 'collection/section-container/default' },
 			{ type: 'collection/section-container/static' },
-			{ type: 'collection/section-container/card', state: { perRow: 1, gap: 4 } },
+			{ type: 'collection/section-container/card', state: { gap: 4 } },
 			{ type: 'collection/section-container/brick' },
 			{
 				type: 'collection/section-container/table-of-contents',
@@ -848,7 +848,7 @@ export const sidebarExample: SectionContainer = {
 	view: [
 		{ type: 'collection/section-container/default' },
 		{ type: 'collection/section-container/static' },
-		{ type: 'collection/section-container/card', state: { perRow: 1, gap: 4 } },
+		{ type: 'collection/section-container/card', state: {  gap: 4 } },
 		{ type: 'collection/section-container/brick' },
 		{ type: 'collection/section-container/table-of-contents', state: { directions: [] } },
 		{
