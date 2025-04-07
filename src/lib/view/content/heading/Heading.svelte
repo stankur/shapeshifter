@@ -62,7 +62,7 @@
     const defaultOverrides = {
         class: ''
     }
-    overrides = { ...defaultOverrides, ...overrides };
+    let mergedOverrides = $derived({ ...defaultOverrides, ...overrides });
 
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 	const node = documentManipulator.getByPath(path) as ContentHeading;
@@ -221,7 +221,7 @@
 			e.stopPropagation();
 		}
 	}}
-	class={[headingSize, 'prose-h1:inline-block', 'prose-h1:font-semibold', overrides.class]}
+	class={[headingSize, 'prose-h1:inline-block', 'prose-h1:font-semibold', mergedOverrides.class]}
 ></div>
 
 <svelte:document

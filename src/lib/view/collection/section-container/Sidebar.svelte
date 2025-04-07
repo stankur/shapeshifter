@@ -8,6 +8,8 @@
 	import { getContext } from 'svelte';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 	import type { Document } from '$lib/model/document';
+	import Chip from '$lib/components/Chip.svelte';
+	import { onMount } from 'svelte';
 	type SectionContainer = z.infer<typeof sectionContainer>;
 
 	let {
@@ -74,58 +76,154 @@
 	function setActiveSection(index: number) {
 		onUnmount();
 		// Update the activeIndex in the state
-        document.state.animateNextChange = false;
+		document.state.animateNextChange = false;
 		sidebarState.activeIndex = index;
+
+		// On mobile, close the drawer after selecting a section
+		if (isMobile) {
+			isDrawerOpen = false;
+		}
 	}
+
+	// Mobile drawer state
+	let isDrawerOpen = $state(false);
+	let isMobile = $state(false);
+
+	// Toggle drawer
+	function toggleDrawer() {
+		isDrawerOpen = !isDrawerOpen;
+	}
+
+	// Check if screen is mobile size (md breakpoint = 768px)
+	function checkMobileSize() {
+		isMobile = window.innerWidth < 768;
+	}
+
+	onMount(() => {
+		checkMobileSize();
+		window.addEventListener('resize', checkMobileSize);
+
+		return () => {
+			window.removeEventListener('resize', checkMobileSize);
+		};
+	});
+
+	$inspect(`acommodateControls: ${!isMobile}`);
 </script>
 
 {#key children[sidebarState.activeIndex].id}
-	<div class="flex">
-		<!-- Sidebar -->
-		<div class="border-r-1 border-gray-300 shrink-0" style:width="{sidebarState.percentageWidth}%">
-			{#each ChildrenRenderers as { child, index, HeadingRenderer, SummaryRenderers }}
-				<div class="sidebar-item first:pt-0 p-5" on:click={() => setActiveSection(index)}>
-					<div class="heading">
-						<HeadingRenderer
-							path={[...path, 'children', index, 'heading']}
-							additionalFlipId={'sidebar-item-' + index}
-							{refs}
-							{onUnmount}
-							overrides={{ class: 'prose-h1:text-xl' }}
-						/>
+	<div class="flex flex-col md:flex-row">
+		<!-- Mobile toggle button -->
+		{#if isMobile && !isDrawerOpen}
+			<div class="mb-4">
+				<Chip label="sidebar" onclick={toggleDrawer} />
+			</div>
+		{/if}
+
+		{#if isMobile}
+			<!-- Mobile View: Show either sidebar or content -->
+			{#if isDrawerOpen}
+				<!-- Mobile Sidebar -->
+				<div class="w-full bg-white">
+					<!-- Mobile close button -->
+					<div class="mb-4">
+						<Chip label="close" onclick={toggleDrawer} />
 					</div>
 
-					{#if SummaryRenderers.length > 0}
-						<div class="summary">
-							{#each SummaryRenderers as { summaryChild, summaryIndex, Renderer }}
-								<Renderer
-									path={[...path, 'children', index, 'summary', summaryIndex]}
+					<!-- Sidebar items -->
+					{#each ChildrenRenderers as { child, index, HeadingRenderer, SummaryRenderers }}
+						<div class="sidebar-item p-5 first:pt-0" on:click={() => setActiveSection(index)}>
+							<div class="heading">
+								<HeadingRenderer
+									path={[...path, 'children', index, 'heading']}
 									additionalFlipId={'sidebar-item-' + index}
 									{refs}
 									{onUnmount}
-									overrides={{ class: 'prose-p:text-xs prose-p:text-gray-500' }}
+									overrides={{ class: 'prose-h1:text-xl' }}
 								/>
-							{/each}
-						</div>
-					{/if}
-				</div>
-			{/each}
-		</div>
+							</div>
 
-		<!-- Content -->
-		<div class="content grow basis-0 p-2 pt-0" style:width="{100 - sidebarState.percentageWidth}%">
-			<ActiveSectionRenderer
-				overrides={{ accommodateControls: true }}
-				path={[...path, 'children', sidebarState.activeIndex]}
-				{refs}
-				{onUnmount}
-			/>
-		</div>
+							{#if SummaryRenderers.length > 0}
+								<div class="summary">
+									{#each SummaryRenderers as { summaryChild, summaryIndex, Renderer }}
+										<Renderer
+											path={[...path, 'children', index, 'summary', summaryIndex]}
+											additionalFlipId={'sidebar-item-' + index}
+											{refs}
+											{onUnmount}
+											overrides={{ class: 'prose-p:text-xs prose-p:text-gray-500' }}
+										/>
+									{/each}
+								</div>
+							{/if}
+						</div>
+					{/each}
+				</div>
+			{:else}
+				<!-- Mobile Content View -->
+				<div class="w-full">
+					<ActiveSectionRenderer
+						overrides={{ heading: true }}
+						path={[...path, 'children', sidebarState.activeIndex]}
+						{refs}
+						{onUnmount}
+					/>
+				</div>
+			{/if}
+		{:else}
+			<!-- Desktop View: Show sidebar and content side by side -->
+			<!-- Sidebar -->
+			<div
+				class="shrink-0 border-r-1 border-gray-300"
+				style:width={sidebarState.percentageWidth + '%'}
+			>
+				<!-- Sidebar items -->
+				{#each ChildrenRenderers as { child, index, HeadingRenderer, SummaryRenderers }}
+					<div class="sidebar-item p-5 first:pt-0" on:click={() => setActiveSection(index)}>
+						<div class="heading">
+							<HeadingRenderer
+								path={[...path, 'children', index, 'heading']}
+								additionalFlipId={'sidebar-item-' + index}
+								{refs}
+								{onUnmount}
+								overrides={{ class: 'prose-h1:text-xl' }}
+							/>
+						</div>
+
+						{#if SummaryRenderers.length > 0}
+							<div class="summary">
+								{#each SummaryRenderers as { summaryChild, summaryIndex, Renderer }}
+									<Renderer
+										path={[...path, 'children', index, 'summary', summaryIndex]}
+										additionalFlipId={'sidebar-item-' + index}
+										{refs}
+										{onUnmount}
+										overrides={{ class: 'prose-p:text-xs prose-p:text-gray-500' }}
+									/>
+								{/each}
+							</div>
+						{/if}
+					</div>
+				{/each}
+			</div>
+
+			<!-- Content -->
+			<div
+				class="content relative grow basis-0 pt-0"
+				style:width={100 - sidebarState.percentageWidth + '%'}
+			>
+				<ActiveSectionRenderer
+					overrides={{ accommodateControls: true, heading: false }}
+					path={[...path, 'children', sidebarState.activeIndex]}
+					{refs}
+					{onUnmount}
+				/>
+			</div>
+		{/if}
 	</div>
 {/key}
 
 <style>
-
 	.sidebar-item {
 		cursor: pointer;
 	}
