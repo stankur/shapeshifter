@@ -9,7 +9,7 @@
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 	import type { Document } from '$lib/model/document';
 	import Chip from '$lib/components/Chip.svelte';
-	import { onMount } from 'svelte';
+	import type { DeviceContext } from '$lib/services/deviceContext.svelte';
 	type SectionContainer = z.infer<typeof sectionContainer>;
 
 	let {
@@ -24,6 +24,8 @@
 
 	const document = getContext('document') as Document;
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
+	// Get device context
+	const deviceContext = getContext('deviceContext') as DeviceContext;
 	const node = documentManipulator.getByPath(path) as SectionContainer;
 	let { children, view, activeView } = $derived(node);
 
@@ -80,47 +82,32 @@
 		sidebarState.activeIndex = index;
 
 		// On mobile, close the drawer after selecting a section
-		if (isMobile) {
+		if (deviceContext.isMobile) {
 			isDrawerOpen = false;
 		}
 	}
 
 	// Mobile drawer state
 	let isDrawerOpen = $state(false);
-	let isMobile = $state(false);
 
 	// Toggle drawer
 	function toggleDrawer() {
 		isDrawerOpen = !isDrawerOpen;
 	}
 
-	// Check if screen is mobile size (md breakpoint = 768px)
-	function checkMobileSize() {
-		isMobile = window.innerWidth < 768;
-	}
-
-	onMount(() => {
-		checkMobileSize();
-		window.addEventListener('resize', checkMobileSize);
-
-		return () => {
-			window.removeEventListener('resize', checkMobileSize);
-		};
-	});
-
-	$inspect(`acommodateControls: ${!isMobile}`);
+	$inspect(`acommodateControls: ${!deviceContext.isMobile}`);
 </script>
 
 {#key children[sidebarState.activeIndex].id}
 	<div class="flex flex-col md:flex-row">
 		<!-- Mobile toggle button -->
-		{#if isMobile && !isDrawerOpen}
+		{#if deviceContext.isMobile && !isDrawerOpen}
 			<div class="mb-4">
 				<Chip label="sidebar" onclick={toggleDrawer} />
 			</div>
 		{/if}
 
-		{#if isMobile}
+		{#if deviceContext.isMobile}
 			<!-- Mobile View: Show either sidebar or content -->
 			{#if isDrawerOpen}
 				<!-- Mobile Sidebar -->

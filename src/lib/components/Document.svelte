@@ -9,7 +9,8 @@
 	import { createDocumentManipulator } from '../documentManipulator.svelte';
 	import SectionWrite from '$lib/view/collection/section/write/Write.svelte';
 	import SectionContainerWrite from '$lib/view/collection/section-container/Write.svelte';
-    import { Toggle } from 'flowbite-svelte';
+	import { Toggle } from 'flowbite-svelte';
+	import { createDeviceContext } from '$lib/services/deviceContext.svelte';
 
 	gsap.registerPlugin(Flip);
 
@@ -17,14 +18,18 @@
 		string,
 		{ element: HTMLElement; animateAbsolute: boolean; animateNested: boolean }
 	>;
+	// Create and initialize device context
+	const { deviceState, initialize: initializeDeviceContext } = createDeviceContext();
+	initializeDeviceContext();
+	setContext('deviceContext', deviceState);
 
-    let writerContext = $state({showSummary: true});
+	let writerContext = $state({ showSummary: true });
 
 	let { node }: { node: Document } = $props();
 	const documentManipulator = createDocumentManipulator(node);
 	setContext('document', node);
 	setContext('documentManipulator', documentManipulator);
-    setContext('writerContext', writerContext);
+	setContext('writerContext', writerContext);
 
 	let Renderer = $derived(
 		registry[node.content.activeView as keyof typeof registry] as Component<{
@@ -106,8 +111,6 @@
 	});
 
 	$inspect(node);
-
-    
 </script>
 
 <div class="flex gap-7">
@@ -118,9 +121,12 @@
 			<option value="read">Read</option>
 		</select>
 	{/if}
-    <Toggle checked={writerContext.showSummary} onchange={() => {
-        writerContext.showSummary = !writerContext.showSummary;
-    }} />
+	<Toggle
+		checked={writerContext.showSummary}
+		onchange={() => {
+			writerContext.showSummary = !writerContext.showSummary;
+		}}
+	/>
 </div>
 
 <div class="flex flex-col items-center gap-4">
