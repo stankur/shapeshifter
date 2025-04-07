@@ -41,9 +41,8 @@
 	}: Props = $props();
 
 	const defaultOverRides = { heading: true, accommodateControls: false };
-	let mergedOverrides = $derived({ ...defaultOverRides, heading: overrides.heading, accommodateControls: overrides.accommodateControls });
-
-    $inspect(`mergedOverrides:`, mergedOverrides)
+	let mergedOverrides = $derived(Object.assign({}, defaultOverRides, overrides));
+	$inspect(`mergedOverrides:`, mergedOverrides);
 	let document = getContext('document') as Document;
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 	const node = documentManipulator.getByPath(path) as Section;
@@ -92,15 +91,17 @@
 	onMount(() => {
 		if (containerElement && controlElement) {
 			if (mergedOverrides.accommodateControls) {
-                console.log("for section", node.id, " with title ", node.heading.content)
-                console.log('accommodateControls is true, setting paddingLeft to', controlElement.clientWidth)
-				containerElement.style.paddingLeft = `${controlElement.clientWidth}px`
+				console.log('for section', node.id, ' with title ', node.heading.content);
+				console.log(
+					'accommodateControls is true, setting paddingLeft to',
+					controlElement.clientWidth
+				);
+				containerElement.style.paddingLeft = `${controlElement.clientWidth}px`;
 			} else {
-                console.log("for section", node.id, " with title ", node.heading.content)
-                console.log('accommodateControls is false, setting paddingLeft to 0px')
-				containerElement.style.paddingLeft = '0px'
+				console.log('for section', node.id, ' with title ', node.heading.content);
+				console.log('accommodateControls is false, setting paddingLeft to 0px');
+				containerElement.style.paddingLeft = '0px';
 			}
-
 
 			// Determine which element to use as reference for the floating control
 			const referenceElement = mergedOverrides?.heading ? headingElement : contentElement;
@@ -118,16 +119,15 @@
 		}
 	});
 
-    $effect(() => {
-        if (containerElement && controlElement) {
-            if (mergedOverrides.accommodateControls) {
+	$effect(() => {
+		if (containerElement && controlElement) {
+			if (mergedOverrides.accommodateControls) {
                 containerElement.style.paddingLeft = `${controlElement.clientWidth}px`
             } else {
-                containerElement.style.paddingLeft = '0px'
-            }
-        }
-    })
-    
+				containerElement.style.paddingLeft = '0px';
+			}
+		}
+	});
 </script>
 
 <DefaultControl
@@ -137,7 +137,7 @@
 />
 
 <div class="container flex flex-col gap-7" bind:this={containerElement}>
-	{#if overrides && overrides.heading}
+	{#if mergedOverrides && mergedOverrides.heading}
 		{#key node.heading.id}
 			<div bind:this={headingElement}>
 				<HeadingRenderer
@@ -146,26 +146,30 @@
 					{onUnmount}
 					onLevelIncrease={() => {
 						console.log('onLevelIncrease in section');
-						return handleHeadingLevelIncrease(node, findPrecedingSection, removeSectionFromContainer);
+						return handleHeadingLevelIncrease(
+							node,
+							findPrecedingSection,
+							removeSectionFromContainer
+						);
 					}}
 					onLevelDecrease={() => {
 						console.log('onLevelDecrease in section');
 						return handleHeadingLevelDecrease(
-							node, 
-							findParentSectionContainer, 
-							findParentSection, 
+							node,
+							findParentSectionContainer,
+							findParentSection,
 							removeSectionFromContainer,
 							() => {
 								// Find the grandparent section container
 								// This is the container that contains the parent section
 								const parentSection = findParentSection();
 								if (!parentSection) return null;
-								
+
 								// Get the path to the parent section's container
 								// This would be the grandparent container for the current section
 								const parentSectionContainer = findParentSectionContainer();
 								if (!parentSectionContainer) return null;
-								
+
 								// Find the container that contains the parent section container
 								// This is done by looking at the parent section's parent
 								// We assume every section is in a container
