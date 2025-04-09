@@ -1,7 +1,6 @@
 <script lang="ts">
 	import AddIcon from './ExpandIcon.svelte';
 	import SummaryIcon from './SummaryIcon.svelte';
-	import CollapseIcon from './CollapseIcon.svelte';
 	import { getContext } from 'svelte';
 	import type { Document } from '$lib/model/document';
 	let {
@@ -10,7 +9,7 @@
 		onUnmount
 	}: {
 		controlElement: HTMLDivElement;
-		viewState: { state: 'expanded' | 'summary' | 'collapsed' };
+		viewState: { state: 'expanded' | 'summary' };
 		onUnmount: () => void;
 	} = $props();
 
@@ -22,16 +21,7 @@
 		<SummaryIcon
 			onclick={() => {
 				document.state.animateNextChange = false;
-
 				viewState.state = 'summary';
-			}}
-		/>
-	{:else if viewState.state === 'summary'}
-		<CollapseIcon
-			onclick={() => {
-				document.state.animateNextChange = false;
-
-				viewState.state = 'collapsed';
 			}}
 		/>
 	{:else}

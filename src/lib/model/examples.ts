@@ -57,7 +57,7 @@ export const simpleSection: Document = {
 			activeView: 'content/heading/default'
 		},
 		view: [
-			{ type: 'collection/section/default', state: 'collapsed' },
+			{ type: 'collection/section/default', state: 'summary' },
 			{ type: 'collection/section/static' },
 			{ type: 'collection/section/page' }
 		],
@@ -493,7 +493,7 @@ export const card: Document = {
 					activeView: 'content/heading/default'
 				},
 				view: [
-					{ type: 'collection/section/default', state: 'collapsed' },
+					{ type: 'collection/section/default', state: 'summary' },
 					{ type: 'collection/section/static' },
 					{ type: 'collection/section/page' }
 				],

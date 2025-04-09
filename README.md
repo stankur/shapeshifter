@@ -66,6 +66,8 @@ pressing tab on a heading should not work when the parent's heading is one level
 
 In sidebar view, if you consider the active section being rendered, there are two consecutive appearances of  a heading. However if you update one, the other does not get updated.
 
-There's a bug right now in which we wouldn't want animation when switching tabs, or switching the active item in the sidebar. Strangely enough it works during customize mode, but not when viewing a published document.
-
 there is a bug where when you have a document whise current structure is H1 (A), H1 (B), H1 (C), and then you increase the level by using tab for H1 (B), it turns to H1 (A), H2 (B), H2 (B). This wrong. However, the document state seems to be updated correctly. So my guess would be this is an issue with not trigerring svelte's reactivity, rather than purely logic issue.
+
+There is an issue where if you are in the editor mode, and you go from read to customize view, the summary/expand toggles that show up are not at the right place. It seems like only one is showing at the top left.
+
+Animation is displaying in the published view for switching tabs, etc. We don't want it to work for those kind of things. But it is proper in the editor's read view.

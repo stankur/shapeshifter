@@ -261,9 +261,6 @@ export function handleEnterInHeading(node: Section, document: Document): boolean
 		EditorFocusService.focus(newParagraphId, document, 'start');
 
 		return true;
-	} else if (state === 'collapsed') {
-		// Do nothing for collapsed state
-		return true;
 	}
 
 	return false;

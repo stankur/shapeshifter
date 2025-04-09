@@ -27,7 +27,7 @@
 		findParentSectionContainer: () => SectionContainer | null;
 		removeSectionFromContainer: () => void;
 	};
-	type ViewState = { state: 'expanded' | 'summary' | 'collapsed' };
+	type ViewState = { state: 'expanded' | 'summary' };
 	let {
 		path,
 		refs,
