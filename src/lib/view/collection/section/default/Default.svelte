@@ -52,6 +52,7 @@
 		registry[node.heading.activeView as keyof typeof registry] as unknown as Component<{
 			path: (string | number)[];
 			refs: Refs;
+			onClickReadMode: () => void;
 			onUnmount: () => void;
 			onLevelIncrease: () => boolean;
 			onLevelDecrease: () => boolean;
@@ -122,25 +123,38 @@
 	$effect(() => {
 		if (containerElement && controlElement) {
 			if (mergedOverrides.accommodateControls) {
-                containerElement.style.paddingLeft = `${controlElement.clientWidth}px`
-            } else {
+				containerElement.style.paddingLeft = `${controlElement.clientWidth}px`;
+			} else {
 				containerElement.style.paddingLeft = '0px';
 			}
 		}
 	});
 </script>
 
-<DefaultControl
-	bind:controlElement={controlElement as HTMLDivElement}
-	viewState={node.view[viewStateIndex] as ViewState}
-	{onUnmount}
-/>
+{#if document.state.mode === 'customize'}
+	<DefaultControl
+		bind:controlElement={controlElement as HTMLDivElement}
+		viewState={node.view[viewStateIndex] as ViewState}
+		{onUnmount}
+	/>
+{/if}
 
 <div class="container flex flex-col gap-7" bind:this={containerElement}>
 	{#if mergedOverrides && mergedOverrides.heading}
 		{#key node.heading.id}
 			<div bind:this={headingElement}>
 				<HeadingRenderer
+					onClickReadMode={() => {
+						onUnmount();
+
+						document.state.animateNextChange = false;
+
+						if ((node.view[viewStateIndex] as ViewState).state === 'expanded') {
+							(node.view[viewStateIndex] as ViewState).state = 'summary';
+							return;
+						}
+						(node.view[viewStateIndex] as ViewState).state = 'expanded';
+					}}
 					path={[...path, 'heading']}
 					{refs}
 					{onUnmount}

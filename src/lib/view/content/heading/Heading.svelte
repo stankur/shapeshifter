@@ -33,16 +33,16 @@
 			{ element: HTMLElement; animateAbsolute: boolean; animateNested: boolean }
 		>;
 		overrides?: {
-            class?: string;
+			class?: string;
 		};
 		onUnmount: () => void;
-		updateParent: () => void;
 		additionalFlipId?: string;
 		getNextEditable: NavigationHandler;
 		getPrevEditable: NavigationHandler;
 		onLevelIncrease: () => boolean;
 		onLevelDecrease: () => boolean;
 		onEnterAtEnd: () => boolean;
+		onClickReadMode?: () => void;
 	};
 
 	let {
@@ -50,19 +50,19 @@
 		refs,
 		onUnmount,
 		overrides = {},
-		updateParent,
 		additionalFlipId,
 		getNextEditable,
 		getPrevEditable,
 		onLevelIncrease,
 		onLevelDecrease,
-		onEnterAtEnd
+		onEnterAtEnd,
+		onClickReadMode = () => {}
 	}: Props = $props();
 
-    const defaultOverrides = {
-        class: ''
-    }
-    let mergedOverrides = $derived({ ...defaultOverrides, ...overrides });
+	const defaultOverrides = {
+		class: ''
+	};
+	let mergedOverrides = $derived({ ...defaultOverrides, ...overrides });
 
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 	const node = documentManipulator.getByPath(path) as ContentHeading;
@@ -72,8 +72,6 @@
 
 	let headingContent = $derived(`# ${content}`);
 	let headingSize = $derived(getHeadingSize(level));
-
-	let doc: Node = $derived(defaultMarkdownParser.parse(headingContent));
 
 	// Create the plugins array
 	// Create a separate Enter key handler plugin for better debugging
@@ -97,13 +95,13 @@
 
 	// Make sure our Enter key plugin is registered last to have higher priority
 	const plugins = [
-        enterKeyPlugin,
+		enterKeyPlugin,
 		...exampleSetup({
 			schema,
 			menuBar: false
 		}),
 		createNavigationPlugin(getNextEditable, getPrevEditable, documentNode),
-		createLevelPlugin(node, documentNode, onLevelIncrease, onLevelDecrease),
+		createLevelPlugin(node, documentNode, onLevelIncrease, onLevelDecrease)
 	];
 
 	// Log the plugins to make sure they're registered correctly
@@ -217,11 +215,20 @@
 <div
 	bind:this={ref}
 	onclick={(e) => {
-		if (documentNode.state.mode !== 'read') {
-			e.stopPropagation();
+		e.stopPropagation();
+
+		if (documentNode.state.mode === 'read') {
+			onClickReadMode();
 		}
 	}}
-	class={[headingSize, 'prose-h1:inline-block', 'prose-h1:font-semibold', mergedOverrides.class]}
+	role="button"
+	class={[
+		headingSize,
+		'prose-h1:inline-block',
+		'prose-h1:font-semibold',
+		mergedOverrides.class,
+		documentNode.state.mode === 'read' && 'cursor-pointer select-none'
+	]}
 ></div>
 
 <svelte:document
