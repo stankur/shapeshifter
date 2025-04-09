@@ -62,6 +62,10 @@
 		onclick={() => {
 			console.log('clicked');
 			onUnmount();
+			node.children.forEach((child) => {
+				const defaultView = child.view.find((view) => view.type === 'collection/section/default');
+				defaultView && (defaultView.state = 'summary');
+			});
 			node.activeView = 'collection/section-container/card';
 		}}
 	>

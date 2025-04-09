@@ -17,6 +17,7 @@
 	import type { NavigationHandler } from '$lib/services/navigation/types';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 	import Chip from '$lib/components/Chip.svelte';
+	import Default from '../Default/Default.svelte';
 
 	const document = getContext('document') as Document;
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
@@ -35,6 +36,7 @@
 		overrides?: {
 			class?: string;
 		};
+		onClickReadMode?: () => void;
 		documentNode?: Document;
 	};
 
@@ -100,49 +102,66 @@
 	}
 </script>
 
-<div class="card-container" onmouseenter={showCardControls} onmouseleave={hideCardControls}>
-	{#if document.state.mode === 'customize'}
-		<Controls {path} {onUnmount} {isCardHovered} />
-	{/if}
+{#if !node.children.every((child) => {
+	const defaultView = child.view.find((v) => v.type === 'collection/section/default');
+	return defaultView?.state === 'summary';
+})}
+	<div class="card-container" onmouseenter={showCardControls} onmouseleave={hideCardControls}>
+		<Default {path} {refs} {onUnmount} />
+	</div>
+{:else}
+	<div class="card-container" onmouseenter={showCardControls} onmouseleave={hideCardControls}>
+		{#if document.state.mode === 'customize'}
+			<Controls {path} {onUnmount} {isCardHovered} />
+		{/if}
 
-	<div class="card-grid" style:--gap={`${gap}px`} style:--min-card-width={`${minCardWidth}px`}>
-		{#each SectionRenderers as { child, sectionIndex, HeadingRenderer, SummaryRenderers }}
-			<div class="card border-1 border-gray-400 p-5">
-				<HeadingRenderer
-					path={[...path, 'children', sectionIndex, 'heading']}
-					{refs}
-					{onUnmount}
-					{...createHeadingNavProps(child, node, sectionIndex, document)}
-                    overrides={{
-                        class: 'prose-h1:text-xl',
-                    }}
-
-				/>
-				{#each SummaryRenderers as { summaryChild, summaryIndex, Renderer }}
-					<Renderer
-						path={[...path, 'children', sectionIndex, 'summary', summaryIndex]}
+		<div class="card-grid" style:--gap={`${gap}px`} style:--min-card-width={`${minCardWidth}px`}>
+			{#each SectionRenderers as { child, sectionIndex, HeadingRenderer, SummaryRenderers }}
+				<div class="card border-1 border-gray-400 p-5">
+					<HeadingRenderer
+						path={[...path, 'children', sectionIndex, 'heading']}
 						{refs}
 						{onUnmount}
-                        overrides={{
-                            class: 'prose-p:text-xs prose-p:text-gray-500',
-                        }}
-						{...createSummaryNavProps(child, node, summaryChild.id, sectionIndex, document)}
+						{...createHeadingNavProps(child, node, sectionIndex, document)}
+						overrides={{
+							class: 'prose-h1:text-xl'
+						}}
+						onClickReadMode={() => {
+							// toggle the state in the default view, not change it to the default view. Change the state in the default view.
+							const defaultView = node.children[sectionIndex].view.find(
+								(v) => v.type === 'collection/section/default'
+							);
+							if (defaultView) {
+								defaultView.state = defaultView.state === 'expanded' ? 'summary' : 'expanded';
+							}
+						}}
 					/>
-				{/each}
-			</div>
-		{/each}
+					{#each SummaryRenderers as { summaryChild, summaryIndex, Renderer }}
+						<Renderer
+							path={[...path, 'children', sectionIndex, 'summary', summaryIndex]}
+							{refs}
+							{onUnmount}
+							overrides={{
+								class: 'prose-p:text-xs prose-p:text-gray-500'
+							}}
+							{...createSummaryNavProps(child, node, summaryChild.id, sectionIndex, document)}
+						/>
+					{/each}
+				</div>
+			{/each}
 
-		{#if document.state.mode !== 'read'}
-			<Chip
-				onclick={() => {
-					onUnmount();
-					addSection(node, node.children[0].heading.level);
-				}}
-				label="Add Section"
-			/>
-		{/if}
+			{#if document.state.mode !== 'read'}
+				<Chip
+					onclick={() => {
+						onUnmount();
+						addSection(node, node.children[0].heading.level);
+					}}
+					label="Add Section"
+				/>
+			{/if}
+		</div>
 	</div>
-</div>
+{/if}
 
 <style lang="postcss">
 	.card-container {

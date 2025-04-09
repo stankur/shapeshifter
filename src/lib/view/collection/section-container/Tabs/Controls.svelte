@@ -13,7 +13,7 @@
 		onUnmount: () => void;
 		isTabsHovered: boolean;
 	} = $props();
-	
+
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 	const node = documentManipulator.getByPath(path) as SectionContainer;
 
@@ -37,6 +37,10 @@
 
 	function switchToCard() {
 		onUnmount();
+		node.children.forEach((child) => {
+			const defaultView = child.view.find((view) => view.type === 'collection/section/default');
+			defaultView && (defaultView.state = 'summary');
+		});
 		node.activeView = 'collection/section-container/card';
 	}
 
@@ -60,9 +64,7 @@
 	<button class="rounded-md bg-blue-500 p-2 text-white" onclick={switchToTableOfContents}>
 		toc
 	</button>
-	<button class="rounded-md bg-blue-500 p-2 text-white" onclick={switchToCard}>
-		card
-	</button>
+	<button class="rounded-md bg-blue-500 p-2 text-white" onclick={switchToCard}> card </button>
 </div>
 
 <div bind:this={referenceElement} class="reference-element w-full"></div>
