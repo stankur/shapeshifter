@@ -86,7 +86,36 @@ This implementation required clarifying the distinction between:
 - findParentSectionContainer: Finds the container that holds the current section
 - findGrandparentSectionContainer: Finds the container that holds the parent section
 
-There is currently a UI update issue where changes don't appear immediately unless the user switches modes and goes back to write mode. This needs to be addressed in future updates.
+## Backspace Functionality Issue Investigation
+
+We've identified and diagnosed a race condition in the paragraph joining functionality:
+
+1. **Issue Symptoms**:
+   - When pressing backspace at the start of a paragraph, it should join with the previous paragraph
+   - The document node shows correct joining at some point during execution
+   - However, the final result shows the paragraph being deleted instead of joined
+
+2. **Root Cause Analysis**:
+   - The race condition occurs between two separate processes:
+     - Direct document model updates in `joinWithPreviousParagraph`
+     - ProseMirror's transaction processing in `dispatchTransaction`
+   - The key issue is that `prevBlock.content` and `prevBlock.last_modified` are updated in separate steps
+   - This creates a timing window where the component re-renders due to the key change (`node.children[i].last_modified + node.children[i].id`)
+   - The old ProseMirror instance's transaction processing overwrites the correctly joined content with stale data
+
+3. **Solution Plan**:
+   - Implement atomic updates for content and last_modified in `joinWithPreviousParagraph`
+   - Update both properties in a single operation to prevent the race condition
+   - This ensures that the component re-render doesn't occur between property updates
+   - Example implementation:
+     ```typescript
+     // Update previous block atomically
+     const updates = {
+       content: prevBlock.content + currentBlock.content,
+       last_modified: new Date().toISOString()
+     };
+     Object.assign(prevBlock, updates);
+     ```
 
 ## Known Issues
 
@@ -97,8 +126,4 @@ There is currently a UI update issue where changes don't appear immediately unle
 - Need to implement navigation for all container types
 - Performance optimization for large documents with many editors
 - Need to ensure all components are updated to use the path-based pattern
-- Backspace functionality issues:
-  - Empty transaction steps being logged (transaction steps: [])
-  - Document being set to wrong version where content is deleted instead of joined
-  - Cursor disappearing after backspace operation
-  - Content that should be joined is sometimes just deleted
+- Backspace functionality race condition (solution identified and documented)

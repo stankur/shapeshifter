@@ -39,16 +39,44 @@ We're implementing a path-based component access pattern to replace the two-way 
   - Updated Paragraph component to use the backspace plugin
   - Implemented onJoinWithPrevious callbacks in Write component for both children and summary paragraphs
 
+## Backspace Functionality Issue and Solution
+We've identified a race condition in the paragraph joining functionality:
+
+1. **Issue Diagnosis**:
+   - When backspace is pressed at the start of a paragraph, the backspace plugin correctly calls `onJoinWithPrevious`
+   - `joinWithPreviousParagraph` joins the content and removes the current paragraph
+   - The content is joined correctly in the document model
+   - However, the paragraph is deleted instead of joined in the final UI state
+
+2. **Root Cause**:
+   - The race condition occurs between two separate processes:
+     - Direct document model updates in `joinWithPreviousParagraph`
+     - ProseMirror's transaction processing in `dispatchTransaction`
+   - The key issue is that `prevBlock.content` and `prevBlock.last_modified` are updated in separate steps
+   - This creates a timing window where the component re-renders due to the key change (`node.children[i].last_modified + node.children[i].id`)
+   - The old ProseMirror instance's transaction processing overwrites the correctly joined content with stale data
+
+3. **Solution Plan**:
+   - Implement atomic updates for content and last_modified in `joinWithPreviousParagraph`
+   - Create a helper function in DocumentManipulator to update multiple properties in a single operation
+   - This ensures that both properties are updated together, preventing the race condition
+   - Example implementation:
+     ```typescript
+     // Update previous block atomically
+     const updates = {
+       content: prevBlock.content + currentBlock.content,
+       last_modified: new Date().toISOString()
+     };
+     Object.assign(prevBlock, updates);
+     ```
+
 ## Next Steps
+- Implement the atomic update solution for the backspace functionality
 - Test the heading level decrease functionality with complex nested structures
 - Address UI update issues (currently requires mode switching to see changes)
 - Optimize performance for large documents
 - Update documentation with the new access pattern
 - Consider adding debugging tools for path-based access
-- Fix backspace functionality issues:
-  - Empty transaction steps being logged (transaction steps: [])
-  - Document being set to wrong version where content is deleted instead of joined
-  - Cursor disappearing after backspace operation
 
 ## Active Decisions
 - Using path-based access instead of two-way binding for nested objects
@@ -56,3 +84,4 @@ We're implementing a path-based component access pattern to replace the two-way 
 - Leveraging Svelte 5's reactivity system for direct mutations
 - Maintaining existing callback patterns for actions
 - Following a consistent pattern for component props (paths instead of nodes)
+- Implementing atomic updates for properties that affect component keying
