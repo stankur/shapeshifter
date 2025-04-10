@@ -11,7 +11,8 @@
 		handleHeadingLevelDecrease,
 		splitParagraph,
 		splitSection,
-		handleEnterInHeading
+		handleEnterInHeading,
+		joinWithPreviousParagraph
 	} from '$lib/actions/collection/section.svelte';
 	import Write from '$lib/view/collection/section-container/Write.svelte';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
@@ -65,7 +66,8 @@
 				refs: Refs;
 				onUnmount: () => void;
 				onSplit: (newBlocks: [string, string]) => void;
-				onConvertToHeading: (paragraphId: string) => void;
+				onJoinWithPrevious?: () => boolean;
+				onConvertToHeading?: (paragraphId: string) => void;
 			}>
 		}))
 	);
@@ -76,6 +78,7 @@
 				refs: Refs;
 				onUnmount: () => void;
 				onSplit: (newBlocks: [string, string]) => void;
+				onJoinWithPrevious?: () => boolean;
 			}>
 		}))
 	);
@@ -137,6 +140,21 @@
 						onSplit={(newBlocks) => {
 							splitParagraph(node, 'summary', newBlocks, document, i);
 						}}
+						onJoinWithPrevious={() => {
+							if (i === 0) return false; // First paragraph can't join with previous
+							
+							// Get the previous block ID
+							const prevId = node.summary[i-1].id;
+							
+							// Join with previous paragraph
+							return joinWithPreviousParagraph(
+								node,
+								'summary',
+								i,
+								document,
+								prevId
+							);
+						}}
 						{onUnmount}
 					/>
 				{/each}
@@ -155,6 +173,22 @@
 							console.log('newBlocks');
 							console.log(newBlocks);
 							splitParagraph(node, 'children', newBlocks, document, i);
+						}}
+						onJoinWithPrevious={() => {
+							if (i === 0) return false; // First paragraph can't join with previous
+							
+							// Get the previous block ID
+							const prevId = node.children[i-1].id;
+							if (!prevId) return false;
+							
+							// Join with previous paragraph
+							return joinWithPreviousParagraph(
+								node,
+								'children',
+								i,
+								document,
+								prevId
+							);
 						}}
 						onConvertToHeading={(paragraphId) => {
 							splitSection(node, paragraphId, document, addSection);

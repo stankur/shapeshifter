@@ -43,6 +43,51 @@ export function moveChildrenToSection(
 	return childrenAfter;
 }
 
+/**
+ * Joins a paragraph with the previous paragraph when backspace is pressed at the start
+ * 
+ * @param node The section containing the paragraphs
+ * @param arr The array containing the paragraphs ('summary' or 'children')
+ * @param currentIndex The index of the current paragraph
+ * @param document The document node
+ * @param prevId The ID of the previous paragraph
+ * @returns True if the join was successful, false otherwise
+ */
+export function joinWithPreviousParagraph(
+	node: Section,
+	arr: 'summary' | 'children',
+	currentIndex: number,
+	document: Document,
+	prevId: string
+): boolean {
+    console.log('joining with previous paragraph');
+	if (!prevId) return false;
+	
+	// Find previous block in the array
+	const prevIndex = node[arr].findIndex(item => item.id === prevId);
+	if (prevIndex === -1 || prevIndex >= currentIndex) return false;
+	
+	// Check if both are paragraphs
+	const currentBlock = node[arr][currentIndex];
+	const prevBlock = node[arr][prevIndex];
+	if (currentBlock.type !== 'paragraph' || prevBlock.type !== 'paragraph') return false;
+	
+	// Join content
+	const joinedContent = prevBlock.content + currentBlock.content;
+	prevBlock.content = joinedContent;
+	prevBlock.last_modified = new Date().toISOString();
+	
+	// Remove current block
+	node[arr].splice(currentIndex, 1);
+	node.last_modified = new Date().toISOString();
+	
+	// Focus previous block at join point
+	const cursorPosition = prevBlock.content.length
+	EditorFocusService.focus(prevId, document, cursorPosition);
+	
+	return true;
+}
+
 export async function splitParagraph(
 	node: Section,
 	arr: 'summary' | 'children',

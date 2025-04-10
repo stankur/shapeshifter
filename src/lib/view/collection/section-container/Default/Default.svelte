@@ -52,7 +52,7 @@
 	onmouseleave={() => (isDefaultHovered = false)}
 >
 	{console.log('children renderers length in section container: ', ChildrenRenderers.length)}
-	{#each ChildrenRenderers as { Renderer }, index}
+	{#each ChildrenRenderers as { Renderer }, index (node.children[index].last_modified + node.children[index].id)}
 		<Renderer
 			path={[...path, 'children', index]}
 			{refs}
