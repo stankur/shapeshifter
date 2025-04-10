@@ -33,6 +33,11 @@ We're implementing a path-based component access pattern to replace the two-way 
   - Control components (for Card, TableOfContents, Tabs)
 - Maintained existing callback patterns for actions
 - Ensured reactivity through direct mutations
+- Implemented backspace functionality to join blocks when pressing backspace at the start of a block:
+  - Created backspacePlugin.ts to detect backspace at the start of content
+  - Added joinWithPreviousParagraph function to handle joining paragraphs
+  - Updated Paragraph component to use the backspace plugin
+  - Implemented onJoinWithPrevious callbacks in Write component for both children and summary paragraphs
 
 ## Next Steps
 - Test the heading level decrease functionality with complex nested structures
@@ -40,6 +45,10 @@ We're implementing a path-based component access pattern to replace the two-way 
 - Optimize performance for large documents
 - Update documentation with the new access pattern
 - Consider adding debugging tools for path-based access
+- Fix backspace functionality issues:
+  - Empty transaction steps being logged (transaction steps: [])
+  - Document being set to wrong version where content is deleted instead of joined
+  - Cursor disappearing after backspace operation
 
 ## Active Decisions
 - Using path-based access instead of two-way binding for nested objects

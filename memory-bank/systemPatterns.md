@@ -64,6 +64,7 @@ flowchart TD
 - Hierarchical document model
 - Section splitting for content reorganization
 - Heading level management with document restructuring
+- Paragraph joining with backspace at start of block
 
 ```mermaid
 flowchart TD
@@ -77,6 +78,17 @@ flowchart TD
     Decrease --> Step1[Step 1: Move Siblings to Children]
     Step1 --> Step2[Step 2: Remove from Container]
     Step2 --> Step3[Step 3: Add to Grandparent Container]
+    
+    ContentOps[Content Operations] --> Split[Split Paragraph]
+    ContentOps --> Join[Join Paragraphs]
+    
+    Split --> EnterMiddle[Enter in Middle]
+    Split --> CreateTwo[Create Two Blocks]
+    
+    Join --> BackspaceStart[Backspace at Start]
+    Join --> FindPrevious[Find Previous Block]
+    FindPrevious --> MergeContent[Merge Content]
+    MergeContent --> RemoveBlock[Remove Current Block]
 ```
 
 ### UI Components
