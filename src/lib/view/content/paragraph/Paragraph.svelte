@@ -4,6 +4,7 @@
 	import { DOMParser, Node } from 'prosemirror-model';
 
 	import type { ContentParagraph } from '$lib/model/content';
+	import type { Section } from '$lib/model/collection';
 	import { EditorState } from 'prosemirror-state';
 	import { EditorView } from 'prosemirror-view';
 	import { getContext, onMount } from 'svelte';
@@ -12,6 +13,7 @@
 	import { EditorFocusService } from '$lib/services/editorFocus';
 	import type { NavigationHandler } from '$lib/services/navigation/types';
 	import { createNavigationPlugin } from '../heading/navigationPlugin';
+	import { createBackspacePlugin } from './backspacePlugin';
 	import ParagraphControls from './ParagraphControls.svelte';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 
@@ -25,10 +27,11 @@
 		updateParent: () => void;
 		onUnmount: () => void;
 		onSplit: (blocks: [string, string]) => void;
+		onJoinWithPrevious?: () => boolean;
 		onConvertToHeading?: (paragraphId: string) => void;
 		getNextEditable?: NavigationHandler;
 		getPrevEditable?: NavigationHandler;
-        overrides?: { class?: string };
+		overrides?: { class?: string };
 	};
 	let {
 		path,
@@ -37,17 +40,18 @@
 		updateParent,
 		onUnmount,
 		onSplit,
+		onJoinWithPrevious = () => false,
 		onConvertToHeading,
 		getNextEditable,
 		getPrevEditable,
-        overrides
+		overrides
 	}: Props = $props();
 
-    const defaultOverrides = {
-        class: ''
-    }
-    overrides = { ...defaultOverrides, ...overrides };
-	
+	const defaultOverrides = {
+		class: ''
+	};
+	overrides = { ...defaultOverrides, ...overrides };
+
 	let documentNode: Document = getContext('document');
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 	const node = $derived(documentManipulator.getByPath(path) as ContentParagraph);
@@ -67,6 +71,9 @@
 		plugins.push(createNavigationPlugin(getNextEditable, getPrevEditable, documentNode));
 	}
 
+	// Add backspace plugin if onJoinWithPrevious is provided
+	plugins.push(createBackspacePlugin(onJoinWithPrevious));
+
 	// Create the editor state
 	let editorState = EditorState.create({
 		schema,
@@ -77,6 +84,8 @@
 	// Update editor state when content changes
 	$effect(() => {
 		const newDoc = defaultMarkdownParser.parse(content);
+        console.log('newDoc');
+        console.log(newDoc);
 		editorState = EditorState.create({
 			schema,
 			doc: newDoc,
@@ -84,11 +93,11 @@
 		});
 	});
 
-    $effect(() => {
-        if (!node) {
-            console.log("node is undefined")
-        }
-    })
+	$effect(() => {
+		if (!node) {
+			console.log('node is undefined');
+		}
+	});
 	let view: EditorView;
 	let ref: HTMLDivElement;
 
@@ -196,16 +205,16 @@
 			e.stopPropagation();
 		}
 	}}
-	class="mt-6 leading-7 first:mt-0 relative {overrides.class}"
+	class="relative mt-6 leading-7 first:mt-0 {overrides.class}"
 	bind:this={ref}
-	onmouseenter={() => isParagraphHovered = true}
-	onmouseleave={() => isParagraphHovered = false}
+	onmouseenter={() => (isParagraphHovered = true)}
+	onmouseleave={() => (isParagraphHovered = false)}
 >
 	{#if onConvertToHeading && documentNode.state.mode !== 'read'}
-		<ParagraphControls 
-			{isParagraphHovered} 
+		<ParagraphControls
+			{isParagraphHovered}
 			{path}
-			onConvertToHeading={() => onConvertToHeading(node.id)} 
+			onConvertToHeading={() => onConvertToHeading(node.id)}
 		/>
 	{/if}
 </div>
