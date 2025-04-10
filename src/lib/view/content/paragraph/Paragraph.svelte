@@ -128,8 +128,6 @@
 			},
 			dispatchTransaction(transaction) {
 				const newState = view.state.apply(transaction);
-				console.log('transaction steps:');
-				console.log(transaction.steps);
 				onUnmount();
 
 				// console.log("enter pressed state:");
@@ -146,7 +144,10 @@
 				}
 
 				documentNode.state.animateNextChange = false;
-				node.content = defaultMarkdownSerializer.serialize(newState.doc);
+
+                if (transaction.docChanged) {
+                    node.content = defaultMarkdownSerializer.serialize(newState.doc);
+                }
 
 				view.updateState(newState);
 			},

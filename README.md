@@ -71,3 +71,5 @@ there is a bug where when you have a document whise current structure is H1 (A),
 There is an issue where if you are in the editor mode, and you go from read to customize view, the summary/expand toggles that show up are not at the right place. It seems like only one is showing at the top left.
 
 Animation is displaying in the published view for switching tabs, etc. We don't want it to work for those kind of things. But it is proper in the editor's read view.
+
+When you press backspace at the start of a paragraph, cursor is just gone, not transfered. Should be transferred to previous paragraph, and the point where the two paragraphs are joined.
