@@ -6,7 +6,6 @@
 	import { z } from 'zod';
 	import TableOfContentsChild from './TableOfContentsChild.svelte';
 	import type { Refs } from '$lib/components/Document.svelte';
-	import { registerRef } from '$lib/view/utils/registerRef.svelte';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 	
 	let {
@@ -59,14 +58,6 @@
 	};
 </script>
 
-<!-- use:registerRef={{
-		id: getTOCChildContainerId(node),
-		refs,
-		animateOptions: {
-			animateAbsolute: false,
-			animateNested: false
-		}
-	}} -->
 
 <div
 	class="container flex flex-wrap"
@@ -76,14 +67,6 @@
 	data-flip-id={getTOCChildContainerId(node)}
 	style:--gap={`${currentDirection.gap || 0}px`}
 >
-	<!-- use:registerRef={{
-				id: getTOCChildId(child),
-				refs,
-				animateOptions: {
-					animateAbsolute: false,
-					animateNested: false
-				}
-			}} -->
 
 	{#each ChildrenRenderers as { child, childIndex, HeadingRenderer, SummaryRenderers }}
 		<div

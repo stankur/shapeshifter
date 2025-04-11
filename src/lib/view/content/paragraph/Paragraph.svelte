@@ -19,10 +19,7 @@
 
 	type Props = {
 		path: (string | number)[];
-		refs: Record<
-			string,
-			{ element: HTMLElement; animateAbsolute: boolean; animateNested: boolean }
-		>;
+		refs: Record<string, { element: HTMLElement }>;
 		additionalFlipId?: string;
 		updateParent: () => void;
 		onUnmount: () => void;
@@ -112,7 +109,7 @@
 						node.id + (additionalFlipId ? `-${additionalFlipId}` : '')
 					);
 
-					refs[node.id] = { element: dom, animateAbsolute: false, animateNested: false };
+					refs[node.id] = { element: dom };
 
 					return {
 						dom,
