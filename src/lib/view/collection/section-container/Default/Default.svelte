@@ -15,11 +15,13 @@
 	let {
 		path,
 		refs,
-		onUnmount
+		onUnmount,
+        onHeadingClick
 	}: {
 		path: (string | number)[];
 		refs: Refs;
 		onUnmount: () => void;
+		onHeadingClick?: (section: Section) => void;
 	} = $props();
 
 	const document = getContext('document') as Document;
@@ -41,6 +43,7 @@
 				findParentSection: () => Section | null;
 				findParentSectionContainer: () => SectionContainer | null;
 				removeSectionFromContainer: () => void;
+                onHeadingClick?: (section: Section) => void;
 			}>
 		}))
 	);
@@ -92,6 +95,7 @@
 			removeSectionFromContainer={() => {
 				removeSectionFromContainer(node, index);
 			}}
+            {onHeadingClick}
 		/>
 	{/each}
 </div>

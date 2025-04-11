@@ -26,6 +26,7 @@
 		findParentSection: () => Section | null;
 		findParentSectionContainer: () => SectionContainer | null;
 		removeSectionFromContainer: () => void;
+		onHeadingClick?: (section: Section) => void;
 	};
 	type ViewState = { state: 'expanded' | 'summary' };
 	let {
@@ -37,7 +38,8 @@
 		findPrecedingSection,
 		findParentSection,
 		findParentSectionContainer,
-		removeSectionFromContainer
+		removeSectionFromContainer,
+		onHeadingClick
 	}: Props = $props();
 
 	const defaultOverRides = { heading: true, accommodateControls: false };
@@ -146,8 +148,11 @@
 				<HeadingRenderer
 					onClickReadMode={() => {
 						onUnmount();
-
 						document.state.animateNextChange = false;
+
+						if (onHeadingClick) {
+							onHeadingClick(node);
+						}
 
 						if ((node.view[viewStateIndex] as ViewState).state === 'expanded') {
 							(node.view[viewStateIndex] as ViewState).state = 'summary';

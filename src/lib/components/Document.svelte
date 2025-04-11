@@ -47,7 +47,9 @@
 		const elements = Object.values(refs)
 			.filter((ref) => ref.element)
 			.map((ref) => ref.element);
-		flipState = Flip.getState(elements);
+		flipState = Flip.getState(elements, {
+            props: "fontSize,lineHeight"
+        });
 	};
 
 	$effect(() => {

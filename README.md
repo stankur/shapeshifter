@@ -73,3 +73,5 @@ There is an issue where if you are in the editor mode, and you go from read to c
 Animation is displaying in the published view for switching tabs, etc. We don't want it to work for those kind of things. But it is proper in the editor's read view.
 
 When you press backspace at the start of a paragraph, cursor is just gone, not transfered. Should be transferred to previous paragraph, and the point where the two paragraphs are joined.
+
+There is a bit of jump in the summary when you go from card, and you click a heading, to default section container view, or vice versa.
