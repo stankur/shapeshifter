@@ -14,10 +14,7 @@
 
 	gsap.registerPlugin(Flip);
 
-	export type Refs = Record<
-		string,
-		{ element: HTMLElement; animateAbsolute: boolean; animateNested: boolean }
-	>;
+	export type Refs = Record<string, { element: HTMLElement }>;
 	// Create and initialize device context
 	const { deviceState, initialize: initializeDeviceContext } = createDeviceContext();
 	initializeDeviceContext();
@@ -49,60 +46,47 @@
 		const elements = Object.values(refs)
 			.filter((ref) => ref.element)
 			.map((ref) => ref.element);
-		flipState = Flip.getState(elements);
+		flipState = Flip.getState(elements, {
+			props: 'fontSize',
+		});
 	};
 
 	$effect(() => {
 		if (flipState !== null && node.state.animateNextChange) {
-			const groupedRefs = Object.values(refs).reduce(
-				(acc, ref) => {
-					const key = `${ref.animateAbsolute}-${ref.animateNested}`;
-					if (!acc[key]) {
-						acc[key] = [];
-					}
-					acc[key].push(ref.element);
-					return acc;
-				},
-				{} as Record<string, HTMLElement[]>
-			);
-
-			// Call Flip.from for each group
-			Object.entries(groupedRefs).forEach(([key, elements]) => {
-				const [animateAbsolute, animateNested] = key.split('-').map((v) => v === 'true');
-				Flip.from(flipState as Flip.FlipState, {
-					targets: elements,
+			const elements = Object.values(refs).map(ref => ref.element);
+			
+			Flip.from(flipState as Flip.FlipState, {
+				targets: elements,
 					duration: 0.2,
-					delay: 0.2,
-					ease: 'power4.inOut',
-					absolute: animateAbsolute,
-					nested: animateNested,
-					onStart: () => {
-						elements.forEach((element: HTMLElement) => {
-							element.style.pointerEvents = 'none';
-						});
-					},
-					onComplete: () => {
-						elements.forEach((element: HTMLElement) => {
-							element.style.pointerEvents = 'auto';
-						});
-					},
+				delay: 0.2,
+				ease: 'power4.inOut',
+				props: 'fontSize',
+				onStart: () => {
+					elements.forEach((element: HTMLElement) => {
+						element.style.pointerEvents = 'none';
+					});
+				},
+				onComplete: () => {
+					elements.forEach((element: HTMLElement) => {
+						element.style.pointerEvents = 'auto';
+					});
+				},
 
-					onLeave: (elements) => {
-						gsap.fromTo(
-							elements,
-							{ opacity: 1 },
-							{ opacity: 0, duration: 0.2, ease: 'power4.inOut' }
-						);
-					},
+				onLeave: (elements) => {
+					gsap.fromTo(
+						elements,
+						{ opacity: 1 },
+						{ opacity: 0, duration: 0.2, ease: 'power4.inOut' }
+					);
+				},
 
-					onEnter: (elements) => {
-						gsap.fromTo(
-							elements,
-							{ opacity: 0 },
+				onEnter: (elements) => {
+					gsap.fromTo(
+						elements,
+						{ opacity: 0 },
 							{ opacity: 1, duration: 0.2, delay: 0.4, ease: 'power4.inOut' }
-						);
-					}
-				});
+					);
+				}
 			});
 		} else {
 			node.state.animateNextChange = true;

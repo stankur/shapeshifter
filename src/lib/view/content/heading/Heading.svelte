@@ -28,10 +28,7 @@
 
 	type Props = {
 		path: (string | number)[];
-		refs: Record<
-			string,
-			{ element: HTMLElement; animateAbsolute: boolean; animateNested: boolean }
-		>;
+		refs: Record<string, { element: HTMLElement }>;
 		overrides?: {
 			class?: string;
 		};
@@ -148,7 +145,7 @@
 					const dom = document.createElement('h1');
 					dom.setAttribute('data-flip-id', id);
 
-					refs[id] = { element: dom, animateAbsolute: false, animateNested: false };
+					refs[id] = { element: dom };
 
 					return {
 						dom,
