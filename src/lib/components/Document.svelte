@@ -22,7 +22,8 @@
 
 	let writerContext = $state({ showSummary: true });
 
-	let { node }: { node: Document } = $props();
+	let { node: document }: { node: Document } = $props();
+    const node = $state(document);
 	const documentManipulator = createDocumentManipulator(node);
 	setContext('document', node);
 	setContext('documentManipulator', documentManipulator);
