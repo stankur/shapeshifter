@@ -22,7 +22,8 @@
 
 	let writerContext = $state({ showSummary: true });
 
-	let { node }: { node: Document } = $props();
+	let { node: document }: { node: Document } = $props();
+    const node = $state(document);
 	const documentManipulator = createDocumentManipulator(node);
 	setContext('document', node);
 	setContext('documentManipulator', documentManipulator);
@@ -46,7 +47,9 @@
 		const elements = Object.values(refs)
 			.filter((ref) => ref.element)
 			.map((ref) => ref.element);
-		flipState = Flip.getState(elements);
+		flipState = Flip.getState(elements, {
+            props: "fontSize,lineHeight"
+        });
 	};
 
 	$effect(() => {

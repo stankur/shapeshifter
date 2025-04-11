@@ -100,6 +100,22 @@
 	function hideCardControls() {
 		isCardHovered = false;
 	}
+
+    //** if the heading is clicked, and the section is the only expanded section in the container, animate the change. */
+	function onHeadingClick(section: Section) {
+		const defaultView = section.view.find((v) => v.type === 'collection/section/default');
+		if (defaultView?.state === 'expanded') {
+			const expandedSections = children.filter((s) => {
+				const view = s.view.find((v) => v.type === 'collection/section/default');
+				return view?.state === 'expanded';
+			});
+
+			if (expandedSections.length === 1 && expandedSections[0].id === section.id) {
+				onUnmount();
+				document.state.animateNextChange = true;
+			}
+		}
+	}
 </script>
 
 {#if !node.children.every((child) => {
@@ -107,7 +123,7 @@
 	return defaultView?.state === 'summary';
 })}
 	<div class="card-container" onmouseenter={showCardControls} onmouseleave={hideCardControls}>
-		<Default {path} {refs} {onUnmount} />
+		<Default {path} {refs} {onUnmount} {onHeadingClick} />
 	</div>
 {:else}
 	<div class="card-container" onmouseenter={showCardControls} onmouseleave={hideCardControls}>
@@ -132,6 +148,8 @@
 								(v) => v.type === 'collection/section/default'
 							);
 							if (defaultView) {
+								document.state.animateNextChange = true;
+								onUnmount();
 								defaultView.state = defaultView.state === 'expanded' ? 'summary' : 'expanded';
 							}
 						}}
