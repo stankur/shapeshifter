@@ -52,6 +52,9 @@
 	let documentNode: Document = getContext('document');
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 	const node = $derived(documentManipulator.getByPath(path) as ContentParagraph);
+
+    // this is used so that when we reset the value of isInternalUpdate, we don't trigger a re update that will run the effect again
+	let isInternalUpdate = $state.raw<{value: boolean}>({value: false});
 	let { content } = $derived(node);
 	let isParagraphHovered = $state(false);
 
@@ -81,20 +84,22 @@
 	// Update editor state when content changes
 	$effect(() => {
 		const newDoc = defaultMarkdownParser.parse(content);
-        console.log('newDoc');
-        console.log(newDoc);
 		editorState = EditorState.create({
 			schema,
 			doc: newDoc,
 			plugins
 		});
+
+		if (view && !isInternalUpdate.value) {
+			view.updateState(editorState);
+            return
+		}
+        isInternalUpdate.value = false;
+
 	});
 
-	$effect(() => {
-		if (!node) {
-			console.log('node is undefined');
-		}
-	});
+
+
 	let view: EditorView;
 	let ref: HTMLDivElement;
 
@@ -142,9 +147,10 @@
 
 				documentNode.state.animateNextChange = false;
 
-                if (transaction.docChanged) {
-                    node.content = defaultMarkdownSerializer.serialize(newState.doc);
-                }
+				if (transaction.docChanged) {
+					isInternalUpdate.value = true;
+					node.content = defaultMarkdownSerializer.serialize(newState.doc);
+				}
 
 				view.updateState(newState);
 			},

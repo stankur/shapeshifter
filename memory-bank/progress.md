@@ -19,9 +19,14 @@
 - Heading level decrease with document restructuring
 - Path-based component access pattern
 - Backspace functionality for joining blocks (with known issues)
+- Summary section in Write mode (manually written by users)
 
 ## What's Left to Build
 
+- AI-generated summary feature (in progress)
+  - Phase 1: Create streaming mock endpoint
+  - Phase 2: Add generate button to summary panel
+  - Future phases: Integration with OpenRouter and Claude 3.7
 - Fix UI update issues with heading level changes (currently requires mode switching)
 - Complete navigation system for all view types
 - Keyboard shortcuts for common operations
@@ -36,6 +41,25 @@
 - Debugging tools for path-based access
 
 ## Current Status
+
+We're implementing an AI-generated summary feature for the document editor. This feature will allow users to generate summaries of their content using Claude 3.7 via OpenRouter, with the results streaming back to the UI in real-time.
+
+The implementation is divided into phases:
+
+1. **Phase 1 (Current Focus)**: Create a streaming mock endpoint
+   - Implement a SvelteKit API endpoint that simulates streaming responses
+   - Send chunks of text with delays to mimic LLM streaming behavior
+   - Ensure proper content-type and headers for streaming
+
+2. **Phase 2**: Add generate button to summary panel
+   - Update the SummaryContainer component with a "Generate Summary" button
+   - Implement click handler to call the streaming endpoint
+   - Create a function to consume the streaming response
+   - Update the summary content incrementally as chunks arrive
+
+This feature builds on the existing summary functionality in the Write mode, where summaries are currently manually written by users. The streaming approach will provide immediate feedback to users as the summary is being generated.
+
+## Path-Based Component Access Pattern
 
 We've implemented a path-based component access pattern to replace the two-way binding approach. This change addresses issues with deeply nested objects, where two-way binding creates friction when accessing state from adjacent components.
 
@@ -53,38 +77,6 @@ This pattern provides several benefits:
 - Better performance with deeply nested structures
 - Consistent access pattern across all components
 - Maintained reactivity through Svelte 5's reactivity system
-
-We've implemented document structure updates for both heading level increases and decreases:
-
-**Heading Level Increase (Tab/Space at start of heading):**
-
-1. Check if there's a preceding section with the appropriate level (one level lower than the new heading level)
-2. If found, increase the heading level and move the section to become a child of that preceding section
-3. Update the document structure accordingly
-
-**Heading Level Decrease (Backspace at start of heading):**
-
-1. Check if decreasing the level would violate the constraint (section cannot have direct section children whose level is more than 1 above its level)
-2. If safe, perform a three-step restructuring process:
-   - Step 1: Move siblings after the section to be children of that section
-   - Step 2: Remove the section from its container and move children after container to the section
-   - Step 3: Add the section to the grandparent section container after the parent section
-3. Update the heading level and document structure
-
-**Backspace at Start of Paragraph (Join with Previous):**
-
-1. Detect when backspace is pressed at the start of a paragraph
-2. Find the previous paragraph in the same section
-3. Join the content of the current paragraph with the previous paragraph
-4. Remove the current paragraph from the document
-5. Set focus to the previous paragraph with cursor at the join point
-
-This implementation required clarifying the distinction between:
-
-- findPrecedingSection: Finds a preceding sibling section with the appropriate level
-- findParentSection: Finds the actual parent section in the hierarchy
-- findParentSectionContainer: Finds the container that holds the current section
-- findGrandparentSectionContainer: Finds the container that holds the parent section
 
 ## Backspace Functionality Issue Investigation
 

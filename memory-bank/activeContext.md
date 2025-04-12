@@ -1,9 +1,38 @@
 # Active Context
 
 ## Current Focus
-We're implementing a path-based component access pattern to replace the two-way binding approach. This change addresses issues with deeply nested objects, where two-way binding creates friction when accessing state from adjacent components. The new approach uses a centralized global reactive state accessed through paths.
+We're implementing an AI-generated summary feature for the document editor. This feature will allow users to generate summaries of their content using Claude 3.7 via OpenRouter, with the results streaming back to the UI in real-time.
 
 ## Implementation Approach
+We're breaking this down into multiple phases:
+
+### Phase 1: Create a Streaming Mock Endpoint
+- Create a new API endpoint in SvelteKit that simulates streaming responses
+- Implement a mock response that sends chunks of text with delays to mimic LLM streaming
+- Ensure proper content-type and headers for streaming
+- Test the streaming functionality without external dependencies
+
+### Phase 2: Add Generate Button to Summary Panel
+- Update the SummaryContainer component with a "Generate Summary" button
+- Implement click handler to call the streaming endpoint
+- Create a function to consume the streaming response
+- Update the summary content incrementally as chunks arrive
+- Handle loading states, errors, and completion
+
+## Technical Details
+- The summary feature will build on the existing summary functionality in the Write mode
+- Currently, summaries are manually written by users in the summary section
+- We'll add the ability to generate these summaries automatically
+- The streaming approach will provide immediate feedback to users as the summary is being generated
+
+## Integration Points
+- The SummaryContainer component in `src/lib/view/collection/section/write/SummaryContainer.svelte`
+- The Write component in `src/lib/view/collection/section/write/Write.svelte`
+- The document model's summary array in each section
+
+## Previous Work Context
+We previously implemented a path-based component access pattern to replace the two-way binding approach. This change addressed issues with deeply nested objects, where two-way binding created friction when accessing state from adjacent components. The new approach uses a centralized global reactive state accessed through paths.
+
 1. Enhanced DocumentManipulator
    - Created a centralized document state accessible via paths
    - Implemented `getByPath` function to access nodes by path
@@ -24,64 +53,16 @@ We're implementing a path-based component access pattern to replace the two-way 
    - Maintained the component hierarchy pattern
    - Actions still operate on node objects directly
 
-## Recent Changes
-- Updated DocumentManipulator with path-based access functionality
-- Modified components to use paths instead of direct node references:
-  - Section container components (Default, Sidebar, Card, TableOfContents, Tabs)
-  - Section components (Default)
-  - Content components (Heading, Paragraph)
-  - Control components (for Card, TableOfContents, Tabs)
-- Maintained existing callback patterns for actions
-- Ensured reactivity through direct mutations
-- Implemented backspace functionality to join blocks when pressing backspace at the start of a block:
-  - Created backspacePlugin.ts to detect backspace at the start of content
-  - Added joinWithPreviousParagraph function to handle joining paragraphs
-  - Updated Paragraph component to use the backspace plugin
-  - Implemented onJoinWithPrevious callbacks in Write component for both children and summary paragraphs
-
-## Backspace Functionality Issue and Solution
-We've identified a race condition in the paragraph joining functionality:
-
-1. **Issue Diagnosis**:
-   - When backspace is pressed at the start of a paragraph, the backspace plugin correctly calls `onJoinWithPrevious`
-   - `joinWithPreviousParagraph` joins the content and removes the current paragraph
-   - The content is joined correctly in the document model
-   - However, the paragraph is deleted instead of joined in the final UI state
-
-2. **Root Cause**:
-   - The race condition occurs between two separate processes:
-     - Direct document model updates in `joinWithPreviousParagraph`
-     - ProseMirror's transaction processing in `dispatchTransaction`
-   - The key issue is that `prevBlock.content` and `prevBlock.last_modified` are updated in separate steps
-   - This creates a timing window where the component re-renders due to the key change (`node.children[i].last_modified + node.children[i].id`)
-   - The old ProseMirror instance's transaction processing overwrites the correctly joined content with stale data
-
-3. **Solution Plan**:
-   - Implement atomic updates for content and last_modified in `joinWithPreviousParagraph`
-   - Create a helper function in DocumentManipulator to update multiple properties in a single operation
-   - This ensures that both properties are updated together, preventing the race condition
-   - Example implementation:
-     ```typescript
-     // Update previous block atomically
-     const updates = {
-       content: prevBlock.content + currentBlock.content,
-       last_modified: new Date().toISOString()
-     };
-     Object.assign(prevBlock, updates);
-     ```
-
 ## Next Steps
-- Implement the atomic update solution for the backspace functionality
-- Test the heading level decrease functionality with complex nested structures
-- Address UI update issues (currently requires mode switching to see changes)
-- Optimize performance for large documents
-- Update documentation with the new access pattern
-- Consider adding debugging tools for path-based access
+- Implement Phase 1: Create the streaming mock endpoint
+- Test the streaming functionality
+- Implement Phase 2: Add the generate button to the summary panel
+- Integrate the streaming consumer with the UI
+- Future phases will be planned based on the results of the initial implementation
 
 ## Active Decisions
-- Using path-based access instead of two-way binding for nested objects
-- Centralizing state in the document model
-- Leveraging Svelte 5's reactivity system for direct mutations
-- Maintaining existing callback patterns for actions
-- Following a consistent pattern for component props (paths instead of nodes)
-- Implementing atomic updates for properties that affect component keying
+- Using a streaming approach to provide immediate feedback
+- Starting with a mock endpoint to establish patterns before integrating with external APIs
+- Building on the existing summary functionality in the document model
+- Leveraging SvelteKit's streaming response capabilities
+- Following the established path-based component access pattern

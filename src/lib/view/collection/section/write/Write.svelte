@@ -130,7 +130,7 @@
 
 	<div class="flex flex-col gap-7">
 		{#if writerContext.showSummary}
-			<SummaryContainer>
+			<SummaryContainer {path}>
 				{#each SummaryRenderers as { Renderer }, i (node.summary[i].last_modified + node.summary[i].id)}
 					{console.log(i)}
 					{console.log((node.summary[i] as ContentParagraph).content)}

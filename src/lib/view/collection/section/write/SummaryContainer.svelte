@@ -1,16 +1,94 @@
-<script>
-	import { onMount } from 'svelte';
+<script lang="ts">
+	import { onMount, getContext } from 'svelte';
+	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
+	import type { Section } from '$lib/model/collection';
+	import type { ContentParagraph } from '$lib/model/content';
+	import { createSummaryParagraph } from '$lib/actions/content/summary.svelte';
+
+	let isGenerating = $state(false);
+	let generationProgress = $state('');
+	let errorMessage = $state<string | null>(null);
+
+	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
+
+	let { 
+        // path to the section
+        path 
+    } = $props();
 
 	onMount(() => {
 		console.log('SummaryContainer mounted');
 	});
+
+	/**
+	 * Generate a summary using the streaming API endpoint
+	 */
+	async function generateSummary() {
+		isGenerating = true;
+		generationProgress = '';
+		errorMessage = null;
+
+		try {
+			const response = await fetch('/api/generate-summary', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+
+			if (!response.ok) {
+				throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
+			}
+
+			const section = documentManipulator.getByPath(path) as Section;
+			
+			if (section.summary.length === 0) {
+				section.summary.push(createSummaryParagraph());
+			}
+
+			if (!response.body) {
+				throw new Error('No response body');
+			}
+			// Process the streaming response
+			const reader = response.body.getReader();
+			const decoder = new TextDecoder();
+
+			while (true) {
+				const { done, value } = await reader.read();
+				
+				if (done) {
+					break;
+				}
+
+				const chunk = decoder.decode(value);
+                (section.summary[0] as ContentParagraph).content += chunk;
+				
+			}
+		} catch (err) {
+			const error = err as Error;
+			console.error('Error generating summary:', error);
+			errorMessage = error.message || 'Failed to generate summary';
+		} finally {
+			isGenerating = false;
+		}
+	}
 </script>
 
 <div class="border border-gray-300">
-    <div class="p-1 text-xs bg-gray-300 text-white">
-        Summary
-    </div>
-	<div class=" p-2 text-sm text-gray-500">
+	<div class="p-1 text-xs bg-gray-300 text-white flex justify-between items-center">
+		<span>Summary</span>
+		<button
+			class="text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-0.5 rounded"
+			onclick={generateSummary}
+			disabled={isGenerating}
+		>
+			{isGenerating ? 'Generating...' : 'Generate'}
+		</button>
+	</div>
+	<div class="p-2 text-sm text-gray-500">
+		{#if errorMessage}
+			<p class="text-red-500">{errorMessage}</p>
+		{/if}
 		<slot></slot>
 	</div>
 </div>
