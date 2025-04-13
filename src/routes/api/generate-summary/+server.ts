@@ -9,7 +9,12 @@ import { ChatPromptTemplate } from '@langchain/core/prompts';
  * POST endpoint to generate a summary with streaming response
  * Uses LangChain with ChatOpenAI pointed to OpenRouter for Claude 3.7
  */
-export const POST: RequestHandler = async () => {
+export const POST: RequestHandler = async ({ request }) => {
+	// Extract the content from the request body
+	const { content } = await request.json();
+	
+	// Log the content to the console
+	console.log('Content to summarize:', content);
 	try {
 		const stream = new ReadableStream({
 			async start(controller) {
@@ -26,9 +31,10 @@ export const POST: RequestHandler = async () => {
 
 					const prompt = ChatPromptTemplate.fromMessages([
 						[
-							'human',
-							'Generate a 30-word lorem ipsum text. Respond with just the text, no explanations.'
-						]
+							'system',
+							"Summarize the following to one concise paragraph. Use the source words as much as possible. Keep the most important points, and maintain the tone and personality of the writer. Write in markdown if appropriate but avoid enclosing the entire response in triple backticks, code blocks, or quotes. Write as if you are the original author. Write directly to the user without meta-comments or acknowledgments. Make it simple and easy to understand. The purpose of the summary is to be a blurb for the section, that exists for people to see before clicking into the section, and makes people curious and want to know more. It should be short because the purpose is to combat the daunting look of a wall of text. 20 words maximum. Don't make it sound fabricated. Make it spark curiosity, but sound neutral."
+						],
+						['human', content]
 					]);
 
 					const chain = prompt.pipe(model).pipe(new StringOutputParser());

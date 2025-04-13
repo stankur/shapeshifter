@@ -4,6 +4,7 @@
 	import type { Section } from '$lib/model/collection';
 	import type { ContentParagraph } from '$lib/model/content';
 	import { createSummaryParagraph } from '$lib/actions/content/summary.svelte';
+	import { extractMarkdownSection } from '$lib/extract/section';
 
 	let isGenerating = $state(false);
 	let generationProgress = $state('');
@@ -29,18 +30,24 @@
 		errorMessage = null;
 
 		try {
+			const section = documentManipulator.getByPath(path) as Section;
+			
+			// Extract markdown content from the section
+			const markdownContent = extractMarkdownSection(section);
+			
 			const response = await fetch('/api/generate-summary', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
-				}
+				},
+				body: JSON.stringify({ content: markdownContent })
 			});
 
 			if (!response.ok) {
 				throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
 			}
 
-			const section = documentManipulator.getByPath(path) as Section;
+			// Ensure we have a summary paragraph to update
 			
 			if (section.summary.length === 0) {
 				section.summary.push(createSummaryParagraph());
