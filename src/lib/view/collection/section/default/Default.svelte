@@ -233,7 +233,7 @@
 				<Renderer
 					path={[...path, 'summary', i]}
 					{refs}
-					overrides={{ class: 'prose-p:text-xs prose-p:text-gray-500' }}
+					overrides={{ class: 'prose-p:text-gray-500' }}
 					onSplit={(newBlocks) => {
 						splitParagraph(node, 'summary', newBlocks, document, i);
 					}}
