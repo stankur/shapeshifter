@@ -29,7 +29,9 @@
 	/**
 	 * Generate a summary using the streaming API endpoint
 	 */
-	async function generateSummary() {
+	async function generateSummary(e: Event) {
+        e.stopImmediatePropagation()
+
 		isGenerating = true;
 		generationProgress = '';
 		errorMessage = null;

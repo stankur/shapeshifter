@@ -2,6 +2,7 @@
 	import { onMount, getContext } from 'svelte';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 	import type { Section } from '$lib/model/collection';
+	import { extractSummaryMarkdown } from '$lib/extract/section';
 
 	let isGenerating = $state(false);
 	let errorMessage = $state<string | null>(null);
@@ -25,18 +26,37 @@
 	});
 
 	/**
-	 * Generate an image (to be implemented later)
+	 * Generate a cover image for the section by calling the API
 	 */
-	async function generateImage() {
+	async function generateImage(e: Event) {
+        e.stopImmediatePropagation()
 		isGenerating = true;
 		errorMessage = null;
 
 		try {
-			// This functionality will be implemented later
-			console.log('Generate image functionality will be implemented later');
-
-			// For now, just simulate a delay
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+			// Extract the summary content as markdown
+			const markdown = extractSummaryMarkdown(section);
+			
+			// Call the API to generate a cover image
+			const response = await fetch('/api/generate-cover-image', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ markdown })
+			});
+			
+			if (!response.ok) {
+				throw new Error(`Failed to generate cover image: ${response.statusText}`);
+			}
+			
+			const data = await response.json();
+			
+			// Set the image field on the section
+			section.image = data.imageUrl;
+			section.last_modified = new Date().toISOString();
+			
+			console.log('Set cover image:', section.image);
 		} catch (err) {
 			const error = err as Error;
 			console.error('Error generating image:', error);
