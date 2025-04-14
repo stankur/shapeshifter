@@ -9,6 +9,11 @@
 	let isGenerating = $state(false);
 	let generationProgress = $state('');
 	let errorMessage = $state<string | null>(null);
+	let isExpanded = $state(true);
+
+	function toggleExpanded() {
+		isExpanded = !isExpanded;
+	}
 
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 
@@ -24,7 +29,9 @@
 	/**
 	 * Generate a summary using the streaming API endpoint
 	 */
-	async function generateSummary() {
+	async function generateSummary(e: Event) {
+        e.stopImmediatePropagation()
+
 		isGenerating = true;
 		generationProgress = '';
 		errorMessage = null;
@@ -82,20 +89,25 @@
 </script>
 
 <div class="border border-gray-300">
-	<div class="p-1 text-xs bg-gray-300 text-white flex justify-between items-center">
-		<span>Summary</span>
+	<div class="p-1 text-xs bg-gray-300 text-white flex justify-between items-center cursor-pointer" onclick={toggleExpanded}>
+		<span class="flex items-center">
+			<span class="inline-block w-4 text-center">{isExpanded ? '-' : '+'}</span>
+			<span class="select-none">Summary</span>
+		</span>
 		<button
-			class="text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-0.5 rounded"
+			class="text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-0.5 rounded select-none"
 			onclick={generateSummary}
 			disabled={isGenerating}
 		>
 			{isGenerating ? 'Generating...' : 'Generate'}
 		</button>
 	</div>
+	{#if isExpanded}
 	<div class="p-2 text-sm text-gray-500">
 		{#if errorMessage}
 			<p class="text-red-500">{errorMessage}</p>
 		{/if}
 		<slot></slot>
 	</div>
+	{/if}
 </div>

@@ -49,7 +49,8 @@ const sectionBase = collectionBase.extend({
 	view: sectionView,
 	activeView: z.enum(
 		sectionView.items.map((schema) => schema.shape.type.value) as [string, ...string[]]
-	)
+	),
+    image: z.optional(z.string())
 });
 
 export type Section = z.infer<typeof sectionBase> & {

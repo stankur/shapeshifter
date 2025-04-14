@@ -25,3 +25,18 @@ export function extractMarkdownSection(
 
 	return markdown;
 }
+
+/**
+ * Extracts markdown from a section's summary content
+ * @param section The section to extract summary markdown from
+ * @returns Markdown string representation of the section's summary
+ */
+export function extractSummaryMarkdown(section: Section): string {
+	let markdown = "";
+
+	if (section.summary.length > 0) {
+		markdown += processContent(section.summary, 1);
+	}
+
+	return markdown;
+}

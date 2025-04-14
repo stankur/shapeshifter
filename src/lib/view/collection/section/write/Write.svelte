@@ -17,6 +17,7 @@
 	import Write from '$lib/view/collection/section-container/Write.svelte';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 	import SummaryContainer from './SummaryContainer.svelte';
+	import ImageContainer from './ImageContainer.svelte';
 
 	type Props = {
 		path: (string | number)[];
@@ -41,7 +42,7 @@
 		removeSectionFromContainer = () => {}
 	}: Props = $props();
 
-    const writerContext = getContext('writerContext') as {showSummary: boolean};
+	const writerContext = getContext('writerContext') as { showSummary: boolean };
 	const defaultOverRides = { heading: true, accommodateControls: false };
 	overrides = { ...defaultOverRides, ...overrides };
 
@@ -98,21 +99,21 @@
 				onLevelDecrease={() => {
 					console.log('onLevelDecrease in section');
 					return handleHeadingLevelDecrease(
-						node, 
-						findParentSectionContainer, 
-						findParentSection, 
+						node,
+						findParentSectionContainer,
+						findParentSection,
 						removeSectionFromContainer,
 						() => {
 							// Find the grandparent section container
 							// This is the container that contains the parent section
 							const parentSection = findParentSection();
 							if (!parentSection) return null;
-							
+
 							// Get the path to the parent section's container
 							// This would be the grandparent container for the current section
 							const parentSectionContainer = findParentSectionContainer();
 							if (!parentSectionContainer) return null;
-							
+
 							// Find the container that contains the parent section container
 							// This is done by looking at the parent section's parent
 							// We assume every section is in a container
@@ -130,35 +131,32 @@
 
 	<div class="flex flex-col gap-7">
 		{#if writerContext.showSummary}
-			<SummaryContainer {path}>
-				{#each SummaryRenderers as { Renderer }, i (node.summary[i].last_modified + node.summary[i].id)}
-					{console.log(i)}
-					{console.log((node.summary[i] as ContentParagraph).content)}
-					<Renderer
-						path={[...path, 'summary', i]}
-						{refs}
-						onSplit={(newBlocks) => {
-							splitParagraph(node, 'summary', newBlocks, document, i);
-						}}
-						onJoinWithPrevious={() => {
-							if (i === 0) return false; // First paragraph can't join with previous
-							
-							// Get the previous block ID
-							const prevId = node.summary[i-1].id;
-							
-							// Join with previous paragraph
-							return joinWithPreviousParagraph(
-								node,
-								'summary',
-								i,
-								document,
-								prevId
-							);
-						}}
-						{onUnmount}
-					/>
-				{/each}
-			</SummaryContainer>
+			<div>
+				<SummaryContainer {path}>
+					{#each SummaryRenderers as { Renderer }, i (node.summary[i].last_modified + node.summary[i].id)}
+						{console.log(i)}
+						{console.log((node.summary[i] as ContentParagraph).content)}
+						<Renderer
+							path={[...path, 'summary', i]}
+							{refs}
+							onSplit={(newBlocks) => {
+								splitParagraph(node, 'summary', newBlocks, document, i);
+							}}
+							onJoinWithPrevious={() => {
+								if (i === 0) return false; // First paragraph can't join with previous
+
+								// Get the previous block ID
+								const prevId = node.summary[i - 1].id;
+
+								// Join with previous paragraph
+								return joinWithPreviousParagraph(node, 'summary', i, document, prevId);
+							}}
+							{onUnmount}
+						/>
+					{/each}
+				</SummaryContainer>
+				<ImageContainer {path} />
+			</div>
 		{/if}
 		<div>
 			{#each ChildrenRenderers as { Renderer }, i (node.children[i].last_modified + node.children[i].id)}
@@ -176,19 +174,13 @@
 						}}
 						onJoinWithPrevious={() => {
 							if (i === 0) return false; // First paragraph can't join with previous
-							
+
 							// Get the previous block ID
-							const prevId = node.children[i-1].id;
+							const prevId = node.children[i - 1].id;
 							if (!prevId) return false;
-							
+
 							// Join with previous paragraph
-							return joinWithPreviousParagraph(
-								node,
-								'children',
-								i,
-								document,
-								prevId
-							);
+							return joinWithPreviousParagraph(node, 'children', i, document, prevId);
 						}}
 						onConvertToHeading={(paragraphId) => {
 							splitSection(node, paragraphId, document, addSection);
