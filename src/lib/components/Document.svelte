@@ -44,57 +44,57 @@
 	const isDocumentViewPage = $derived(!!page.params.username && !!page.params.slug);
 
 	const onUnmount = () => {
-		const elements = Object.values(refs)
-			.filter((ref) => ref.element)
-			.map((ref) => ref.element);
-		flipState = Flip.getState(elements, {
-            props: "fontSize,lineHeight"
-        });
+		// const elements = Object.values(refs)
+		// 	.filter((ref) => ref.element)
+		// 	.map((ref) => ref.element);
+		// flipState = Flip.getState(elements, {
+        //     props: "fontSize,lineHeight"
+        // });
 	};
 
-	$effect(() => {
-		if (flipState !== null && node.state.animateNextChange) {
-			const elements = Object.values(refs).map(ref => ref.element);
+	// $effect(() => {
+	// 	if (flipState !== null && node.state.animateNextChange) {
+	// 		const elements = Object.values(refs).map(ref => ref.element);
 			
-			Flip.from(flipState as Flip.FlipState, {
-				targets: elements,
-				duration: 0.2,
-				delay: 0.2,
-				ease: 'power4.inOut',
-				absolute: false,
-				nested: false,
-				onStart: () => {
-					elements.forEach((element: HTMLElement) => {
-						element.style.pointerEvents = 'none';
-					});
-				},
-				onComplete: () => {
-					elements.forEach((element: HTMLElement) => {
-						element.style.pointerEvents = 'auto';
-					});
-				},
+	// 		Flip.from(flipState as Flip.FlipState, {
+	// 			targets: elements,
+	// 			duration: 0.2,
+	// 			delay: 0.2,
+	// 			ease: 'power4.inOut',
+	// 			absolute: false,
+	// 			nested: false,
+	// 			onStart: () => {
+	// 				elements.forEach((element: HTMLElement) => {
+	// 					element.style.pointerEvents = 'none';
+	// 				});
+	// 			},
+	// 			onComplete: () => {
+	// 				elements.forEach((element: HTMLElement) => {
+	// 					element.style.pointerEvents = 'auto';
+	// 				});
+	// 			},
 
-				onLeave: (elements) => {
-					gsap.fromTo(
-						elements,
-						{ opacity: 1 },
-						{ opacity: 0, duration: 0.2, ease: 'power4.inOut' }
-					);
-				},
+	// 			onLeave: (elements) => {
+	// 				gsap.fromTo(
+	// 					elements,
+	// 					{ opacity: 1 },
+	// 					{ opacity: 0, duration: 0.2, ease: 'power4.inOut' }
+	// 				);
+	// 			},
 
-				onEnter: (elements) => {
-					gsap.fromTo(
-						elements,
-						{ opacity: 0 },
-						{ opacity: 1, duration: 0.2, delay: 0.4, ease: 'power4.inOut' }
-					);
-				}
-			});
-		} else {
-			node.state.animateNextChange = true;
-			flipState = null;
-		}
-	});
+	// 			onEnter: (elements) => {
+	// 				gsap.fromTo(
+	// 					elements,
+	// 					{ opacity: 0 },
+	// 					{ opacity: 1, duration: 0.2, delay: 0.4, ease: 'power4.inOut' }
+	// 				);
+	// 			}
+	// 		});
+	// 	} else {
+	// 		node.state.animateNextChange = true;
+	// 		flipState = null;
+	// 	}
+	// });
 
 	$inspect(node);
 </script>
