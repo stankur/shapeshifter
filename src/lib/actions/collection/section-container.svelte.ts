@@ -104,14 +104,21 @@ export function createSectionContainer(): SectionContainer {
 		view: [
 			{ type: 'collection/section-container/default' },
 			{ type: 'collection/section-container/static' },
-			{ type: 'collection/section-container/card', state: {  gap: 16 } },
-			{ type: 'collection/section-container/brick' },
-			{ type: 'collection/section-container/table-of-contents', state: { directions: [] } },
+			{ type: 'collection/section-container/card', state: { gap: 16, variation: 'default' } },
+			{
+				type: 'collection/section-container/table-of-contents',
+				state: {
+					directions: []
+				}
+			},
 			{
 				type: 'collection/section-container/sidebar',
 				state: { percentageWidth: 30, activeIndex: 0 }
 			},
-			{ type: 'collection/section-container/tabs', state: { gap: 16, activeIndex: 0 } }
+			{
+				type: 'collection/section-container/tabs',
+				state: { gap: 16, activeIndex: 0 }
+			}
 		],
 		activeView: 'collection/section-container/default'
 	};
