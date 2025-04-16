@@ -9,7 +9,7 @@
 	import type { Component } from 'svelte';
 	import type { z } from 'zod';
 	import type { Refs } from '$lib/components/Document.svelte';
-	import { getContext } from 'svelte';
+	import { getContext, onDestroy } from 'svelte';
 	import type { Document } from '$lib/model/document';
 	import Controls from './Controls.svelte';
 	import { addSection } from '$lib/actions/collection/section-container.svelte';
@@ -18,6 +18,23 @@
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 	import Chip from '$lib/components/Chip.svelte';
 	import Default from '../Default/Default.svelte';
+
+	// Custom action to bind an element to refs with a specific ID
+	function bindToRefs(element: HTMLElement, id: string) {
+		// Set the data-flip-id attribute
+		element.setAttribute('data-flip-id', id);
+		
+		// Add the element to the refs object
+		refs[id] = { element };
+		
+		// Return a cleanup function
+		return {
+			destroy() {
+				// Remove the element from refs when unmounted
+				delete refs[id];
+			}
+		};
+	}
 
 	const document = getContext('document') as Document;
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
@@ -137,7 +154,12 @@
 			{#each SectionRenderers as { child, sectionIndex, HeadingRenderer, SummaryRenderers }}
 				<div class="card flex flex-col gap-6 border-1 border-gray-400 p-5">
 					{#if child.image}
-						<img class="aspect-square" src={child.image} alt="Section cover" />
+						<img 
+							class="aspect-square" 
+							src={child.image} 
+							alt="Section cover"
+							use:bindToRefs={`${child.id}-image`}
+						/>
 					{:else if someHasImage}
 						<div class="aspect-square" />
 					{/if}
