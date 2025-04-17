@@ -9,6 +9,7 @@
 	import type { Document } from '$lib/model/document';
 	import Controls from './Controls.svelte';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
+    import DefaultView from "$lib/view/collection/section-container/Default/Default.svelte"
 	import Default from './Default.svelte';
 	import Brick from './Brick.svelte';
 	import type { z } from 'zod';
@@ -42,21 +43,6 @@
 		isCardHovered = false;
 	}
 
-	//** if the heading is clicked, and the section is the only expanded section in the container, animate the change. */
-	function onHeadingClick(section: Section) {
-		const defaultView = section.view.find((v) => v.type === 'collection/section/default');
-		if (defaultView?.state === 'expanded') {
-			const expandedSections = children.filter((s) => {
-				const view = s.view.find((v) => v.type === 'collection/section/default');
-				return view?.state === 'expanded';
-			});
-
-			if (expandedSections.length === 1 && expandedSections[0].id === section.id) {
-				onUnmount();
-				document.state.animateNextChange = true;
-			}
-		}
-	}
 
 	// Get the current variation from the state
 	function getVariation() {
@@ -75,7 +61,7 @@
 	return defaultView?.state === 'summary';
 })}
 	<div class="card-container" onmouseenter={showCardControls} onmouseleave={hideCardControls}>
-		<Default {path} {refs} {onUnmount} {onHeadingClick} />
+		<DefaultView {path} {refs} {onUnmount}/>
 	</div>
 {:else}
 	<div class="card-container" onmouseenter={showCardControls} onmouseleave={hideCardControls}>
@@ -84,9 +70,9 @@
 		{/if}
 
 		{#if variation === 'brick'}
-			<Brick {path} {refs} {onUnmount} {onHeadingClick} />
+			<Brick {path} {refs} {onUnmount}/>
 		{:else}
-			<Default {path} {refs} {onUnmount} {onHeadingClick} />
+			<Default {path} {refs} {onUnmount} />
 		{/if}
 	</div>
 {/if}

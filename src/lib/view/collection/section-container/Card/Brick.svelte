@@ -73,12 +73,10 @@
 		path,
 		refs,
 		onUnmount,
-		onHeadingClick
 	}: {
 		path: (string | number)[];
 		refs: Refs;
 		onUnmount: () => void;
-		onHeadingClick?: (section: Section) => void;
 	} = $props();
 
 	const node = documentManipulator.getByPath(path) as SectionContainer;
@@ -122,7 +120,7 @@
 					use:bindToRefs={`${child.id}-image`}
 				/>
 			{:else if someHasImage}
-				<div class="w-24 h-24 xl:w-32 xl:h-32" />
+				<div class="w-24 shrink-0 h-24 xl:w-32 xl:h-32" />
 			{/if}
 			<div class="flex flex-col gap-2 xl:gap-2">
 				<HeadingRenderer
@@ -142,9 +140,6 @@
 							document.state.animateNextChange = true;
 							onUnmount();
 							defaultView.state = defaultView.state === 'expanded' ? 'summary' : 'expanded';
-						}
-						if (onHeadingClick) {
-							onHeadingClick(child);
 						}
 					}}
 				/>
@@ -169,7 +164,7 @@
 		<Chip
 			onclick={() => {
 				onUnmount();
-				addSection(node, node.children[0].heading.level);
+				addSection(node, node.children[0].heading.level, "summary");
 			}}
 			label="Add Section"
 		/>

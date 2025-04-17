@@ -2,54 +2,56 @@ import type { Section, SectionContainer } from '$lib/model/collection';
 
 /**
  * Moves siblings after a section to be children of that section
- * 
+ *
  * @param container The section container
  * @param sectionId The ID of the section
  * @returns The siblings that were moved
  */
 export function moveSiblingsToSection(container: SectionContainer, sectionId: string): Section[] {
-	const sectionIndex = container.children.findIndex(child => child.id === sectionId);
+	const sectionIndex = container.children.findIndex((child) => child.id === sectionId);
 	if (sectionIndex === -1) return [];
-	
+
 	const section = container.children[sectionIndex];
 	const siblingsAfter = container.children.slice(sectionIndex + 1);
-	
+
 	// Find or create a section container in the section's children
-	let sectionContainerIndex = section.children.findIndex(child => child.type === 'section-container');
-	
+	let sectionContainerIndex = section.children.findIndex(
+		(child) => child.type === 'section-container'
+	);
+
 	if (sectionContainerIndex === -1) {
 		// Create a new section container and add it to the section's children
 		const newContainer = createSectionContainer();
 		section.children.push(newContainer);
 		sectionContainerIndex = section.children.length - 1;
 	}
-	
+
 	// Add siblings to the container by directly accessing it through the section's children
 	for (const sibling of siblingsAfter) {
 		(section.children[sectionContainerIndex] as SectionContainer).children.push(sibling);
 	}
-	
+
 	// Remove siblings from original container
 	container.children.splice(sectionIndex + 1, siblingsAfter.length);
 	container.last_modified = new Date().toISOString();
 	section.last_modified = new Date().toISOString();
-	
+
 	return siblingsAfter;
 }
 
 /**
  * Adds a section to a container after a specified section
- * 
+ *
  * @param container The section container
  * @param section The section to add
  * @param afterSectionId The ID of the section to add after
  */
 export function addSectionAfter(
-	container: SectionContainer, 
-	section: Section, 
+	container: SectionContainer,
+	section: Section,
 	afterSectionId: string
 ) {
-	const afterIndex = container.children.findIndex(child => child.id === afterSectionId);
+	const afterIndex = container.children.findIndex((child) => child.id === afterSectionId);
 	if (afterIndex !== -1) {
 		container.children.splice(afterIndex + 1, 0, section);
 		container.last_modified = new Date().toISOString();
@@ -131,14 +133,18 @@ export function createSectionContainer(): SectionContainer {
  * @param headingLevel
  * @returns
  */
-export function addSection(node: SectionContainer, headingLevel: number = 1) {
+export function addSection(
+	node: SectionContainer,
+	headingLevel: number = 1,
+	defaultState: 'expanded' | 'summary' = 'expanded'
+) {
 	node.children.push({
 		type: 'section',
 		id: crypto.randomUUID(),
 		created: new Date().toISOString(),
 		last_modified: new Date().toISOString(),
 		view: [
-			{ type: 'collection/section/default', state: 'expanded' },
+			{ type: 'collection/section/default', state: defaultState },
 			{ type: 'collection/section/static' },
 			{ type: 'collection/section/page' }
 		],

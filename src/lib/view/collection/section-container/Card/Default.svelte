@@ -73,12 +73,10 @@
 		path,
 		refs,
 		onUnmount,
-		onHeadingClick
 	}: {
 		path: (string | number)[];
 		refs: Refs;
 		onUnmount: () => void;
-		onHeadingClick?: (section: Section) => void;
 	} = $props();
 
 	const node = documentManipulator.getByPath(path) as SectionContainer;
@@ -143,9 +141,6 @@
 							onUnmount();
 							defaultView.state = defaultView.state === 'expanded' ? 'summary' : 'expanded';
 						}
-						if (onHeadingClick) {
-							onHeadingClick(child);
-						}
 					}}
 				/>
 				{#each SummaryRenderers as { summaryChild, summaryIndex, Renderer }}
@@ -167,7 +162,7 @@
 		<Chip
 			onclick={() => {
 				onUnmount();
-				addSection(node, node.children[0].heading.level);
+				addSection(node, node.children[0].heading.level, "summary");
 			}}
 			label="Add Section"
 		/>
