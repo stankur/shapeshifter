@@ -13,6 +13,7 @@
 	import Default from './Default.svelte';
 	import Brick from './Brick.svelte';
 	import type { z } from 'zod';
+	import { collapseAllSections } from './cardUtils';
 
 	let {
 		path,
@@ -61,7 +62,16 @@
 	return defaultView?.state === 'summary';
 })}
 	<div class="card-container" onmouseenter={showCardControls} onmouseleave={hideCardControls}>
-		<DefaultView {path} {refs} {onUnmount}/>
+		<DefaultView 
+			{path} 
+			{refs} 
+			{onUnmount} 
+			onHeadingClick={(section) => {
+				// When a heading is clicked in the default view that was shown from card view,
+				// collapse all sections to go back to card view
+				collapseAllSections(node, document, onUnmount);
+			}} 
+		/>
 	</div>
 {:else}
 	<div class="card-container" onmouseenter={showCardControls} onmouseleave={hideCardControls}>

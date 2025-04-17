@@ -37,22 +37,40 @@ export type ContentComponentProps = {
 export type SectionContainerType = z.infer<typeof sectionContainer>;
 export type SectionContainerViewStateType = z.infer<typeof sectionContainerCardViewState>;
 
-// Function to handle read mode toggle
-export function handleReadModeToggle(
-	sectionIndex: number,
+// Function to expand all sections in a section container
+export function expandAllSections(
 	node: SectionContainerType,
 	document: Document,
 	onUnmount: () => void
 ) {
-	// toggle the state in the default view, not change it to the default view. Change the state in the default view.
-	const defaultView = node.children[sectionIndex].view.find(
-		(v) => v.type === 'collection/section/default'
-	);
-	if (defaultView) {
-		document.state.animateNextChange = true;
-		onUnmount();
-		defaultView.state = defaultView.state === 'expanded' ? 'summary' : 'expanded';
-	}
+	document.state.animateNextChange = true;
+	onUnmount();
+	
+	// Set all sections to expanded state
+	node.children.forEach(child => {
+		const defaultView = child.view.find(v => v.type === 'collection/section/default');
+		if (defaultView) {
+			defaultView.state = 'expanded';
+		}
+	});
+}
+
+// Function to collapse all sections in a section container
+export function collapseAllSections(
+	node: SectionContainerType,
+	document: Document,
+	onUnmount: () => void
+) {
+	document.state.animateNextChange = true;
+	onUnmount();
+	
+	// Set all sections to summary state
+	node.children.forEach(child => {
+		const defaultView = child.view.find(v => v.type === 'collection/section/default');
+		if (defaultView) {
+			defaultView.state = 'summary';
+		}
+	});
 }
 
 // Function to handle adding a section

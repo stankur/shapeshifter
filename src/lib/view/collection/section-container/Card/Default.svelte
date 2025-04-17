@@ -12,18 +12,18 @@
 	import { getContext } from 'svelte';
 	import type { Document } from '$lib/model/document';
 	import { addSection } from '$lib/actions/collection/section-container.svelte';
-	import { createHeadingNavProps, createSummaryNavProps } from './navigation';
-	import type { NavigationHandler } from '$lib/services/navigation/types';
-	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
-	import Chip from '$lib/components/Chip.svelte';
-	import {
-		handleReadModeToggle,
-		handleAddSection,
-		type HeadingComponentProps,
-		type ContentComponentProps,
-		type SectionContainerType,
-		type SectionContainerViewStateType
-	} from './cardUtils';
+import { createHeadingNavProps, createSummaryNavProps } from './navigation';
+import type { NavigationHandler } from '$lib/services/navigation/types';
+import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
+import Chip from '$lib/components/Chip.svelte';
+import {
+	expandAllSections,
+	handleAddSection,
+	type HeadingComponentProps,
+	type ContentComponentProps,
+	type SectionContainerType,
+	type SectionContainerViewStateType
+} from './cardUtils';
 
 	// Custom action to bind an element to refs with a specific ID
 	function bindToRefs(element: HTMLElement, id: string) {
@@ -104,7 +104,7 @@
 					overrides={{
 						class: 'prose-h1:text-xl'
 					}}
-					onClickReadMode={() => handleReadModeToggle(sectionIndex, node, document, onUnmount)}
+					onClickReadMode={() => expandAllSections(node, document, onUnmount)}
 				/>
 				{#each SummaryRenderers as { summaryChild, summaryIndex, Renderer }}
 					<Renderer

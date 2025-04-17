@@ -152,6 +152,7 @@
 
 						if (onHeadingClick) {
 							onHeadingClick(node);
+                            return
 						}
 
 						if ((node.view[viewStateIndex] as ViewState).state === 'expanded') {
