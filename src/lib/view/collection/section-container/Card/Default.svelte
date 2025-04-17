@@ -16,6 +16,14 @@
 	import type { NavigationHandler } from '$lib/services/navigation/types';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 	import Chip from '$lib/components/Chip.svelte';
+	import {
+		handleReadModeToggle,
+		handleAddSection,
+		type HeadingComponentProps,
+		type ContentComponentProps,
+		type SectionContainerType,
+		type SectionContainerViewStateType
+	} from './cardUtils';
 
 	// Custom action to bind an element to refs with a specific ID
 	function bindToRefs(element: HTMLElement, id: string) {
@@ -37,49 +45,17 @@
 	const document = getContext('document') as Document;
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 
-	type SectionContainer = z.infer<typeof sectionContainer>;
-	type SectionContainerViewState = z.infer<typeof sectionContainerCardViewState>;
-
-	// Define component types with navigation props
-	type HeadingComponentProps = {
-		path: (string | number)[];
-		refs: Refs;
-		onUnmount: () => void;
-		updateParent?: () => void;
-		getNextEditable?: NavigationHandler;
-		getPrevEditable?: NavigationHandler;
-		overrides?: {
-			class?: string;
-		};
-		onClickReadMode?: () => void;
-		documentNode?: Document;
-	};
-
-	type ContentComponentProps = {
-		path: (string | number)[];
-		refs: Refs;
-		onUnmount: () => void;
-		overrides?: {
-			class?: string;
-		};
-		updateParent?: () => void;
-		onSplit?: (blocks: [string, string]) => void;
-		getNextEditable?: NavigationHandler;
-		getPrevEditable?: NavigationHandler;
-		documentNode?: Document;
-	};
-
 	let {
 		path,
 		refs,
-		onUnmount,
+		onUnmount
 	}: {
 		path: (string | number)[];
 		refs: Refs;
 		onUnmount: () => void;
 	} = $props();
 
-	const node = documentManipulator.getByPath(path) as SectionContainer;
+	const node = documentManipulator.getByPath(path) as SectionContainerType;
 	let { children, view, activeView } = $derived(node);
 
 	let SectionRenderers = $derived(
@@ -101,21 +77,18 @@
 
 	let someHasImage = $derived(children.some((child) => child.image));
 
-	let gap = $derived(
-		(view.find((v) => v.type === activeView) as { state: SectionContainerViewState }).state.gap
-	);
 
 	// Minimum width for cards
 	const minCardWidth = 250;
 </script>
 
-<div class="card-grid" style:--gap={`${gap}px`} style:--min-card-width={`${minCardWidth}px`}>
+<div class="card-grid" style:--min-card-width={`${minCardWidth}px`}>
 	{#each SectionRenderers as { child, sectionIndex, HeadingRenderer, SummaryRenderers }}
 		<div class="card flex flex-col gap-6 border-1 border-gray-400 p-5">
 			{#if child.image}
-				<img 
-					class="aspect-square" 
-					src={child.image} 
+				<img
+					class="aspect-square"
+					src={child.image}
 					alt="Section cover"
 					use:bindToRefs={`${child.id}-image`}
 				/>
@@ -131,17 +104,7 @@
 					overrides={{
 						class: 'prose-h1:text-xl'
 					}}
-					onClickReadMode={() => {
-						// toggle the state in the default view, not change it to the default view. Change the state in the default view.
-						const defaultView = node.children[sectionIndex].view.find(
-							(v) => v.type === 'collection/section/default'
-						);
-						if (defaultView) {
-							document.state.animateNextChange = true;
-							onUnmount();
-							defaultView.state = defaultView.state === 'expanded' ? 'summary' : 'expanded';
-						}
-					}}
+					onClickReadMode={() => handleReadModeToggle(sectionIndex, node, document, onUnmount)}
 				/>
 				{#each SummaryRenderers as { summaryChild, summaryIndex, Renderer }}
 					<Renderer
@@ -159,13 +122,7 @@
 	{/each}
 
 	{#if document.state.mode !== 'read'}
-		<Chip
-			onclick={() => {
-				onUnmount();
-				addSection(node, node.children[0].heading.level, "summary");
-			}}
-			label="Add Section"
-		/>
+		<Chip onclick={() => handleAddSection(node, onUnmount)} label="Add Section" />
 	{/if}
 </div>
 
@@ -173,7 +130,7 @@
 	.card-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(var(--min-card-width), 1fr));
-		gap: var(--gap);
+        gap: 16px;
 	}
 
 	.card {

@@ -99,7 +99,6 @@ export const untitledSection: z.ZodType<UntitledSection> = untitledSectionBase.e
 
 // Define a new type for the view state with constraints
 export const sectionContainerCardViewState = z.object({
-	gap: z.number().int().min(0).max(36),
 	variation: z.enum(['default', 'brick'])
 });
 

@@ -106,7 +106,7 @@ export function createSectionContainer(): SectionContainer {
 		view: [
 			{ type: 'collection/section-container/default' },
 			{ type: 'collection/section-container/static' },
-			{ type: 'collection/section-container/card', state: { gap: 16, variation: 'default' } },
+			{ type: 'collection/section-container/card', state: { variation: 'default' } },
 			{
 				type: 'collection/section-container/table-of-contents',
 				state: {
