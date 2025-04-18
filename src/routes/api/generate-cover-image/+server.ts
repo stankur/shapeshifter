@@ -42,7 +42,7 @@ export const POST: RequestHandler = async ({ request }) => {
 					],
 					[
 						'user',
-						`give one simple symbolic representation noun that could represent the following:\n\n"""${markdown}"""`
+						`give one simple everyday non-technical layman symbolic representation noun that could represent the following:\n\n"""${markdown}"""`
 					]
 				]);
 
