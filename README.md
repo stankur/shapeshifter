@@ -132,3 +132,5 @@ The editor, on press of heading, doesn't always create a content paragraph. I am
 when the bricks is rendered as active section in a sidebar, not expected because it doesn't wrap. i think this is because I am using screen as breakpoint. Maybe should instead use min-width or something attached to the component instead of the screen size.
 
 documents are mysteriously disappearing from the database, like text cinema's doc, aak.
+
+when the editor initially loads, the summary select dropdown has empty value, not populated properly.
