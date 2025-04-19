@@ -47,13 +47,65 @@ npx supabase gen types typescript --project-id "<PROJECT ID>" --schema public > 
 most updated version should be able to be found here: 
 - https://supabase.com/docs/guides/local-development/overview#link-your-project
 
-
-
 ```
 supabase db push
 ```
 
+## Document Schema Migration System
 
+This project includes a document migration system that handles schema changes to documents. The migration system automatically upgrades documents to the latest schema version when they are retrieved from the database.
+
+### How It Works
+
+1. **Document Versioning**: Each document has a `version` field that tracks its schema version. And when you change the shape of the document, you need to bump up the version.
+2. **Migration Registry**: The system maintains a registry of migration steps, each upgrading a document from one version to the next.
+3. **Automatic Migration**: When a document is retrieved, the system checks its version and applies any necessary migrations.
+
+### Creating a New Migration
+
+When you need to change the document schema, follow these steps:
+
+1. **Update the Model**: First, update the model definition in the appropriate file (e.g., `src/lib/model/document.ts` or `src/lib/model/collection.ts`).
+
+2. **Create a Migration Step**: Add a new migration step in the appropriate file in the `src/lib/migrations/collection/` directory. For example:
+
+```typescript
+// In src/lib/migrations/collection/your-component.ts
+export function createYourComponentMigrations(registry: any) {
+  // Register migration to version X
+  registry.registerStep({
+    toVersion: X, // Increment from the previous version
+    migrate: (document: Document) => {
+      return traverseDocument(document, {
+        yourComponent: updateYourComponent
+      });
+    }
+  });
+  
+  // Function to update your component
+  function updateYourComponent(component: any) {
+    // Apply your schema changes here
+    // For example:
+    if (component.someProperty && typeof component.someProperty === 'string') {
+      component.someProperty = {
+        value: component.someProperty,
+        newField: 'default value'
+      };
+    }
+  }
+}
+```
+
+3. **Register the Migration**: Import and register your migration function in `src/lib/migrations/index.ts`:
+
+```typescript
+// In src/lib/migrations/index.ts
+import { createYourComponentMigrations } from './collection/your-component';
+
+// Register all migrations
+createSectionMigrations(migrationRegistry);
+createYourComponentMigrations(migrationRegistry); // Add your new migration
+```
 ## known bugs
 
 when you press enter on the end of a heading, it should transfer the cursor to what is next in the section, but it doesn't. The next in section does get created, either summary of paragraph child, but the cursor doesn't move.
