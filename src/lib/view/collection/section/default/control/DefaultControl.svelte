@@ -9,7 +9,12 @@
 		onUnmount
 	}: {
 		controlElement: HTMLDivElement;
-		viewState: { state: 'expanded' | 'summary' };
+		viewState: { 
+			state: { 
+				state: 'expanded' | 'summary',
+				variation: 'default' | 'summary-always'
+			} 
+		};
 		onUnmount: () => void;
 	} = $props();
 
@@ -17,18 +22,18 @@
 </script>
 
 <div class="floating-controls cursor-pointer p-2" bind:this={controlElement}>
-	{#if viewState.state === 'expanded'}
+	{#if viewState.state.state === 'expanded'}
 		<SummaryIcon
 			onclick={() => {
 				document.state.animateNextChange = false;
-				viewState.state = 'summary';
+				viewState.state.state = 'summary';
 			}}
 		/>
 	{:else}
 		<AddIcon
 			onclick={() => {
 				document.state.animateNextChange = false;
-				viewState.state = 'expanded';
+				viewState.state.state = 'expanded';
 			}}
 		/>
 	{/if}

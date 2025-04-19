@@ -50,7 +50,7 @@ export function expandAllSections(
 	node.children.forEach(child => {
 		const defaultView = child.view.find(v => v.type === 'collection/section/default');
 		if (defaultView) {
-			defaultView.state = 'expanded';
+			defaultView.state.state = 'expanded';
 		}
 	});
 }
@@ -68,7 +68,7 @@ export function collapseAllSections(
 	node.children.forEach(child => {
 		const defaultView = child.view.find(v => v.type === 'collection/section/default');
 		if (defaultView) {
-			defaultView.state = 'summary';
+			defaultView.state.state = 'summary';
 		}
 	});
 }

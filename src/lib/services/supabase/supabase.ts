@@ -1,4 +1,5 @@
 import type { Document } from '$lib/model/document';
+import { migrateDocumentIfNeeded } from '$lib/migrations';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 export async function getUserProfile(supabase: SupabaseClient, userId: string) {
@@ -118,7 +119,10 @@ export async function getDocumentByUsernameAndSlug(
 			return { success: false, error: 'Document not found' };
 		}
 
-		return { success: true, document: data.document as Document };
+		// Apply migrations if needed
+		const migratedDocument = migrateDocumentIfNeeded(data.document as Document);
+		
+		return { success: true, document: migratedDocument };
 	} catch (error) {
 		console.error('Error fetching document:', error);
 		return { success: false, error };
@@ -145,7 +149,10 @@ export async function getDocumentBySlugForCurrentUser(
 			return { success: false, error: 'Document not found' };
 		}
 
-		return { success: true, document: data.document as Document };
+		// Apply migrations if needed
+		const migratedDocument = migrateDocumentIfNeeded(data.document as Document);
+		
+		return { success: true, document: migratedDocument };
 	} catch (error) {
 		console.error('Error fetching document for current user:', error);
 		return { success: false, error };
