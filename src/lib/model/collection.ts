@@ -24,11 +24,17 @@ const collectionBase = z.object({
 	view: z.string()
 });
 
+// Define a new type for the section default view state with variation
+export const sectionDefaultViewState = z.object({
+	state: z.enum(['expanded', 'summary']),
+	variation: z.enum(['default', 'summary-visible-on-expand'])
+});
+
 // collection/section/view
 const sectionView = z.tuple([
 	z.object({
 		type: z.literal('collection/section/default'),
-		state: z.enum(['expanded', 'summary'])
+		state: sectionDefaultViewState
 	}),
 	z.object({
 		type: z.literal('collection/section/static')

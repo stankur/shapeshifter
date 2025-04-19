@@ -45,12 +45,12 @@ export function expandAllSections(
 ) {
 	document.state.animateNextChange = true;
 	onUnmount();
-	
+
 	// Set all sections to expanded state
-	node.children.forEach(child => {
-		const defaultView = child.view.find(v => v.type === 'collection/section/default');
+	node.children.forEach((child) => {
+		const defaultView = child.view.find((v) => v.type === 'collection/section/default');
 		if (defaultView) {
-			defaultView.state = 'expanded';
+			defaultView.state.state = 'expanded';
 		}
 	});
 }
@@ -63,21 +63,18 @@ export function collapseAllSections(
 ) {
 	document.state.animateNextChange = true;
 	onUnmount();
-	
+
 	// Set all sections to summary state
-	node.children.forEach(child => {
-		const defaultView = child.view.find(v => v.type === 'collection/section/default');
+	node.children.forEach((child) => {
+		const defaultView = child.view.find((v) => v.type === 'collection/section/default');
 		if (defaultView) {
-			defaultView.state = 'summary';
+			defaultView.state.state = 'summary';
 		}
 	});
 }
 
 // Function to handle adding a section
-export function handleAddSection(
-	node: SectionContainerType,
-	onUnmount: () => void
-) {
+export function handleAddSection(node: SectionContainerType, onUnmount: () => void) {
 	onUnmount();
-	addSection(node, node.children[0].heading.level, "summary");
+	addSection(node, node.children[0].heading.level, 'summary');
 }

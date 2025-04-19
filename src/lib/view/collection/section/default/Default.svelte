@@ -28,7 +28,10 @@
 		removeSectionFromContainer: () => void;
 		onHeadingClick?: (section: Section) => void;
 	};
-	type ViewState = { state: 'expanded' | 'summary' };
+	import type { sectionDefaultViewState } from '$lib/model/collection';
+	import type { z } from 'zod';
+
+	type ViewState = z.infer<typeof sectionDefaultViewState>;
 	let {
 		path,
 		refs,
@@ -86,6 +89,14 @@
 
 	let viewStateIndex = $derived(view.findIndex((v) => v.type === activeView));
 
+	// Function to get the current variation with fallback
+	function getVariation(viewState: ViewState): string {
+		return viewState.variation || 'default';
+	}
+
+	let currentViewState = $derived(node.view[viewStateIndex] as unknown as ViewState);
+	let variation = $derived(getVariation(currentViewState));
+
 	let headingElement: HTMLDivElement | null = $state(null);
 	let contentElement: HTMLDivElement | null = $state(null);
 	let controlElement: HTMLDivElement | null = $state(null);
@@ -136,7 +147,7 @@
 {#if document.state.mode === 'customize'}
 	<DefaultControl
 		bind:controlElement={controlElement as HTMLDivElement}
-		viewState={node.view[viewStateIndex] as ViewState}
+		viewState={node.view[viewStateIndex] as unknown as ViewState}
 		{onUnmount}
 	/>
 {/if}
@@ -155,11 +166,11 @@
                             return
 						}
 
-						if ((node.view[viewStateIndex] as ViewState).state === 'expanded') {
-							(node.view[viewStateIndex] as ViewState).state = 'summary';
+						if ((node.view[viewStateIndex] as unknown as ViewState).state === 'expanded') {
+							(node.view[viewStateIndex] as unknown as ViewState).state = 'summary';
 							return;
 						}
-						(node.view[viewStateIndex] as ViewState).state = 'expanded';
+						(node.view[viewStateIndex] as unknown as ViewState).state = 'expanded';
 					}}
 					path={[...path, 'heading']}
 					{refs}
@@ -207,7 +218,22 @@
 	{/if}
 
 	<div bind:this={contentElement} class="flex flex-col gap-7">
-		{#if (node.view[viewStateIndex] as ViewState).state === 'expanded'}
+		{#if currentViewState.state === 'expanded'}
+			{#if variation === 'summary-visible-on-expand'}
+				<!-- Show summary when expanded for this variation -->
+				{#each SummaryRenderers as { Renderer }, i (node.summary[i].last_modified + node.summary[i].id)}
+					<Renderer
+						path={[...path, 'summary', i]}
+						{refs}
+						overrides={{ class: 'prose-p:text-gray-500' }}
+						onSplit={(newBlocks) => {
+							splitParagraph(node, 'summary', newBlocks, document, i);
+						}}
+						{onUnmount}
+					/>
+				{/each}
+			{/if}
+
 			{console.log('children renderers length in section: ', ChildrenRenderers.length)}
 			<!-- should work without the key, but not working -->
 			{#each ChildrenRenderers as { Renderer }, i (node.children[i].last_modified + node.children[i].id)}
@@ -227,7 +253,7 @@
 					/>
 				</div>
 			{/each}
-		{:else if (node.view[viewStateIndex] as ViewState).state === 'summary'}
+		{:else if currentViewState.state === 'summary'}
 			{#each SummaryRenderers as { Renderer }, i (node.summary[i].last_modified + node.summary[i].id)}
 				{console.log(i)}
 				{console.log((node.summary[i] as ContentParagraph).content)}

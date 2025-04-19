@@ -9,7 +9,7 @@
 	import type { Document } from '$lib/model/document';
 	import Controls from './Controls.svelte';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
-    import DefaultView from "$lib/view/collection/section-container/Default/Default.svelte"
+	import DefaultView from '$lib/view/collection/section-container/Default/Default.svelte';
 	import Default from './Default.svelte';
 	import Brick from './Brick.svelte';
 	import type { z } from 'zod';
@@ -44,7 +44,6 @@
 		isCardHovered = false;
 	}
 
-
 	// Get the current variation from the state
 	function getVariation() {
 		const currentView = view.find((v) => v.type === activeView);
@@ -53,24 +52,24 @@
 		}
 		return 'default';
 	}
-	
+
 	let variation = $derived(getVariation());
 </script>
 
 {#if !node.children.every((child) => {
 	const defaultView = child.view.find((v) => v.type === 'collection/section/default');
-	return defaultView?.state === 'summary';
+	return defaultView?.state.state === 'summary';
 })}
 	<div class="card-container" onmouseenter={showCardControls} onmouseleave={hideCardControls}>
-		<DefaultView 
-			{path} 
-			{refs} 
-			{onUnmount} 
+		<DefaultView
+			{path}
+			{refs}
+			{onUnmount}
 			onHeadingClick={(section) => {
 				// When a heading is clicked in the default view that was shown from card view,
 				// collapse all sections to go back to card view
 				collapseAllSections(node, document, onUnmount);
-			}} 
+			}}
 		/>
 	</div>
 {:else}
@@ -80,7 +79,7 @@
 		{/if}
 
 		{#if variation === 'brick'}
-			<Brick {path} {refs} {onUnmount}/>
+			<Brick {path} {refs} {onUnmount} />
 		{:else}
 			<Default {path} {refs} {onUnmount} />
 		{/if}

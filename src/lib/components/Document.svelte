@@ -23,7 +23,7 @@
 	let writerContext = $state({ showSummary: true });
 
 	let { node: document }: { node: Document } = $props();
-    const node = $state(document);
+	const node = $state(document);
 	const documentManipulator = createDocumentManipulator(node);
 	setContext('document', node);
 	setContext('documentManipulator', documentManipulator);
@@ -48,14 +48,14 @@
 		// 	.filter((ref) => ref.element)
 		// 	.map((ref) => ref.element);
 		// flipState = Flip.getState(elements, {
-        //     props: "fontSize,lineHeight"
-        // });
+		//     props: "fontSize,lineHeight"
+		// });
 	};
 
 	// $effect(() => {
 	// 	if (flipState !== null && node.state.animateNextChange) {
 	// 		const elements = Object.values(refs).map(ref => ref.element);
-			
+
 	// 		Flip.from(flipState as Flip.FlipState, {
 	// 			targets: elements,
 	// 			duration: 0.2,

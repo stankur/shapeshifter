@@ -3,13 +3,18 @@
 	import SummaryIcon from './SummaryIcon.svelte';
 	import { getContext } from 'svelte';
 	import type { Document } from '$lib/model/document';
+	import type { sectionDefaultViewState } from '$lib/model/collection';
+	import type { z } from 'zod';
+	
+	type ViewState = z.infer<typeof sectionDefaultViewState>;
+	
 	let {
 		controlElement = $bindable(),
 		viewState,
 		onUnmount
 	}: {
 		controlElement: HTMLDivElement;
-		viewState: { state: 'expanded' | 'summary' };
+		viewState: ViewState;
 		onUnmount: () => void;
 	} = $props();
 

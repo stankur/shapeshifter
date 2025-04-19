@@ -1,5 +1,6 @@
 import type { Document } from '$lib/model/document';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { applyMigrations } from '$lib/migrations';
 
 export async function getUserProfile(supabase: SupabaseClient, userId: string) {
 	const { data, error } = await supabase
@@ -118,7 +119,20 @@ export async function getDocumentByUsernameAndSlug(
 			return { success: false, error: 'Document not found' };
 		}
 
-		return { success: true, document: data.document as Document };
+		// Apply migrations to the document
+		const document = data.document as Document;
+		const migrationResults = applyMigrations(document);
+		
+		if (migrationResults.length > 0) {
+			console.log('Applied migrations:', migrationResults);
+			
+			// If migrations were applied, save the updated document
+			if (migrationResults.some(r => r.applied)) {
+				await saveDocument(supabase, document, profileData.id);
+			}
+		}
+
+		return { success: true, document };
 	} catch (error) {
 		console.error('Error fetching document:', error);
 		return { success: false, error };
@@ -145,7 +159,20 @@ export async function getDocumentBySlugForCurrentUser(
 			return { success: false, error: 'Document not found' };
 		}
 
-		return { success: true, document: data.document as Document };
+		// Apply migrations to the document
+		const document = data.document as Document;
+		const migrationResults = applyMigrations(document);
+		
+		if (migrationResults.length > 0) {
+			console.log('Applied migrations:', migrationResults);
+			
+			// If migrations were applied, save the updated document
+			if (migrationResults.some(r => r.applied)) {
+				await saveDocument(supabase, document, userId);
+			}
+		}
+
+		return { success: true, document };
 	} catch (error) {
 		console.error('Error fetching document for current user:', error);
 		return { success: false, error };
