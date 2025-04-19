@@ -22,12 +22,40 @@
 	let floatingElement: HTMLDivElement;
 	let referenceElement: HTMLDivElement;
 
+	// Reactive variable to track the current variation across all child sections
+	let currentVariation = $derived(() => {
+		// If any section has summary-always, return that
+		for (const child of node.children) {
+			const defaultView = child.view.find((view) => view.type === 'collection/section/default');
+			if (defaultView && defaultView.state.variation === 'summary-always') {
+				return 'summary-always';
+			}
+		}
+		return 'default';
+	});
+
 	function showControls() {
 		isHovered = true;
 	}
 
 	function hideControls() {
 		isHovered = false;
+	}
+	
+	// Update all child sections' variation
+	function updateChildrenVariation(event: Event) {
+		const select = event.target as HTMLSelectElement;
+		const newVariation = select.value as 'default' | 'summary-always';
+		
+		onUnmount();
+		
+		// Update all child sections
+		node.children.forEach((child) => {
+			const defaultView = child.view.find((view) => view.type === 'collection/section/default');
+			if (defaultView) {
+				defaultView.state.variation = newVariation;
+			}
+		});
 	}
 
 	function switchToTabs() {
@@ -76,7 +104,18 @@
 	<button class="rounded-md bg-blue-500 p-2 text-white" onclick={switchToTableOfContents}>
 		toc
 	</button>
-	<button class="rounded-md bg-blue-500 p-2 text-white" onclick={switchToSidebar}> sidebar </button>
+	<button class="mb-1 rounded-md bg-blue-500 p-2 text-white" onclick={switchToSidebar}> sidebar </button>
+	
+	<div class="flex flex-col">
+		<label for="variation-select" class="text-sm text-gray-700">Summary:</label>
+		<select 
+			value={currentVariation}
+			onchange={updateChildrenVariation}
+		>
+			<option value="default">Default</option>
+			<option value="summary-always">Always Show</option>
+		</select>
+	</div>
 </div>
 
 <div bind:this={referenceElement} class="reference-element w-full"></div>
