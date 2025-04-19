@@ -9,6 +9,7 @@ export const document = z.object({
 	created: z.string().datetime(),
 	last_modified: z.string().datetime(),
 	content: noHeadingContentSingle,
+	version: z.number(),
 	state: z.object({
 		mode: z.enum(['write', 'customize', 'read']),
 		animateNextChange: z.boolean(),

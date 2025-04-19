@@ -4,14 +4,14 @@
 	import {
 		getUserProfile,
 		getDocumentBySlugForCurrentUser
-	} from '$lib/services/supabase/supabase.js';
+	} from '$lib/services/supabase/supabase';
 	import { page } from '$app/state';
 	import { goto, invalidate } from '$app/navigation';
 	import UsernameInput from '$lib/components/UsernameInput.svelte';
 	import TitleInput from '$lib/components/TitleInput.svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import GoogleIcon from '$lib/components/GoogleIcon.svelte';
-	import { createDocumentState } from '$lib/services/documentState.svelte.js';
+	import { createDocumentState } from '$lib/services/documentState.svelte';
 	import { onMount } from 'svelte';
 
 	let { data } = $props();

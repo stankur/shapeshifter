@@ -28,7 +28,12 @@
 		removeSectionFromContainer: () => void;
 		onHeadingClick?: (section: Section) => void;
 	};
-	type ViewState = { state: 'expanded' | 'summary' };
+	type ViewState = { 
+		state: { 
+			state: 'expanded' | 'summary',
+			variation: 'default' | 'summary-always'
+		} 
+	};
 	let {
 		path,
 		refs,
@@ -155,11 +160,11 @@
                             return
 						}
 
-						if ((node.view[viewStateIndex] as ViewState).state === 'expanded') {
-							(node.view[viewStateIndex] as ViewState).state = 'summary';
+						if ((node.view[viewStateIndex] as ViewState).state.state === 'expanded') {
+							(node.view[viewStateIndex] as ViewState).state.state = 'summary';
 							return;
 						}
-						(node.view[viewStateIndex] as ViewState).state = 'expanded';
+						(node.view[viewStateIndex] as ViewState).state.state = 'expanded';
 					}}
 					path={[...path, 'heading']}
 					{refs}
@@ -207,7 +212,7 @@
 	{/if}
 
 	<div bind:this={contentElement} class="flex flex-col gap-7">
-		{#if (node.view[viewStateIndex] as ViewState).state === 'expanded'}
+		{#if (node.view[viewStateIndex] as ViewState).state.state === 'expanded'}
 			{console.log('children renderers length in section: ', ChildrenRenderers.length)}
 			<!-- should work without the key, but not working -->
 			{#each ChildrenRenderers as { Renderer }, i (node.children[i].last_modified + node.children[i].id)}
@@ -227,7 +232,7 @@
 					/>
 				</div>
 			{/each}
-		{:else if (node.view[viewStateIndex] as ViewState).state === 'summary'}
+		{:else if (node.view[viewStateIndex] as ViewState).state.state === 'summary'}
 			{#each SummaryRenderers as { Renderer }, i (node.summary[i].last_modified + node.summary[i].id)}
 				{console.log(i)}
 				{console.log((node.summary[i] as ContentParagraph).content)}

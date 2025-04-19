@@ -59,7 +59,7 @@
 
 {#if !node.children.every((child) => {
 	const defaultView = child.view.find((v) => v.type === 'collection/section/default');
-	return defaultView?.state === 'summary';
+	return defaultView?.state?.state === 'summary';
 })}
 	<div class="card-container" onmouseenter={showCardControls} onmouseleave={hideCardControls}>
 		<DefaultView 

@@ -28,7 +28,10 @@ const collectionBase = z.object({
 const sectionView = z.tuple([
 	z.object({
 		type: z.literal('collection/section/default'),
-		state: z.enum(['expanded', 'summary'])
+		state: z.object({
+			state: z.enum(['expanded', 'summary']),
+			variation: z.enum(['default', 'summary-always'])
+		})
 	}),
 	z.object({
 		type: z.literal('collection/section/static')
