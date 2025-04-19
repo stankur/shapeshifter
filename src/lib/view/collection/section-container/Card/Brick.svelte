@@ -80,13 +80,13 @@
 		<div class="card flex flex-row gap-6 border-1 border-gray-400 p-5">
 			{#if child.image}
 				<img
-					class="h-24 w-24 xl:h-32 xl:w-32"
+					class="w-16  h-16 md:h-24 md:w-24 xl:h-32 xl:w-32"
 					src={child.image}
 					alt="Section cover"
 					use:bindToRefs={`${child.id}-image`}
 				/>
 			{:else if someHasImage}
-				<div class="h-24 w-24 shrink-0 xl:h-32 xl:w-32" />
+				<div class="w-16  h-16 md:h-24 md:w-24 shrink-0 xl:h-32 xl:w-32" />
 			{/if}
 			<div class="flex flex-col gap-2 xl:gap-2">
 				<HeadingRenderer

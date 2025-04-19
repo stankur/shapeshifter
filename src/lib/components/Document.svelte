@@ -116,7 +116,7 @@
 </div>
 
 <div class="flex flex-col items-center gap-4">
-	<div class=" w-2/3">
+	<div class="w-5/6 md:w-2/3">
 		{#if node.state.mode !== 'write'}
 			<Renderer path={['content']} {refs} {onUnmount} />
 		{:else if node.content.type === 'section'}
