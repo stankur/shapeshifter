@@ -47,13 +47,6 @@
 	const isDocumentViewPage = $derived(!!page.params.username && !!page.params.slug);
 
 	const onUnmount = (pinElementId?: string) => {
-		// const elements = Object.values(refs)
-		// 	.filter((ref) => ref.element)
-		// 	.map((ref) => ref.element);
-		// flipState = Flip.getState(elements, {
-		//     props: "fontSize,lineHeight"
-		// });
-
 		if (pinElementId) {
 			console.log('pin element id');
 			console.log(refs[pinElementId]);
@@ -65,6 +58,11 @@
 				pinOffset.value = rect.top; // Store the current position from the top of the viewport
 
 				console.log('pinoffset value: ' + pinOffset.value);
+
+				// Capture the state for animation - only for the element being pinned
+				flipState = Flip.getState(refs[pinElementId].element, {
+					props: 'fontSize,lineHeight'
+				});
 			}
 			elementToPin.value = pinElementId;
 		}
@@ -73,18 +71,61 @@
 	$effect(() => {
 		console.log('in effect out');
 
-		if (elementToPin.value && refs[elementToPin.value] && refs[elementToPin.value].element) {
+		if (
+			elementToPin.value &&
+			refs[elementToPin.value] &&
+			refs[elementToPin.value].element &&
+			flipState
+		) {
 			console.log('in effect');
-			gsap.set(window, {
-				scrollTo: {
-					y: refs[elementToPin.value].element,
-					offsetY: pinOffset.value || 0
+            // First, immediately position the element where we want it visually
+            // This prevents the scroll jump
+            const currentRect = refs[elementToPin.value].element.getBoundingClientRect();
+            const currentScroll = window.scrollY;
+        
+
+			// Perform the animation
+			Flip.from(flipState, {
+				targets: refs[elementToPin.value].element,
+				duration: 0.1,
+				ease: 'power4.inOut',
+				absolute: false,
+				nested: false,
+				onStart: () => {
+					refs[elementToPin.value as string].element.style.pointerEvents = 'none';
+                    gsap.set(refs[elementToPin.value as string].element, {display: "fixed", top: })
+					gsap.set(window, {
+						scrollTo: {
+							y: refs[elementToPin.value as string].element,
+							offsetY: pinOffset.value || 0
+						}
+					});
+				},
+				onUpdate: () => {
+					gsap.set(window, {
+						scrollTo: {
+							y: refs[elementToPin.value as string].element,
+							offsetY: pinOffset.value || 0
+						}
+					});
+				},
+				onComplete: () => {
+					refs[elementToPin.value as string].element.style.pointerEvents = 'auto';
+
+					// Ensure the pinned element is in the correct position
+					gsap.set(window, {
+						scrollTo: {
+							y: refs[elementToPin.value as string].element,
+							offsetY: pinOffset.value || 0
+						}
+					});
+
+					// Reset elementToPin, pinOffset, and flipState after use
+					elementToPin.value = null;
+					pinOffset.value = null;
+					flipState = null;
 				}
 			});
-            
-			// Reset elementToPin and pinOffset after use
-			elementToPin.value = null;
-			pinOffset.value = null;
 		}
 	});
 
