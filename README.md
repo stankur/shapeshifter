@@ -134,3 +134,5 @@ when the bricks is rendered as active section in a sidebar, not expected because
 documents are mysteriously disappearing from the database, like text cinema's doc, aak.
 
 when the editor initially loads, the summary select dropdown has empty value, not populated properly.
+
+it is problematic when the image url is not found. I believe the recraft image URL might have expired, making the url invalid, and thing like jump to heading upon card expansion broke.
