@@ -5,6 +5,7 @@
 	import { page } from '$app/state';
 	import { gsap } from 'gsap';
 	import Flip from 'gsap/dist/Flip';
+	import ScrollToPlugin from 'gsap/dist/ScrollToPlugin';
 	import type { NoHeadingContentSingle } from '../model/collection';
 	import { createDocumentManipulator } from '../documentManipulator.svelte';
 	import SectionWrite from '$lib/view/collection/section/write/Write.svelte';
@@ -12,7 +13,7 @@
 	import { Toggle } from 'flowbite-svelte';
 	import { createDeviceContext } from '$lib/services/deviceContext.svelte';
 
-	gsap.registerPlugin(Flip);
+	gsap.registerPlugin(Flip, ScrollToPlugin);
 
 	export type Refs = Record<string, { element: HTMLElement }>;
 	// Create and initialize device context
@@ -23,7 +24,7 @@
 	let writerContext = $state({ showSummary: true });
 
 	let { node: document }: { node: Document } = $props();
-    const node = $state(document);
+	const node = $state(document);
 	const documentManipulator = createDocumentManipulator(node);
 	setContext('document', node);
 	setContext('documentManipulator', documentManipulator);
@@ -37,25 +38,60 @@
 		}>
 	);
 	let refs = $state<Refs>({});
+	let elementToPin = $state<{ value: string | null }>({ value: null });
+	let pinOffset = $state<{ value: number | null }>({ value: null });
 
 	let flipState: Flip.FlipState | null = $state(null);
 
 	// Check if we're on a document view page (URL with username and slug parameters)
 	const isDocumentViewPage = $derived(!!page.params.username && !!page.params.slug);
 
-	const onUnmount = () => {
+	const onUnmount = (pinElementId?: string) => {
 		// const elements = Object.values(refs)
 		// 	.filter((ref) => ref.element)
 		// 	.map((ref) => ref.element);
 		// flipState = Flip.getState(elements, {
-        //     props: "fontSize,lineHeight"
-        // });
+		//     props: "fontSize,lineHeight"
+		// });
+
+		if (pinElementId) {
+			console.log('pin element id');
+			console.log(refs[pinElementId]);
+			console.log(refs[pinElementId].element);
+
+			// Store the element's position before the expansion
+			if (refs[pinElementId] && refs[pinElementId].element) {
+				const rect = refs[pinElementId].element.getBoundingClientRect();
+				pinOffset.value = rect.top; // Store the current position from the top of the viewport
+
+				console.log('pinoffset value: ' + pinOffset.value);
+			}
+			elementToPin.value = pinElementId;
+		}
 	};
+
+	$effect(() => {
+		console.log('in effect out');
+
+		if (elementToPin.value && refs[elementToPin.value] && refs[elementToPin.value].element) {
+			console.log('in effect');
+			gsap.set(window, {
+				scrollTo: {
+					y: refs[elementToPin.value].element,
+					offsetY: pinOffset.value || 0
+				}
+			});
+            
+			// Reset elementToPin and pinOffset after use
+			elementToPin.value = null;
+			pinOffset.value = null;
+		}
+	});
 
 	// $effect(() => {
 	// 	if (flipState !== null && node.state.animateNextChange) {
 	// 		const elements = Object.values(refs).map(ref => ref.element);
-			
+
 	// 		Flip.from(flipState as Flip.FlipState, {
 	// 			targets: elements,
 	// 			duration: 0.2,

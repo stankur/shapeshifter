@@ -12,7 +12,7 @@
 		isCardHovered
 	}: {
 		path: (string | number)[];
-		onUnmount: () => void;
+		onUnmount: (elementToPin?: string | null) => void;
 		isCardHovered: boolean;
 	} = $props();
 

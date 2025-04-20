@@ -46,7 +46,7 @@
 	}: {
 		path: (string | number)[];
 		refs: Refs;
-		onUnmount: () => void;
+		onUnmount: (elementToPin?: string | null) => void;
 	} = $props();
 
 	const node = documentManipulator.getByPath(path) as SectionContainerType;
@@ -97,7 +97,12 @@
 					overrides={{
 						class: 'prose-h1:text-base md:prose-h1:text-xl'
 					}}
-					onClickReadMode={() => expandAllSections(node, document, onUnmount)}
+					onClickReadMode={() => {
+						// Pass the heading ID to onUnmount using a closure
+						expandAllSections(node, document, () => {
+                            console.log("onUnmounting with id: " + child.heading.id)
+                            onUnmount(child.heading.id)});
+					}}
 				/>
 				<div>
 					{#each SummaryRenderers as { summaryChild, summaryIndex, Renderer }}

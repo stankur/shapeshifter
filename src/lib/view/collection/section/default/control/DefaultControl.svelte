@@ -15,7 +15,7 @@
 				variation: 'default' | 'summary-always'
 			} 
 		};
-		onUnmount: () => void;
+		onUnmount: (elementToPin?: string | null) => void;
 	} = $props();
 
 	let document = getContext('document') as Document;

@@ -9,7 +9,7 @@ import { addSection } from '$lib/actions/collection/section-container.svelte';
 export type HeadingComponentProps = {
 	path: (string | number)[];
 	refs: Refs;
-	onUnmount: () => void;
+	onUnmount: (elementToPin?: string | null) => void;
 	updateParent?: () => void;
 	getNextEditable?: NavigationHandler;
 	getPrevEditable?: NavigationHandler;
@@ -23,7 +23,7 @@ export type HeadingComponentProps = {
 export type ContentComponentProps = {
 	path: (string | number)[];
 	refs: Refs;
-	onUnmount: () => void;
+	onUnmount: (elementToPin?: string | null) => void;
 	overrides?: {
 		class?: string;
 	};
@@ -41,14 +41,14 @@ export type SectionContainerViewStateType = z.infer<typeof sectionContainerCardV
 export function expandAllSections(
 	node: SectionContainerType,
 	document: Document,
-	onUnmount: () => void
+	onUnmount: (elementToPin?: string | null) => void
 ) {
 	document.state.animateNextChange = true;
 	onUnmount();
-	
+
 	// Set all sections to expanded state
-	node.children.forEach(child => {
-		const defaultView = child.view.find(v => v.type === 'collection/section/default');
+	node.children.forEach((child) => {
+		const defaultView = child.view.find((v) => v.type === 'collection/section/default');
 		if (defaultView) {
 			defaultView.state.state = 'expanded';
 		}
@@ -59,14 +59,14 @@ export function expandAllSections(
 export function collapseAllSections(
 	node: SectionContainerType,
 	document: Document,
-	onUnmount: () => void
+	onUnmount: (elementToPin?: string | null) => void
 ) {
 	document.state.animateNextChange = true;
 	onUnmount();
-	
+
 	// Set all sections to summary state
-	node.children.forEach(child => {
-		const defaultView = child.view.find(v => v.type === 'collection/section/default');
+	node.children.forEach((child) => {
+		const defaultView = child.view.find((v) => v.type === 'collection/section/default');
 		if (defaultView) {
 			defaultView.state.state = 'summary';
 		}
@@ -76,8 +76,8 @@ export function collapseAllSections(
 // Function to handle adding a section
 export function handleAddSection(
 	node: SectionContainerType,
-	onUnmount: () => void
+	onUnmount: (elementToPin?: string | null) => void
 ) {
 	onUnmount();
-	addSection(node, node.children[0].heading.level, "summary");
+	addSection(node, node.children[0].heading.level, 'summary');
 }

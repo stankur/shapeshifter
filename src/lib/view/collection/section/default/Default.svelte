@@ -19,7 +19,7 @@
 	type Props = {
 		path: (string | number)[];
 		refs: Refs;
-		onUnmount: () => void;
+		onUnmount: (elementToPin?: string | null) => void;
 		overrides?: { heading?: boolean; accommodateControls?: boolean };
 		addSection: (newSection: Section) => void;
 		findPrecedingSection: (level: number) => Section | null;
@@ -152,7 +152,8 @@
 			<div bind:this={headingElement}>
 				<HeadingRenderer
 					onClickReadMode={() => {
-						onUnmount();
+						// Pass the heading ID to onUnmount before changing state
+						onUnmount(node.heading.id);
 						document.state.animateNextChange = false;
 
 						if (onHeadingClick) {
