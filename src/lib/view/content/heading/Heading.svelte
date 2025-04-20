@@ -16,13 +16,13 @@
 	const getHeadingSize = (level: number) => {
 		switch (level) {
 			case 1:
-				return 'prose-h1:text-6xl';
+				return 'prose-h1:text-3xl md:prose-h1:text-6xl';
 			case 2:
-				return 'prose-h1:text-4xl';
+				return 'prose-h1:text-2xl md:prose-h1:text-4xl';
 			case 3:
-				return 'prose-h1:text-2xl';
+				return 'prose-h1:text-xl md:prose-h1:text-2xl';
 			default:
-				return 'prose-h1:text-xl';
+				return 'prose-h1:text-lg md:prose-h1:text-xl';
 		}
 	};
 
