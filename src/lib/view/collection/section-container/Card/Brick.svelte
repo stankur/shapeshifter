@@ -95,7 +95,7 @@
 					{onUnmount}
 					{...createHeadingNavProps(child, node, sectionIndex, document)}
 					overrides={{
-						class: 'prose-h1:text-xl'
+						class: 'prose-h1:text-base md:prose-h1:text-xl'
 					}}
 					onClickReadMode={() => expandAllSections(node, document, onUnmount)}
 				/>
