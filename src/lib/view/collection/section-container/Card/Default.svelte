@@ -12,27 +12,27 @@
 	import { getContext } from 'svelte';
 	import type { Document } from '$lib/model/document';
 	import { addSection } from '$lib/actions/collection/section-container.svelte';
-import { createHeadingNavProps, createSummaryNavProps } from './navigation';
-import type { NavigationHandler } from '$lib/services/navigation/types';
-import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
-import Chip from '$lib/components/Chip.svelte';
-import {
-	expandAllSections,
-	handleAddSection,
-	type HeadingComponentProps,
-	type ContentComponentProps,
-	type SectionContainerType,
-	type SectionContainerViewStateType
-} from './cardUtils';
+	import { createHeadingNavProps, createSummaryNavProps } from './navigation';
+	import type { NavigationHandler } from '$lib/services/navigation/types';
+	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
+	import Chip from '$lib/components/Chip.svelte';
+	import {
+		expandAllSections,
+		handleAddSection,
+		type HeadingComponentProps,
+		type ContentComponentProps,
+		type SectionContainerType,
+		type SectionContainerViewStateType
+	} from './cardUtils';
 
 	// Custom action to bind an element to refs with a specific ID
 	function bindToRefs(element: HTMLElement, id: string) {
 		// Set the data-flip-id attribute
 		element.setAttribute('data-flip-id', id);
-		
+
 		// Add the element to the refs object
 		refs[id] = { element };
-		
+
 		// Return a cleanup function
 		return {
 			destroy() {
@@ -52,7 +52,7 @@ import {
 	}: {
 		path: (string | number)[];
 		refs: Refs;
-		onUnmount: () => void;
+		onUnmount: (elementToPin?: string | null) => void;
 	} = $props();
 
 	const node = documentManipulator.getByPath(path) as SectionContainerType;
@@ -76,7 +76,6 @@ import {
 	);
 
 	let someHasImage = $derived(children.some((child) => child.image));
-
 
 	// Minimum width for cards
 	const minCardWidth = 250;
@@ -104,7 +103,10 @@ import {
 					overrides={{
 						class: 'prose-h1:text-md md:prose-h1:text-xl'
 					}}
-					onClickReadMode={() => expandAllSections(node, document, onUnmount)}
+					onClickReadMode={() => {
+						// Pass the heading ID to onUnmount using a closure
+						expandAllSections(node, document, () => onUnmount(child.heading.id));
+					}}
 				/>
 				{#each SummaryRenderers as { summaryChild, summaryIndex, Renderer }}
 					<Renderer
@@ -130,7 +132,7 @@ import {
 	.card-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(var(--min-card-width), 1fr));
-        gap: 16px;
+		gap: 16px;
 	}
 
 	.card {

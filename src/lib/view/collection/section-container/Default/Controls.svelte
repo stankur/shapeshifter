@@ -10,7 +10,7 @@
 		isDefaultHovered
 	}: {
 		path: (string | number)[];
-		onUnmount: () => void;
+		onUnmount: (elementToPin?: string | null) => void;
 		isDefaultHovered: boolean;
 	} = $props();
 

@@ -22,7 +22,7 @@
 	}: {
 		path: (string | number)[];
 		refs: Refs;
-		onUnmount: () => void;
+		onUnmount: (elementToPin?: string | null) => void;
 	} = $props();
 
 	const document = getContext('document') as Document;

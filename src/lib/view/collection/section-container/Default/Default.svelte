@@ -20,7 +20,7 @@
 	}: {
 		path: (string | number)[];
 		refs: Refs;
-		onUnmount: () => void;
+		onUnmount: (elementToPin?: string | null) => void;
 		onHeadingClick?: (section: Section) => void;
 	} = $props();
 
@@ -37,7 +37,7 @@
 			Renderer: registry[child.activeView as keyof typeof registry] as Component<{
 				path: (string | number)[];
 				refs: Refs;
-				onUnmount: () => void;
+				onUnmount: (elementToPin?: string | null) => void;
 				addSection: (section: Section) => void;
 				findPrecedingSection: (level: number) => Section | null;
 				findParentSection: () => Section | null;
