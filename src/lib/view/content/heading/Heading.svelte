@@ -223,7 +223,7 @@
 		headingSize,
 		'prose-h1:inline-block',
 		'prose-h1:font-semibold',
-        "break-all",
+        "wrap-anywhere",
 		mergedOverrides.class,
 		documentNode.state.mode === 'read' && 'cursor-pointer select-none'
 	]}
