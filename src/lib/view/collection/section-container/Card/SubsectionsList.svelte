@@ -1,25 +1,38 @@
 <script lang="ts">
 	import type { Section, SectionContainer } from '$lib/model/collection';
-	import { getContext } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
+	import type { Document } from '$lib/model/document';
+	import type { Refs } from '$lib/components/Document.svelte';
 
 	let {
 		path,
 		sectionIndex,
 		showSubsections = false,
-		onToggle = () => {}
+		onToggle = () => {},
+		onUnmount = (elementToPin?: string | null) => {},
+		refs 
 	}: {
 		path: (string | number)[];
 		sectionIndex: number;
 		showSubsections?: boolean;
 		onToggle?: () => void;
+		onUnmount?: (elementToPin?: string | null) => void;
+		refs: Refs;
 	} = $props();
 
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
+	const document = getContext('document') as Document;
 
 	// Get the section from the path
 	const container = documentManipulator.getByPath(path) as SectionContainer;
 	const section = container.children[sectionIndex];
+
+	// Create a unique ID for this subsection header
+	const subsectionHeaderId = `subsection-header-${section.id}`;
+	
+	// Reference to the header element
+	let headerElement: HTMLElement;
 
 	// Collect subsection titles from this specific section
 	let subsectionTitles = $derived(
@@ -41,11 +54,40 @@
 			return titles;
 		})()
 	);
+
+	// Function to toggle subsections with animation
+	function toggleSubsections() {
+		// Pass the header ID to onUnmount before toggling
+		onUnmount(subsectionHeaderId);
+		
+		// Set the animation flag
+		document.state.animateNextChange = true;
+		
+		// Call the provided toggle function
+		onToggle();
+	}
+	
+	// Register the header element in refs when the component is mounted
+	onMount(() => {
+		if (headerElement) {
+			refs[subsectionHeaderId] = { element: headerElement };
+		}
+		
+		// Clean up when the component is unmounted
+		return () => {
+			delete refs[subsectionHeaderId];
+		};
+	});
 </script>
 
 {#if subsectionTitles.length > 0}
 	<div class="mt-2 border-t-1 border-t-gray-300 pt-4">
-		<div class="mb-2 flex justify-between cursor-pointer" on:click={onToggle}>
+		<div 
+			bind:this={headerElement}
+			class="mb-2 flex justify-between cursor-pointer" 
+			on:click={toggleSubsections}
+			data-flip-id={subsectionHeaderId}
+		>
 			<span class="select-none mr-1 text-xs font-semibold">subsections</span>
 			<svg
 				class="h-4 w-4 text-gray-600 transition-transform duration-200"

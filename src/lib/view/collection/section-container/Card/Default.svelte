@@ -137,7 +137,7 @@
 				{/each}
 
 				{#if isMultilevelEnabled}
-					<SubsectionsList {path} {sectionIndex} {showSubsections} onToggle={onToggleSubsections} />
+					<SubsectionsList {path} {sectionIndex} {showSubsections} onToggle={onToggleSubsections} {onUnmount} {refs} />
 				{/if}
 			</div>
 		</div>
