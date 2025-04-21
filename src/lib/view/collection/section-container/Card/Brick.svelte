@@ -16,7 +16,15 @@
 	import type { NavigationHandler } from '$lib/services/navigation/types';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 	import Chip from '$lib/components/Chip.svelte';
-	import { handleAddSection, type HeadingComponentProps, type ContentComponentProps, type SectionContainerType, type SectionContainerViewStateType, expandAllSections } from './cardUtils';
+	import SubsectionsList from './SubsectionsList.svelte';
+	import {
+		handleAddSection,
+		type HeadingComponentProps,
+		type ContentComponentProps,
+		type SectionContainerType,
+		type SectionContainerViewStateType,
+		expandAllSections
+	} from './cardUtils';
 
 	// Custom action to bind an element to refs with a specific ID
 	function bindToRefs(element: HTMLElement, id: string) {
@@ -38,15 +46,18 @@
 	const document = getContext('document') as Document;
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 
-
 	let {
 		path,
 		refs,
 		onUnmount,
+		showSubsections = false,
+		onToggleSubsections = () => {}
 	}: {
 		path: (string | number)[];
 		refs: Refs;
 		onUnmount: (elementToPin?: string | null) => void;
+		showSubsections?: boolean;
+		onToggleSubsections?: () => void;
 	} = $props();
 
 	const node = documentManipulator.getByPath(path) as SectionContainerType;
@@ -71,61 +82,76 @@
 
 	let someHasImage = $derived(children.some((child) => child.image));
 
+	// Get the multilevel setting from the state
+	let isMultilevelEnabled = $derived(
+		(() => {
+			const currentView = view.find((v) => v.type === activeView);
+			if (currentView && 'state' in currentView) {
+				return (currentView.state as SectionContainerViewStateType).multilevel;
+			}
+			return false;
+		})()
+	);
+
 	// Minimum width for cards
 	const minCardWidth = 250;
 </script>
 
-<div class="card-container"  style:--min-card-width={`${minCardWidth}px`}>
+<div class="card-container" style:--min-card-width={`${minCardWidth}px`}>
 	{#each SectionRenderers as { child, sectionIndex, HeadingRenderer, SummaryRenderers }}
-		<div class="card flex flex-row gap-6 border-1 border-gray-400 p-5">
-			{#if child.image}
-				<img
-					class="w-16  h-16 md:h-24 md:w-24 xl:h-32 xl:w-32"
-					src={child.image}
-					alt="Section cover"
-					use:bindToRefs={`${child.id}-image`}
-				/>
-			{:else if someHasImage}
-				<div class="w-16  h-16 md:h-24 md:w-24 shrink-0 xl:h-32 xl:w-32" />
-			{/if}
-			<div class="flex flex-col gap-2 xl:gap-2">
-				<HeadingRenderer
-					path={[...path, 'children', sectionIndex, 'heading']}
-					{refs}
-					{onUnmount}
-					{...createHeadingNavProps(child, node, sectionIndex, document)}
-					overrides={{
-						class: 'prose-h1:text-base md:prose-h1:text-xl'
-					}}
-					onClickReadMode={() => {
-						// Pass the heading ID to onUnmount using a closure
-						expandAllSections(node, document, () => {
-                            console.log("onUnmounting with id: " + child.heading.id)
-                            onUnmount(child.heading.id)});
-					}}
-				/>
-				<div>
-					{#each SummaryRenderers as { summaryChild, summaryIndex, Renderer }}
-						<Renderer
-							path={[...path, 'children', sectionIndex, 'summary', summaryIndex]}
-							{refs}
-							{onUnmount}
-							overrides={{
-								class: 'prose-p:text-xs prose-p:text-gray-500'
-							}}
-							{...createSummaryNavProps(child, node, summaryChild.id, sectionIndex, document)}
-						/>
-					{/each}
+		<div class="card flex flex-col border-1 border-gray-400 p-5">
+			<div class="flex flex-row gap-6">
+				{#if child.image}
+					<img
+						class="h-16 w-16 md:h-24 md:w-24 xl:h-32 xl:w-32"
+						src={child.image}
+						alt="Section cover"
+						use:bindToRefs={`${child.id}-image`}
+					/>
+				{:else if someHasImage}
+					<div class="h-16 w-16 shrink-0 md:h-24 md:w-24 xl:h-32 xl:w-32" />
+				{/if}
+				<div class="flex flex-col gap-2 xl:gap-2">
+					<HeadingRenderer
+						path={[...path, 'children', sectionIndex, 'heading']}
+						{refs}
+						{onUnmount}
+						{...createHeadingNavProps(child, node, sectionIndex, document)}
+						overrides={{
+							class: 'prose-h1:text-base md:prose-h1:text-xl'
+						}}
+						onClickReadMode={() => {
+							// Pass the heading ID to onUnmount using a closure
+							expandAllSections(node, document, () => {
+								console.log('onUnmounting with id: ' + child.heading.id);
+								onUnmount(child.heading.id);
+							});
+						}}
+					/>
+					<div>
+						{#each SummaryRenderers as { summaryChild, summaryIndex, Renderer }}
+							<Renderer
+								path={[...path, 'children', sectionIndex, 'summary', summaryIndex]}
+								{refs}
+								{onUnmount}
+								overrides={{
+									class: 'prose-p:text-xs prose-p:text-gray-500'
+								}}
+								{...createSummaryNavProps(child, node, summaryChild.id, sectionIndex, document)}
+							/>
+						{/each}
+					</div>
 				</div>
 			</div>
+			
+			{#if isMultilevelEnabled}
+				<SubsectionsList {path} {sectionIndex} {showSubsections} onToggle={onToggleSubsections} {onUnmount} {refs} />
+			{/if}
 		</div>
 	{/each}
 
 	{#if document.state.mode !== 'read'}
-		<Chip
-			onclick={() => handleAddSection(node, onUnmount)}
-			label="Add Section"
-		/>
+		<Chip onclick={() => handleAddSection(node, onUnmount)} label="Add Section" />
 	{/if}
 </div>
 
@@ -133,7 +159,7 @@
 	.card-container {
 		display: grid;
 		grid-template-columns: 1fr;
-        gap: 16px;
+		gap: 16px;
 	}
 
 	@media (min-width: 1280px) {

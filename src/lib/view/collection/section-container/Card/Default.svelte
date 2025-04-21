@@ -16,6 +16,7 @@
 	import type { NavigationHandler } from '$lib/services/navigation/types';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 	import Chip from '$lib/components/Chip.svelte';
+	import SubsectionsList from './SubsectionsList.svelte';
 	import {
 		expandAllSections,
 		handleAddSection,
@@ -48,11 +49,15 @@
 	let {
 		path,
 		refs,
-		onUnmount
+		onUnmount,
+		showSubsections = false,
+		onToggleSubsections = () => {}
 	}: {
 		path: (string | number)[];
 		refs: Refs;
 		onUnmount: (elementToPin?: string | null) => void;
+		showSubsections?: boolean;
+		onToggleSubsections?: () => void;
 	} = $props();
 
 	const node = documentManipulator.getByPath(path) as SectionContainerType;
@@ -76,6 +81,17 @@
 	);
 
 	let someHasImage = $derived(children.some((child) => child.image));
+
+	// Get the multilevel setting from the state
+	let isMultilevelEnabled = $derived(
+		(() => {
+			const currentView = view.find((v) => v.type === activeView);
+			if (currentView && 'state' in currentView) {
+				return (currentView.state as SectionContainerViewStateType).multilevel;
+			}
+			return false;
+		})()
+	);
 
 	// Minimum width for cards
 	const minCardWidth = 250;
@@ -119,6 +135,10 @@
 						{...createSummaryNavProps(child, node, summaryChild.id, sectionIndex, document)}
 					/>
 				{/each}
+
+				{#if isMultilevelEnabled}
+					<SubsectionsList {path} {sectionIndex} {showSubsections} onToggle={onToggleSubsections} {onUnmount} {refs} />
+				{/if}
 			</div>
 		</div>
 	{/each}

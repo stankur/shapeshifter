@@ -2,6 +2,7 @@
 import type { Document } from '$lib/model/document';
 import type { MigrationRegistry, MigrationStep } from './types';
 import { createSectionMigrations } from './collection/section';
+import { createSectionContainerMigrations } from './collection/section-container';
 
 // Create migration registry using a factory function
 export function createMigrationRegistry() {
@@ -53,6 +54,7 @@ const migrationRegistry = createMigrationRegistry();
 
 // Register all migrations
 createSectionMigrations(migrationRegistry);
+createSectionContainerMigrations(migrationRegistry);
 
 // Export the migration function for use in document retrieval
 export function migrateDocumentIfNeeded(document: Document): Document {
