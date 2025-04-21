@@ -56,6 +56,17 @@
 			(viewToUpdate.state as CardViewState).variation = newVariation;
 		}
 	}
+	
+	function toggleMultilevel(event: Event) {
+		const checkbox = event.target as HTMLInputElement;
+		onUnmount();
+		
+		// Update the multilevel setting in the state
+		const viewToUpdate = node.view.find((v) => v.type === activeView);
+		if (viewToUpdate && 'state' in viewToUpdate && viewToUpdate.state) {
+			(viewToUpdate.state as CardViewState).multilevel = checkbox.checked;
+		}
+	}
 
 	onMount(() => {
 		// Calculate z-index based on path length
@@ -88,6 +99,17 @@
 				<option value="default">Default</option>
 				<option value="brick">Brick</option>
 			</select>
+		</div>
+		
+		<div class="flex flex-col mt-2">
+			<label class="text-sm text-gray-700">
+				<input 
+					type="checkbox" 
+					checked={viewState?.multilevel ?? false}
+					onchange={(e) => toggleMultilevel(e)}
+				/>
+				Multilevel
+			</label>
 		</div>
 	</div>
 </div>

@@ -16,6 +16,7 @@
 	import type { NavigationHandler } from '$lib/services/navigation/types';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
 	import Chip from '$lib/components/Chip.svelte';
+	import SubsectionsList from './SubsectionsList.svelte';
 	import {
 		expandAllSections,
 		handleAddSection,
@@ -77,6 +78,15 @@
 
 	let someHasImage = $derived(children.some((child) => child.image));
 
+	// Get the multilevel setting from the state
+	let isMultilevelEnabled = $derived((() => {
+		const currentView = view.find((v) => v.type === activeView);
+		if (currentView && 'state' in currentView) {
+			return (currentView.state as SectionContainerViewStateType).multilevel;
+		}
+		return false;
+	})());
+
 	// Minimum width for cards
 	const minCardWidth = 250;
 </script>
@@ -119,6 +129,10 @@
 						{...createSummaryNavProps(child, node, summaryChild.id, sectionIndex, document)}
 					/>
 				{/each}
+				
+				{#if isMultilevelEnabled}
+					<SubsectionsList {path} sectionIndex={sectionIndex} />
+				{/if}
 			</div>
 		</div>
 	{/each}
