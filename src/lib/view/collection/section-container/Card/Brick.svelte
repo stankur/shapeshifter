@@ -95,52 +95,54 @@
 
 <div class="card-container" style:--min-card-width={`${minCardWidth}px`}>
 	{#each SectionRenderers as { child, sectionIndex, HeadingRenderer, SummaryRenderers }}
-		<div class="card flex flex-row gap-6 border-1 border-gray-400 p-5">
-			{#if child.image}
-				<img
-					class="h-16 w-16 md:h-24 md:w-24 xl:h-32 xl:w-32"
-					src={child.image}
-					alt="Section cover"
-					use:bindToRefs={`${child.id}-image`}
-				/>
-			{:else if someHasImage}
-				<div class="h-16 w-16 shrink-0 md:h-24 md:w-24 xl:h-32 xl:w-32" />
-			{/if}
-			<div class="flex flex-col gap-2 xl:gap-2">
-				<HeadingRenderer
-					path={[...path, 'children', sectionIndex, 'heading']}
-					{refs}
-					{onUnmount}
-					{...createHeadingNavProps(child, node, sectionIndex, document)}
-					overrides={{
-						class: 'prose-h1:text-base md:prose-h1:text-xl'
-					}}
-					onClickReadMode={() => {
-						// Pass the heading ID to onUnmount using a closure
-						expandAllSections(node, document, () => {
-							console.log('onUnmounting with id: ' + child.heading.id);
-							onUnmount(child.heading.id);
-						});
-					}}
-				/>
-				<div>
-					{#each SummaryRenderers as { summaryChild, summaryIndex, Renderer }}
-						<Renderer
-							path={[...path, 'children', sectionIndex, 'summary', summaryIndex]}
-							{refs}
-							{onUnmount}
-							overrides={{
-								class: 'prose-p:text-xs prose-p:text-gray-500'
-							}}
-							{...createSummaryNavProps(child, node, summaryChild.id, sectionIndex, document)}
-						/>
-					{/each}
-				</div>
-
-				{#if isMultilevelEnabled}
-					<SubsectionsList {path} {sectionIndex} />
+		<div class="card flex flex-col border-1 border-gray-400 p-5">
+			<div class="flex flex-row gap-6">
+				{#if child.image}
+					<img
+						class="h-16 w-16 md:h-24 md:w-24 xl:h-32 xl:w-32"
+						src={child.image}
+						alt="Section cover"
+						use:bindToRefs={`${child.id}-image`}
+					/>
+				{:else if someHasImage}
+					<div class="h-16 w-16 shrink-0 md:h-24 md:w-24 xl:h-32 xl:w-32" />
 				{/if}
+				<div class="flex flex-col gap-2 xl:gap-2">
+					<HeadingRenderer
+						path={[...path, 'children', sectionIndex, 'heading']}
+						{refs}
+						{onUnmount}
+						{...createHeadingNavProps(child, node, sectionIndex, document)}
+						overrides={{
+							class: 'prose-h1:text-base md:prose-h1:text-xl'
+						}}
+						onClickReadMode={() => {
+							// Pass the heading ID to onUnmount using a closure
+							expandAllSections(node, document, () => {
+								console.log('onUnmounting with id: ' + child.heading.id);
+								onUnmount(child.heading.id);
+							});
+						}}
+					/>
+					<div>
+						{#each SummaryRenderers as { summaryChild, summaryIndex, Renderer }}
+							<Renderer
+								path={[...path, 'children', sectionIndex, 'summary', summaryIndex]}
+								{refs}
+								{onUnmount}
+								overrides={{
+									class: 'prose-p:text-xs prose-p:text-gray-500'
+								}}
+								{...createSummaryNavProps(child, node, summaryChild.id, sectionIndex, document)}
+							/>
+						{/each}
+					</div>
+				</div>
 			</div>
+			
+			{#if isMultilevelEnabled}
+				<SubsectionsList {path} {sectionIndex} />
+			{/if}
 		</div>
 	{/each}
 

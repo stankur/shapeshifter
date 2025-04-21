@@ -38,7 +38,7 @@
 </script>
 
 {#if subsectionTitles.length > 0}
-	<div class="mt-6 border-t-1 border-t-gray-300 pt-6 flex flex-wrap gap-3">
+	<div class="mt-6 border-t-1 border-t-gray-300 pt-6 flex flex-wrap gap-3 gap-x-6">
 		{#each subsectionTitles as title}
 			<h1 class="text-xs font-semibold cursor-default text-gray-600">{title}</h1>
 		{/each}
