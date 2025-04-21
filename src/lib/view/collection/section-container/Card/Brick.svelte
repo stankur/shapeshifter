@@ -49,11 +49,15 @@
 	let {
 		path,
 		refs,
-		onUnmount
+		onUnmount,
+		showSubsections = false,
+		onToggleSubsections = () => {}
 	}: {
 		path: (string | number)[];
 		refs: Refs;
 		onUnmount: (elementToPin?: string | null) => void;
+		showSubsections?: boolean;
+		onToggleSubsections?: () => void;
 	} = $props();
 
 	const node = documentManipulator.getByPath(path) as SectionContainerType;
@@ -141,7 +145,7 @@
 			</div>
 			
 			{#if isMultilevelEnabled}
-				<SubsectionsList {path} {sectionIndex} />
+				<SubsectionsList {path} {sectionIndex} {showSubsections} onToggle={onToggleSubsections} />
 			{/if}
 		</div>
 	{/each}

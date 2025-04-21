@@ -18,14 +18,14 @@
 
 	const documentManipulator = getContext('documentManipulator') as DocumentManipulator;
 	const node = documentManipulator.getByPath(path) as SectionContainer;
-	
+
 	type CardViewState = z.infer<typeof sectionContainerCardViewState>;
-	
+
 	// Get the current view state
 	const activeView = node.activeView;
 	const currentView = node.view.find((v) => v.type === activeView);
 	const hasCardState = currentView && 'state' in currentView && currentView.state;
-	const viewState = hasCardState ? currentView.state as CardViewState : null;
+	const viewState = hasCardState ? (currentView.state as CardViewState) : null;
 
 	let isHovered = $state(false);
 
@@ -44,11 +44,11 @@
 		onUnmount();
 		node.activeView = 'collection/section-container/default';
 	}
-	
+
 	function changeVariation(event: Event) {
 		const select = event.target as HTMLSelectElement;
 		const newVariation = select.value as 'default' | 'brick';
-		
+
 		onUnmount();
 		// Update the variation in the state
 		const viewToUpdate = node.view.find((v) => v.type === activeView);
@@ -56,11 +56,11 @@
 			(viewToUpdate.state as CardViewState).variation = newVariation;
 		}
 	}
-	
+
 	function toggleMultilevel(event: Event) {
 		const checkbox = event.target as HTMLInputElement;
 		onUnmount();
-		
+
 		// Update the multilevel setting in the state
 		const viewToUpdate = node.view.find((v) => v.type === activeView);
 		if (viewToUpdate && 'state' in viewToUpdate && viewToUpdate.state) {
@@ -89,22 +89,19 @@
 		<button class="rounded-md bg-blue-500 p-2 text-white" onclick={switchToDefault}>
 			default
 		</button>
-		
+
 		<div class="flex flex-col">
 			<label for="variation-select" class="text-sm text-gray-700">Layout:</label>
-			<select 
-				value={viewState?.variation ?? 'default'}
-				onchange={changeVariation}
-			>
+			<select value={viewState?.variation ?? 'default'} onchange={changeVariation}>
 				<option value="default">Default</option>
 				<option value="brick">Brick</option>
 			</select>
 		</div>
-		
-		<div class="flex flex-col mt-2">
+
+		<div class="mt-2 flex flex-col">
 			<label class="text-sm text-gray-700">
-				<input 
-					type="checkbox" 
+				<input
+					type="checkbox"
 					checked={viewState?.multilevel ?? false}
 					onchange={(e) => toggleMultilevel(e)}
 				/>

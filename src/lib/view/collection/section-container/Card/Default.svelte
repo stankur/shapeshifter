@@ -49,11 +49,15 @@
 	let {
 		path,
 		refs,
-		onUnmount
+		onUnmount,
+		showSubsections = false,
+		onToggleSubsections = () => {}
 	}: {
 		path: (string | number)[];
 		refs: Refs;
 		onUnmount: (elementToPin?: string | null) => void;
+		showSubsections?: boolean;
+		onToggleSubsections?: () => void;
 	} = $props();
 
 	const node = documentManipulator.getByPath(path) as SectionContainerType;
@@ -79,13 +83,15 @@
 	let someHasImage = $derived(children.some((child) => child.image));
 
 	// Get the multilevel setting from the state
-	let isMultilevelEnabled = $derived((() => {
-		const currentView = view.find((v) => v.type === activeView);
-		if (currentView && 'state' in currentView) {
-			return (currentView.state as SectionContainerViewStateType).multilevel;
-		}
-		return false;
-	})());
+	let isMultilevelEnabled = $derived(
+		(() => {
+			const currentView = view.find((v) => v.type === activeView);
+			if (currentView && 'state' in currentView) {
+				return (currentView.state as SectionContainerViewStateType).multilevel;
+			}
+			return false;
+		})()
+	);
 
 	// Minimum width for cards
 	const minCardWidth = 250;
@@ -129,9 +135,9 @@
 						{...createSummaryNavProps(child, node, summaryChild.id, sectionIndex, document)}
 					/>
 				{/each}
-				
+
 				{#if isMultilevelEnabled}
-					<SubsectionsList {path} sectionIndex={sectionIndex} />
+					<SubsectionsList {path} {sectionIndex} {showSubsections} onToggle={onToggleSubsections} />
 				{/if}
 			</div>
 		</div>

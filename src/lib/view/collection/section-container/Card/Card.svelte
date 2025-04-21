@@ -35,6 +35,13 @@
 	let { children, view, activeView } = $derived(node);
 
 	let isCardHovered = $state(false);
+	// State to control subsections visibility
+	let showSubsections = $state(false);
+
+	// Toggle subsections visibility for all subsections
+	function toggleAllSubsections() {
+		showSubsections = !showSubsections;
+	}
 
 	function showCardControls() {
 		isCardHovered = true;
@@ -80,9 +87,21 @@
 		{/if}
 
 		{#if variation === 'brick'}
-			<Brick {path} {refs} {onUnmount}/>
+			<Brick 
+				{path} 
+				{refs} 
+				{onUnmount}
+				{showSubsections} 
+				onToggleSubsections={toggleAllSubsections}
+			/>
 		{:else}
-			<Default {path} {refs} {onUnmount} />
+			<Default 
+				{path} 
+				{refs} 
+				{onUnmount} 
+				{showSubsections} 
+				onToggleSubsections={toggleAllSubsections} 
+			/>
 		{/if}
 	</div>
 {/if}
