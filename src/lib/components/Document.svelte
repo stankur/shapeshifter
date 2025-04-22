@@ -75,12 +75,33 @@
 
 		if (elementToPin.value && refs[elementToPin.value] && refs[elementToPin.value].element) {
 			console.log('in effect');
+			const targetElement = refs[elementToPin.value].element;
+			
+			// First scroll to the element
 			gsap.set(window, {
 				scrollTo: {
-					y: refs[elementToPin.value].element,
+					y: targetElement,
 					offsetY: pinOffset.value || 0
 				}
 			});
+            
+							gsap.fromTo(targetElement, 
+								{ 
+									backgroundImage: "linear-gradient(45deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0) 100%)",
+									backgroundSize: "200% 100%",
+									backgroundPosition: "-100% 0",
+									backgroundRepeat: "no-repeat",
+								},
+								{
+									backgroundPosition: "200% 0",
+									duration: 0.5,
+									ease: "power1.inOut",
+									onComplete: () => {
+										// Clean up the effect when done
+										gsap.set(targetElement, { clearProps: "background" });
+									}
+								}
+							);
             
 			// Reset elementToPin and pinOffset after use
 			elementToPin.value = null;
