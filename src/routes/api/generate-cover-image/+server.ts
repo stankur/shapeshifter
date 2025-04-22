@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { RequestHandler } from './$types';
 import {
 	OPENROUTER_API_KEY,
@@ -12,6 +11,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import { ChatOpenAI } from '@langchain/openai';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
+import type { UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
 
 /**
  * POST endpoint to generate a cover image for a section
@@ -124,14 +124,15 @@ export const POST: RequestHandler = async ({ request }) => {
 					api_key: CLOUDINARY_API_KEY,
 					api_secret: CLOUDINARY_API_SECRET
 				});
-
+				
 				// Upload image to Cloudinary
-				const uploadResult = await new Promise<{secure_url: string}>((resolve, reject) => {
+				const uploadResult = await new Promise<UploadApiResponse>((resolve, reject) => {
 					const uploadStream = cloudinary.uploader.upload_stream(
 						{ folder: 'blog-cover-images' },
-						(error: any, result: any) => {
+						(error: UploadApiErrorResponse | undefined, result?: UploadApiResponse) => {
 							if (error) reject(error);
-							else resolve(result);
+							else if (result) resolve(result);
+							else reject(new Error('No result from Cloudinary upload'));
 						}
 					);
 
