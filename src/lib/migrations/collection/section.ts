@@ -13,6 +13,16 @@ export function createSectionMigrations(registry: any) {
 		}
 	});
 
+	// Register migration to version 3
+	registry.registerStep({
+		toVersion: 3,
+		migrate: (document: Document) => {
+			return traverseDocument(document, {
+				section: addAnimationProperty
+			});
+		}
+	});
+
 	// Function to update section view state
 	function updateSectionViewState(section: any) {
 		if (Array.isArray(section.view)) {
@@ -32,6 +42,22 @@ export function createSectionMigrations(registry: any) {
 					else if (typeof viewItem.state === 'object' && !viewItem.state.variation) {
 						viewItem.state.variation = 'default';
 					}
+				}
+			}
+		}
+	}
+
+	// Function to add animation property to section view state
+	function addAnimationProperty(section: any) {
+		if (Array.isArray(section.view)) {
+			for (let i = 0; i < section.view.length; i++) {
+				const viewItem = section.view[i];
+
+				if (viewItem.type === 'collection/section/default' && 
+					typeof viewItem.state === 'object') {
+					// Add animation property with default value 'none'
+					// This maintains the current behavior where headings have sparkle effect
+					viewItem.state.animation = 'none';
 				}
 			}
 		}

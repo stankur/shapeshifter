@@ -25,13 +25,18 @@ const collectionBase = z.object({
 });
 
 // collection/section/view
-const sectionView = z.tuple([
+export const sectionDefaultViewState = z.object({
+	state: z.enum(['expanded', 'summary']),
+	variation: z.enum(['default', 'summary-always']),
+	animation: z.enum(['none', 'sparkle'])
+});
+
+export type SectionDefaultViewState = z.infer<typeof sectionDefaultViewState>;
+
+export const sectionView = z.tuple([
 	z.object({
 		type: z.literal('collection/section/default'),
-		state: z.object({
-			state: z.enum(['expanded', 'summary']),
-			variation: z.enum(['default', 'summary-always'])
-		})
+		state: sectionDefaultViewState
 	}),
 	z.object({
 		type: z.literal('collection/section/static')
@@ -53,7 +58,7 @@ const sectionBase = collectionBase.extend({
 	activeView: z.enum(
 		sectionView.items.map((schema) => schema.shape.type.value) as [string, ...string[]]
 	),
-    image: z.optional(z.string())
+	image: z.optional(z.string())
 });
 
 export type Section = z.infer<typeof sectionBase> & {
@@ -65,7 +70,6 @@ export const section: z.ZodType<Section> = sectionBase.extend({
 	children: noHeadingContent,
 	summary: noHeadingContent
 });
-
 
 // collection/untitled-section view
 const untitledSectionView = z.tuple([

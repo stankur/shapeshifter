@@ -41,6 +41,7 @@
 		onLevelDecrease: () => boolean;
 		onEnterAtEnd: () => boolean;
 		onClickReadMode?: () => void;
+		animation?: string;
 	};
 
 	let {
@@ -54,7 +55,8 @@
 		onLevelIncrease,
 		onLevelDecrease,
 		onEnterAtEnd,
-		onClickReadMode = () => {}
+		onClickReadMode = () => {},
+		animation
 	}: Props = $props();
 
 	const defaultOverrides = {
@@ -231,9 +233,9 @@
 	></div>
 {/snippet}
 
-{#if documentNode.state.mode === 'read'}
+{#if animation === 'sparkle' && documentNode.state.mode === 'read' }
 	<SparklesText>
-		{@render headingDiv()}
+	{@render headingDiv()}
 	</SparklesText>
 {:else}
 	{@render headingDiv()}
