@@ -13,6 +13,7 @@
 	import { createNavigationPlugin } from './navigationPlugin';
 	import { createLevelPlugin } from './levelPlugin';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
+	import SparklesText from '$lib/components/animation/SparklesText.svelte';
 	const getHeadingSize = (level: number) => {
 		switch (level) {
 			case 1:
@@ -209,26 +210,34 @@
 	});
 </script>
 
-<div
-	bind:this={ref}
-	onclick={(e) => {
-		e.stopPropagation();
+{#snippet headingDiv()}
+	<div
+		bind:this={ref}
+		onclick={(e) => {
+			e.stopPropagation();
+			if (documentNode.state.mode === 'read') {
+				onClickReadMode();
+			}
+		}}
+		role="button"
+		class={[
+			headingSize,
+			'prose-h1:inline-block',
+			'prose-h1:font-semibold',
+			"wrap-anywhere",
+			mergedOverrides.class,
+			documentNode.state.mode === 'read' && 'cursor-pointer select-none'
+		]}
+	></div>
+{/snippet}
 
-		if (documentNode.state.mode === 'read') {
-			onClickReadMode();
-		}
-	}}
-	role="button"
-	class={[
-		headingSize,
-		'prose-h1:inline-block',
-		'prose-h1:font-semibold',
-        "wrap-anywhere",
-		mergedOverrides.class,
-		documentNode.state.mode === 'read' && 'cursor-pointer select-none'
-	]}
-></div>
-
+{#if documentNode.state.mode === 'read'}
+	<SparklesText>
+		{@render headingDiv()}
+	</SparklesText>
+{:else}
+	{@render headingDiv()}
+{/if}
 <svelte:document
 	onclick={() => {
 		// Only clear focus if this editor is focused
