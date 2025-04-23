@@ -28,8 +28,8 @@
 		removeSectionFromContainer: () => void;
 		onHeadingClick?: (section: Section) => void;
 	};
-	type ViewState = { 
-		state: { 
+	type ViewState = {
+		state: {
 			state: 'expanded' | 'summary',
 			variation: 'default' | 'summary-always'
 		} 
@@ -158,7 +158,7 @@
 
 						if (onHeadingClick) {
 							onHeadingClick(node);
-                            return
+							return
 						}
 
 						if ((node.view[viewStateIndex] as ViewState).state.state === 'expanded') {
@@ -216,19 +216,19 @@
 		{#if (node.view[viewStateIndex] as ViewState).state.state === 'expanded'}
 			{#if (node.view[viewStateIndex] as ViewState).state.variation === 'summary-always' && SummaryRenderers.length > 0}
 				<!-- Show summary first when variation is summary-always -->
-					{#each SummaryRenderers as { Renderer }, i (node.summary[i].last_modified + node.summary[i].id)}
-						<Renderer
-							path={[...path, 'summary', i]}
-							{refs}
-							overrides={{ class: 'prose-p:text-gray-500' }}
-							onSplit={(newBlocks) => {
-								splitParagraph(node, 'summary', newBlocks, document, i);
-							}}
-							{onUnmount}
-						/>
-					{/each}
+				{#each SummaryRenderers as { Renderer }, i (node.summary[i].last_modified + node.summary[i].id)}
+					<Renderer
+						path={[...path, 'summary', i]}
+						{refs}
+						overrides={{ class: 'prose-p:text-gray-500' }}
+						onSplit={(newBlocks) => {
+							splitParagraph(node, 'summary', newBlocks, document, i);
+						}}
+						{onUnmount}
+					/>
+				{/each}
 			{/if}
-			
+
 			{console.log('children renderers length in section: ', ChildrenRenderers.length)}
 			<!-- should work without the key, but not working -->
 			{#each ChildrenRenderers as { Renderer }, i (node.children[i].last_modified + node.children[i].id)}

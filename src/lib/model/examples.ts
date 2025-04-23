@@ -73,6 +73,7 @@ export const simpleSection: Document = {
  * a document with one section, one paragraph child, one paragraph summary
  */
 export const nested: Document = {
+    version: 2,
 	state: {
 		mode: 'write',
 		animateNextChange: true
@@ -91,7 +92,7 @@ export const nested: Document = {
 		view: [
 			{ type: 'collection/section-container/default' },
 			{ type: 'collection/section-container/static' },
-			{ type: 'collection/section-container/card', state: {  variation: 'default' } },
+			{ type: 'collection/section-container/card', state: {  variation: 'default', multilevel: false } },
 			{
 				type: 'collection/section-container/table-of-contents',
 				state: {
@@ -131,7 +132,7 @@ export const nested: Document = {
 				created: '2025-02-23T01:04:00Z',
 				last_modified: '2025-02-23T01:04:00Z',
 				view: [
-					{ type: 'collection/section/default', state: 'expanded' },
+					{ type: 'collection/section/default', state: {state: "expanded", variation: "default"} },
 					{ type: 'collection/section/static' },
 					{ type: 'collection/section/page' }
 				],
