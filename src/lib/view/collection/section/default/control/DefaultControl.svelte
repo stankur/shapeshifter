@@ -3,17 +3,16 @@
 	import SummaryIcon from './SummaryIcon.svelte';
 	import { getContext } from 'svelte';
 	import type { Document } from '$lib/model/document';
+	import type { SectionDefaultViewState } from '$lib/model/collection';
+
 	let {
 		controlElement = $bindable(),
 		viewState,
 		onUnmount
 	}: {
 		controlElement: HTMLDivElement;
-		viewState: { 
-			state: { 
-				state: 'expanded' | 'summary',
-				variation: 'default' | 'summary-always'
-			} 
+		viewState: {
+			state: SectionDefaultViewState;
 		};
 		onUnmount: (elementToPin?: string | null) => void;
 	} = $props();

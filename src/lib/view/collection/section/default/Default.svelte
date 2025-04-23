@@ -1,12 +1,13 @@
 <script lang="ts">
 	import type { Refs } from '$lib/components/Document.svelte';
-	import type { Section, SectionContainer } from '$lib/model/collection';
+	import type { Section, SectionContainer, SectionDefaultViewState } from '$lib/model/collection';
 	import type { ContentHeading, ContentParagraph } from '$lib/model/content';
 	import type { Document } from '$lib/model/document';
 	import { float } from '$lib/view/utils/float.svelte';
 	import { registry } from '$lib/viewRegistry.svelte';
 	import { getContext, onMount, type Component } from 'svelte';
 	import DefaultControl from './control/DefaultControl.svelte';
+	import AnimationControl from './control/AnimationControl.svelte';
 	import {
 		handleHeadingLevelIncrease,
 		handleHeadingLevelDecrease,
@@ -15,6 +16,7 @@
 		handleEnterInHeading
 	} from '$lib/actions/collection/section.svelte';
 	import type { DocumentManipulator } from '$lib/documentManipulator.svelte';
+	import type { z } from 'zod';
 
 	type Props = {
 		path: (string | number)[];
@@ -28,11 +30,10 @@
 		removeSectionFromContainer: () => void;
 		onHeadingClick?: (section: Section) => void;
 	};
-	type ViewState = { 
-		state: { 
-			state: 'expanded' | 'summary',
-			variation: 'default' | 'summary-always'
-		} 
+
+	// Use the exported type from collection.ts
+	type ViewState = {
+		state: SectionDefaultViewState;
 	};
 	let {
 		path,
@@ -64,6 +65,7 @@
 			onLevelIncrease: () => boolean;
 			onLevelDecrease: () => boolean;
 			onEnterAtEnd: () => boolean;
+			animation?: string;
 		}>
 	);
 	let ChildrenRenderers = $derived(
@@ -91,10 +93,12 @@
 
 	let viewStateIndex = $derived(view.findIndex((v) => v.type === activeView));
 
-	let headingElement: HTMLDivElement | null = $state(null);
-	let contentElement: HTMLDivElement | null = $state(null);
-	let controlElement: HTMLDivElement | null = $state(null);
-	let containerElement: HTMLDivElement | null = $state(null);
+let headingElement: HTMLDivElement | null = $state(null);
+let contentElement: HTMLDivElement | null = $state(null);
+let controlElement: HTMLDivElement | null = $state(null);
+let animationControlElement: HTMLDivElement | null = $state(null);
+let containerElement: HTMLDivElement | null = $state(null);
+let isHovered = $state(false);
 
 	onMount(() => {
 		if (containerElement && controlElement) {
@@ -117,12 +121,24 @@
 			const placement = mergedOverrides?.heading ? 'left' : 'left-start';
 
 			if (referenceElement) {
-				return float(
+				// Float the default control
+				float(
 					referenceElement as HTMLElement,
 					controlElement as HTMLElement,
 					placement,
 					false
 				)();
+
+				// Float the animation control
+				if (animationControlElement) {
+					float(
+						referenceElement as HTMLElement,
+						animationControlElement as HTMLElement,
+						'left-start',
+						true,
+						11 // Slightly higher z-index than default control
+					)();
+				}
 			}
 		}
 	});
@@ -144,9 +160,20 @@
 		viewState={node.view[viewStateIndex] as ViewState}
 		{onUnmount}
 	/>
+    <AnimationControl
+		bind:animationControlElement={animationControlElement as HTMLDivElement}
+		viewState={node.view[viewStateIndex] as ViewState}
+		isSectionHovered={isHovered}
+		{onUnmount}
+	/>
 {/if}
 
-<div class="container flex flex-col gap-7" bind:this={containerElement}>
+<div 
+	class="container flex flex-col gap-7" 
+	bind:this={containerElement}
+	onmouseenter={() => (isHovered = true)}
+	onmouseleave={() => (isHovered = false)}
+>
 	{#if mergedOverrides && mergedOverrides.heading}
 		{#key node.heading.id}
 			<div bind:this={headingElement}>
@@ -158,7 +185,7 @@
 
 						if (onHeadingClick) {
 							onHeadingClick(node);
-                            return
+							return;
 						}
 
 						if ((node.view[viewStateIndex] as ViewState).state.state === 'expanded') {
@@ -170,6 +197,7 @@
 					path={[...path, 'heading']}
 					{refs}
 					{onUnmount}
+					animation={(node.view[viewStateIndex] as ViewState).state.animation}
 					onLevelIncrease={() => {
 						console.log('onLevelIncrease in section');
 						return handleHeadingLevelIncrease(
@@ -216,19 +244,19 @@
 		{#if (node.view[viewStateIndex] as ViewState).state.state === 'expanded'}
 			{#if (node.view[viewStateIndex] as ViewState).state.variation === 'summary-always' && SummaryRenderers.length > 0}
 				<!-- Show summary first when variation is summary-always -->
-					{#each SummaryRenderers as { Renderer }, i (node.summary[i].last_modified + node.summary[i].id)}
-						<Renderer
-							path={[...path, 'summary', i]}
-							{refs}
-							overrides={{ class: 'prose-p:text-gray-500' }}
-							onSplit={(newBlocks) => {
-								splitParagraph(node, 'summary', newBlocks, document, i);
-							}}
-							{onUnmount}
-						/>
-					{/each}
+				{#each SummaryRenderers as { Renderer }, i (node.summary[i].last_modified + node.summary[i].id)}
+					<Renderer
+						path={[...path, 'summary', i]}
+						{refs}
+						overrides={{ class: 'prose-p:text-gray-500' }}
+						onSplit={(newBlocks) => {
+							splitParagraph(node, 'summary', newBlocks, document, i);
+						}}
+						{onUnmount}
+					/>
+				{/each}
 			{/if}
-			
+
 			{console.log('children renderers length in section: ', ChildrenRenderers.length)}
 			<!-- should work without the key, but not working -->
 			{#each ChildrenRenderers as { Renderer }, i (node.children[i].last_modified + node.children[i].id)}

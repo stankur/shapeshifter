@@ -136,3 +136,7 @@ documents are mysteriously disappearing from the database, like text cinema's do
 when the editor initially loads, the summary select dropdown has empty value, not populated properly.
 
 it is problematic when the image url is not found. I believe the recraft image URL might have expired, making the url invalid, and thing like jump to heading upon card expansion broke.
+
+All the examples in models forlder are outdated. EVERYTHING IS BURNING. THIS IS FINE (it's not).
+
+when sparkle effect is turned on for section, and you go from customize to read, the ehading disappears.
