@@ -290,7 +290,7 @@ export function handleEnterInHeading(node: Section, document: Document): boolean
 	};
 
 	// Handle based on section state
-	if (state === 'expanded') {
+	if (state.state === 'expanded') {
 		// Add empty paragraph to children
 		node.children.unshift(newParagraph);
 		node.last_modified = new Date().toISOString();
@@ -298,7 +298,7 @@ export function handleEnterInHeading(node: Section, document: Document): boolean
 		EditorFocusService.focus(newParagraphId, document, 'start');
 
 		return true;
-	} else if (state === 'summary') {
+	} else if (state.state === 'summary') {
 		// Add empty paragraph to summary
 		node.summary.unshift(newParagraph);
 		node.last_modified = new Date().toISOString();
@@ -337,7 +337,11 @@ export async function splitSection(
 		created: new Date().toISOString(),
 		last_modified: new Date().toISOString(),
 		view: [
-			{ type: 'collection/section/default', state: 'expanded' },
+			{ type: 'collection/section/default', state: {
+                state: 'expanded',
+                variation: 'default',
+                animation: 'none'
+            } },
 			{ type: 'collection/section/static' },
 			{ type: 'collection/section/page' }
 		],

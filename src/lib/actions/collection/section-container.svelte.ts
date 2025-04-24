@@ -106,7 +106,7 @@ export function createSectionContainer(): SectionContainer {
 		view: [
 			{ type: 'collection/section-container/default' },
 			{ type: 'collection/section-container/static' },
-			{ type: 'collection/section-container/card', state: { variation: 'default' } },
+			{ type: 'collection/section-container/card', state: { variation: 'default', multilevel: false } },
 			{
 				type: 'collection/section-container/table-of-contents',
 				state: {
@@ -144,7 +144,11 @@ export function addSection(
 		created: new Date().toISOString(),
 		last_modified: new Date().toISOString(),
 		view: [
-			{ type: 'collection/section/default', state: defaultState },
+			{ type: 'collection/section/default', state: {
+                state: defaultState,
+                variation: 'default',
+                animation: 'none',
+            } },
 			{ type: 'collection/section/static' },
 			{ type: 'collection/section/page' }
 		],
