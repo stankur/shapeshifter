@@ -3,6 +3,7 @@ import type { Section, sectionContainer } from './collection';
 import type { ContentParagraph } from './content';
 import type { Document } from './document';
 import { type SectionContainer } from '$lib/model/collection';
+import {v4 as uuidv4} from 'uuid';
 
 /**
  * a document with one paragraph
@@ -73,13 +74,13 @@ export const simpleSection: Document = {
  * a document with one section, one paragraph child, one paragraph summary
  */
 export const nested: Document = {
-    version: 2,
+	version: 2,
 	state: {
 		mode: 'write',
 		animateNextChange: true
 	},
 	type: 'document',
-	id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+	id: uuidv4(),
 	title: 'Nested Example',
 	slug: 'nested-example',
 	created: '2025-02-23T01:04:00Z',
@@ -92,7 +93,10 @@ export const nested: Document = {
 		view: [
 			{ type: 'collection/section-container/default' },
 			{ type: 'collection/section-container/static' },
-			{ type: 'collection/section-container/card', state: {  variation: 'default', multilevel: false } },
+			{
+				type: 'collection/section-container/card',
+				state: { variation: 'default', multilevel: false }
+			},
 			{
 				type: 'collection/section-container/table-of-contents',
 				state: {
@@ -132,7 +136,10 @@ export const nested: Document = {
 				created: '2025-02-23T01:04:00Z',
 				last_modified: '2025-02-23T01:04:00Z',
 				view: [
-					{ type: 'collection/section/default', state: {state: "expanded", variation: "default"} },
+					{
+						type: 'collection/section/default',
+						state: { state: 'expanded', variation: 'default' }
+					},
 					{ type: 'collection/section/static' },
 					{ type: 'collection/section/page' }
 				],

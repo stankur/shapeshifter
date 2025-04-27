@@ -124,14 +124,10 @@ There is an issue where if you are in the editor mode, and you go from read to c
 
 When you press backspace at the start of a paragraph, cursor is just gone, not transfered. Should be transferred to previous paragraph, and the point where the two paragraphs are joined.
 
-There is a bit of jump in the summary when you go from card, and you click a heading, to default section container view, or vice versa. This issue only shows up when the card is in the third hierarchy level, and beyond, strangely enough.
-
 The editor, on press of heading, doesn't always create a content paragraph. I am not fully sure if it's the reason, but I encountered this when in the customize mode, the view was card. But I tried to make sure that it wasn't because the section was in summary mode that it failed. One followup could be testing if we could add parargaphs when the view of the section container is card.
 
 
 when the bricks is rendered as active section in a sidebar, not expected because it doesn't wrap. i think this is because I am using screen as breakpoint. Maybe should instead use min-width or something attached to the component instead of the screen size.
-
-documents are mysteriously disappearing from the database, like text cinema's doc, aak.
 
 when the editor initially loads, the summary select dropdown has empty value, not populated properly.
 
