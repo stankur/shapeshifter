@@ -87,9 +87,7 @@ export function createLevelPlugin(
           const allowed = onLevelDecrease();
           console.log('in backspace plugin at start if onLevelDecrease allowed', allowed);
           documentNode.state.animateNextChange = false;
-          if (!allowed) {
-            return true; // Consume event but don't change level
-          }
+          return true
         }
         
         // Only decrease if level > 1
