@@ -103,7 +103,7 @@
 			<div class="flex flex-row gap-6">
 				{#if child.image}
 					<img
-						class="h-16 w-16 md:h-24 md:w-24 xl:h-32 xl:w-32"
+						class="h-16 w-16 md:h-24 md:w-24 xl:h-32 xl:w-32 brightness-150 contrast-75 saturate-50"
 						src={child.image}
 						alt="Section cover"
 						use:bindToRefs={`${child.id}-image`}
