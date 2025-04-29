@@ -42,6 +42,7 @@
 		onEnterAtEnd: () => boolean;
 		onClickReadMode?: () => void;
 		animation?: string;
+        underline?: boolean;
 	};
 
 	let {
@@ -56,7 +57,8 @@
 		onLevelDecrease,
 		onEnterAtEnd,
 		onClickReadMode = () => {},
-		animation
+		animation,
+        underline
 	}: Props = $props();
 
 	const defaultOverrides = {
@@ -226,6 +228,7 @@
 			headingSize,
 			'prose-h1:inline-block',
 			'prose-h1:font-semibold',
+            underline && 'prose-h1:text-decoration-line prose-h1:underline prose-h1:decoration-gray-400 prose-h1:decoration-1 prose-h1:underline-offset-2',
 			"wrap-anywhere",
 			mergedOverrides.class,
 			documentNode.state.mode === 'read' && 'cursor-pointer select-none'

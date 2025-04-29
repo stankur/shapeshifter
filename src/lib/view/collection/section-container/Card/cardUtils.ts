@@ -18,6 +18,7 @@ export type HeadingComponentProps = {
 	};
 	onClickReadMode?: () => void;
 	documentNode?: Document;
+    underline?: boolean;
 };
 
 export type ContentComponentProps = {

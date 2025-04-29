@@ -123,6 +123,7 @@
 						// Pass the heading ID to onUnmount using a closure
 						expandAllSections(node, document, () => onUnmount(child.heading.id));
 					}}
+                    underline
 				/>
 				{#each SummaryRenderers as { summaryChild, summaryIndex, Renderer }}
 					<Renderer

@@ -127,6 +127,7 @@
 								onUnmount(child.heading.id);
 							});
 						}}
+                        underline
 					/>
 					<div>
 						{#each SummaryRenderers as { summaryChild, summaryIndex, Renderer }}
