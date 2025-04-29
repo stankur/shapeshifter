@@ -66,6 +66,7 @@
 			onLevelDecrease: () => boolean;
 			onEnterAtEnd: () => boolean;
 			animation?: string;
+			showCollapseIcon?: boolean;
 		}>
 	);
 	let ChildrenRenderers = $derived(
@@ -198,6 +199,7 @@ let isHovered = $state(false);
 					{refs}
 					{onUnmount}
 					animation={(node.view[viewStateIndex] as ViewState).state.animation}
+					showCollapseIcon={(node.view[viewStateIndex] as ViewState).state.state === 'expanded'}
 					onLevelIncrease={() => {
 						console.log('onLevelIncrease in section');
 						return handleHeadingLevelIncrease(
